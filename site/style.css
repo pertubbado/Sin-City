@@ -384,3 +384,9 @@ body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;bac
   .rule-content h5{font-size:14px}
   .md-table{font-size:12px}
 }
+/* B3 - Partículas mais leves em celulares */
+@media (max-width: 620px) and (pointer: coarse) {
+  .ambient-particle {
+    filter: none;
+  }
+}
