@@ -15,7 +15,7 @@
     "show_admin_link": false
   },
   "cursor": {
-    "enabled": false,
+    "enabled": true,
     "trail_enabled": false,
     "size": 33,
     "image": "./assets/pumpkin-cursor.svg",
@@ -26,8 +26,8 @@
       "enabled": true,
       "type": "logo",
       "color": "#7300ff",
-      "count": 5,
-      "size": 13
+      "count": 4,
+      "size": 20
     }
   },
   "site_name": "Sin City Roleplay",
