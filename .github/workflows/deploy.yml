@@ -1,0 +1,97 @@
+
+name: Deploy Sin City Roleplay
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v6
+
+      - name: Validar arquivos do site
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          required = [
+              "site/index.html",
+              "site/editor.html",
+              "site/app.js",
+              "site/style.css",
+              "site/content/site.json",
+              "site/rules.json",
+              "site/content/rules.json",
+              "site/assets/cemetery-halloween.svg",
+              "site/assets/cemetery-night.webp",
+              "site/assets/pumpkin-cursor.svg",
+              "site/assets/sin-city-mark.svg",
+          ]
+
+          missing = [
+              name for name in required
+              if not Path(name).is_file()
+          ]
+
+          if missing:
+              raise SystemExit(
+                  "Arquivos obrigatórios ausentes:\n- "
+                  + "\n- ".join(missing)
+              )
+
+          site = json.loads(
+              Path("site/content/site.json").read_text(encoding="utf-8")
+          )
+
+          rules = json.loads(
+              Path("site/rules.json").read_text(encoding="utf-8")
+          )
+
+          duplicate = json.loads(
+              Path("site/content/rules.json").read_text(encoding="utf-8")
+          )
+
+          if rules != duplicate:
+              raise SystemExit(
+                  "ERRO: as duas cópias de rules.json estão diferentes."
+              )
+
+          if not isinstance(rules.get("categories"), list):
+              raise SystemExit(
+                  "ERRO: categories não foi encontrado como lista."
+              )
+
+          print("Arquivos, JSON e cópias das regras validados com sucesso.")
+          PY
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar arquivos do site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
