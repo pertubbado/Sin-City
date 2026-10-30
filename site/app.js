@@ -353,17 +353,40 @@
     target.innerHTML = matches.length ? matches.map(({item}) => createSearchMarkup(item, q)).join('') : '<p class="search-empty">Nenhuma regra encontrada. Experimente outro termo ou código.</p>';
   }
 
+
+  // C1.2 - Suavizar a digitação na pesquisa
+  let searchTimer = null;
+
+  function scheduleSearch(value, targetSelector) {
+    clearTimeout(searchTimer);
+
+    if (!String(value).trim()) {
+      renderSearch('', targetSelector);
+      return;
+    }
+
+    searchTimer = setTimeout(() => {
+      renderSearch(value, targetSelector);
+    }, 120);
+  }
+
+  
   function openSearchOverlay() {
     const overlay = $('#searchOverlay'); if (!overlay || overlay.hidden) { if (overlay) overlay.hidden = false; }
     $('#overlaySearch').value = ''; renderSearch('', '#overlayResults');
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => $('#overlaySearch')?.focus());
   }
-  function closeSearchOverlay() {
-    const overlay = $('#searchOverlay'); if (overlay) overlay.hidden = true;
-    document.body.style.overflow = '';
-    $('#searchOpen')?.focus();
-  }
+
+function closeSearchOverlay() {
+  clearTimeout(searchTimer);
+
+  const overlay = $('#searchOverlay');
+  if (overlay) overlay.hidden = true;
+
+  document.body.style.overflow = '';
+  $('#searchOpen')?.focus();
+}
 
   function setupCursor(config = {}) {
     const enabled = config.enabled === true && !reduceMotion && !touchPointer;
@@ -550,9 +573,21 @@ function setupAmbientParticles(config = {}) {
   $('#searchOpen')?.addEventListener('click', openSearchOverlay);
   $('#searchClose')?.addEventListener('click', closeSearchOverlay);
   $('#searchScrim')?.addEventListener('click', closeSearchOverlay);
-  $('#overlaySearch')?.addEventListener('input', event => renderSearch(event.target.value, '#overlayResults'));
-  $('#searchInput')?.addEventListener('input', event => renderSearch(event.target.value, '#searchResults'));
-  $('#searchInput')?.addEventListener('keydown', event => { if (event.key === 'Enter') renderSearch(event.target.value, '#searchResults'); });
+
+  $('#overlaySearch')?.addEventListener('input', event =>
+    scheduleSearch(event.target.value, '#overlayResults')
+  );
+
+  $('#searchInput')?.addEventListener('input', event =>
+    scheduleSearch(event.target.value, '#searchResults')
+  );
+
+$('#searchInput')?.addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    clearTimeout(searchTimer);
+    renderSearch(event.target.value, '#searchResults');
+  }
+});
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !$('#searchOverlay').hidden) closeSearchOverlay();
     if (event.key === '/' && !/input|textarea/i.test(document.activeElement?.tagName || '') && $('#searchOverlay').hidden && !$('#searchOpen').hidden) { event.preventDefault(); openSearchOverlay(); }
