@@ -24,10 +24,10 @@
     "trail_count": 16,
     "falling_particles": {
       "enabled": true,
-      "type": "mixed",
+      "type": "spark",
       "color": "#AF7AFF",
-      "count": 15,
-      "size": 13
+      "count": 12,
+      "size": 0
     }
   },
   "site_name": "Sin City Roleplay",
