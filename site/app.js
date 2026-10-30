@@ -223,7 +223,14 @@
       (category.rules || []).forEach((rule, ri) => addRule(rule, null, ri, 'direct'));
       (category.subcategories || []).forEach((sub, si) => (sub.rules || []).forEach((rule, ri) => addRule(rule, sub, ri, si)));
     });
-    state.searchIndex = result;
+  state.searchIndex = result.map(item => ({
+  ...item,
+  searchText: `${item.code} ${item.title} ${item.category} ${item.subcategory} ${item.text}`.toLocaleLowerCase('pt-BR'),
+  titleSearch: item.title.toLocaleLowerCase('pt-BR'),
+  codeSearch: item.code.toLocaleLowerCase('pt-BR'),
+  subcategorySearch: item.subcategory.toLocaleLowerCase('pt-BR')
+}));
+  
   }
 
   function renderRuleCard(rule, categoryIdValue, si, ri, subName) {
@@ -330,11 +337,19 @@
     const q = String(query || '').trim();
     if (!q) { target.innerHTML = '<p class="search-empty">Digite um termo, código ou assunto para pesquisar no regulamento.</p>'; return; }
     const normalized = q.toLocaleLowerCase('pt-BR');
-    const matches = state.searchIndex.map(item => {
-      const haystack = `${item.code} ${item.title} ${item.category} ${item.subcategory} ${item.text}`.toLocaleLowerCase('pt-BR');
-      const score = (item.title.toLocaleLowerCase('pt-BR').includes(normalized) ? 5 : 0) + (item.code.toLocaleLowerCase('pt-BR').includes(normalized) ? 4 : 0) + (item.subcategory.toLocaleLowerCase('pt-BR').includes(normalized) ? 2 : 0) + (haystack.includes(normalized) ? 1 : 0);
-      return {item, score};
-    }).filter(entry => entry.score > 0).sort((a,b) => b.score - a.score).slice(0, 40);
+    
+  const matches = state.searchIndex.map(item => {
+  const score =
+    (item.titleSearch.includes(normalized) ? 5 : 0) +
+    (item.codeSearch.includes(normalized) ? 4 : 0) +
+    (item.subcategorySearch.includes(normalized) ? 2 : 0) +
+    (item.searchText.includes(normalized) ? 1 : 0);
+
+  return {item, score};
+}).filter(entry => entry.score > 0)
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 40);
+  
     target.innerHTML = matches.length ? matches.map(({item}) => createSearchMarkup(item, q)).join('') : '<p class="search-empty">Nenhuma regra encontrada. Experimente outro termo ou código.</p>';
   }
 
