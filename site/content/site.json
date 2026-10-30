@@ -17,8 +17,8 @@
   "cursor": {
     "enabled": true,
     "trail_enabled": false,
-    "size": 33,
-    "image": "./assets/pumpkin-cursor.svg",
+    "size": 34,
+    "image": "./assets/cursor-esqueleto.png",
     "trail_type": "glow",
     "trail_color": "#2D1243",
     "trail_count": 4,
@@ -34,14 +34,14 @@
   "site_title": "Regras da Cidade",
   "tagline": "Cada escolha deixa sua marca.",
   "description": "Central de regras da Sin City Roleplay. Consulte as categorias, entenda as diretrizes e faça parte da cidade.",
-  "logo": "./assets/sin-city-mark.svg",
+  "logo": "./assets/logo-sin-city.webp",
   "favicon": "./assets/sin-city-mark.svg",
   "discord_url": "",
   "hero_eyebrow": "SIN CITY ROLEPLAY",
   "hero_title": "QUEM VIVE SIN CITY\nFAZ HISTÓRIA.",
-  "hero_text": "O Código da Cidade reúne as regras que mantêm Sin City viva. Leia, entenda e faça parte da história.",
+  "hero_text": "O Site da Cidade reúne as regras que mantêm Sin City viva. Leia, entenda e faça parte da história.",
   "hero_image": "./assets/cemetery-night.webp",
   "notice_title": "ANTES DE ENTRAR NA CIDADE",
   "notice_text": "O desconhecimento das regras não isenta o cidadão de sua responsabilidade. Consulte sempre a versão mais recente do regulamento.",
-  "footer_text": "© 2026 Sin City Roleplay. Todos os direitos reservados."
+  "footer_text": "© 2026 Sin City. Todos os direitos reservados."
 }
