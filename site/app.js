@@ -399,27 +399,63 @@
     }
   }
 
-  function setupAmbientParticles(config = {}) {
-    const host = $('#ambientParticles'); if (!host) return;
-    host.innerHTML = '';
-    if (config.enabled === false || reduceMotion) return;
-    const count = Math.max(0, Math.min(28, Number(config.count) || 14));
-    const size = Math.max(8, Math.min(22, Number(config.size) || 13));
-    const color = config.color || '#AF7AFF';
-    const symbols = config.type === 'letters' ? ['✦','·','✧'] : config.type === 'logo' ? ['🎃'] : ['✦','✧','·','🦇'];
-    host.style.color = color;
-    for (let i = 0; i < count; i++) {
-      const particle = document.createElement('span'); particle.className = 'ambient-particle';
-      particle.textContent = symbols[i % symbols.length];
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.fontSize = `${size * (.65 + Math.random() * .6)}px`;
-      particle.style.animationDuration = `${13 + Math.random() * 15}s`;
-      particle.style.animationDelay = `${-Math.random() * 24}s`;
-      particle.style.setProperty('--drift', `${Math.round(Math.random() * 100 - 50)}px`);
-      host.appendChild(particle);
-    }
-  }
 
+function setupAmbientParticles(config = {}) {
+  const host = $('#ambientParticles');
+  if (!host) return;
+
+  host.innerHTML = '';
+  if (config.enabled === false || reduceMotion) return;
+
+  const rawCount = config.count;
+  const parsedCount = rawCount === '' || rawCount === null || rawCount === undefined
+    ? 14
+    : Number(rawCount);
+
+  const count = Math.max(
+    0,
+    Math.min(28, Math.trunc(Number.isFinite(parsedCount) ? parsedCount : 14))
+  );
+
+  const rawSize = config.size;
+  const parsedSize = rawSize === '' || rawSize === null || rawSize === undefined
+    ? 13
+    : Number(rawSize);
+
+  const size = Math.max(
+    8,
+    Math.min(22, Number.isFinite(parsedSize) ? parsedSize : 13)
+  );
+
+  const color = config.color || '#AF7AFF';
+
+  const particleSets = {
+    letters: ['S', 'C'],
+    logo: ['🎃'],
+    spark: ['✦', '✧', '⋆', '✴'],
+    mixed: ['✦', '✧', '·', '🦇', '🎃']
+  };
+
+  const symbols = particleSets[config.type] || particleSets.mixed;
+
+  host.style.color = color;
+
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement('span');
+    particle.className = 'ambient-particle';
+    particle.textContent = symbols[i % symbols.length];
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.fontSize = `${size * (.65 + Math.random() * .6)}px`;
+    particle.style.animationDuration = `${13 + Math.random() * 15}s`;
+    particle.style.animationDelay = `${-Math.random() * 24}s`;
+    particle.style.setProperty(
+      '--drift',
+      `${Math.round(Math.random() * 100 - 50)}px`
+    );
+
+    host.appendChild(particle);
+  }
+}
   function observeRules() {
     categoryObserver?.disconnect();
     categoryObserver = null;
