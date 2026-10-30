@@ -248,7 +248,7 @@ html.sin-city-cursor-enabled .custom-cursor.hovering{filter:drop-shadow(0 0 10px
    portal while keeping the Halloween purple identity.
    ================================================================ */
 :root{--sidebar-width:260px;--header-height:66px;--type-body:15px;--type-small:12px}
-body{font-size:var(--type-body);font-family:Inter,"Segoe UI",Arial,Helvetica,sans-serif;background-color:var(--background);background-image:radial-gradient(ellipse at 72% 22%,rgba(84,34,135,.14),transparent 38%),linear-gradient(180deg,#19151e 0%,#212121 45%,#19171d 100%)}
+body{font-size:var(--type-body); font-family:"Nunito Sans",Inter,"Segoe UI",Arial,Helvetica,sans-serif;background-color:var(--background);background-image:radial-gradient(ellipse at 72% 22%,rgba(84,34,135,.14),transparent 38%),linear-gradient(180deg,#19151e 0%,#212121 45%,#19171d 100%)}
 body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;background-image:radial-gradient(rgba(190,151,230,.24) .75px,transparent .9px);background-size:5px 5px;opacity:.25;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.5) 72%,transparent)}
 .ambient-noise{z-index:79;opacity:.22;background-image:radial-gradient(rgba(197,168,226,.28) .72px,transparent .95px);background-size:5px 5px;mix-blend-mode:screen}
 .app-shell,.site-footer{position:relative;z-index:2}
