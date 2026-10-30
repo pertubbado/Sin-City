@@ -24,7 +24,7 @@ a{color:var(--accent-light)}
 ::selection{background:rgba(175,122,255,.34);color:#fff}
 .ambient-noise{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:.023;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
 .ambient-particles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:3}
-.ambient-particle{position:absolute;top:-35px;color:var(--accent-light);opacity:0;filter:drop-shadow(0 0 8px rgba(175,122,255,.45));animation:particle-fall linear forwards;user-select:none}
+.ambient-particle{position:absolute;top:-35px;color:var(--accent-light);opacity:0;filter:drop-shadow(0 0 8px rgba(175,122,255,.45));animation:particle-fall linear infinite;user-select:none}
 @keyframes particle-fall{0%{opacity:0;transform:translate3d(0,-25px,0) rotate(0deg)}12%{opacity:.55}84%{opacity:.3}100%{opacity:0;transform:translate3d(var(--drift),110vh,0) rotate(260deg)}}
 
 /* Cabeçalho */
