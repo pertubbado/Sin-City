@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • Editor Visual</title>
+<style>
+:root{--bg:#111111;--panel:#17121d;--panel2:#211a2b;--line:#433052;--text:#ffffff;--muted:#bba3d3;--accent:#542287;--danger:#ff5c68;--ok:#38d996}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;overflow:hidden}button,input,textarea,select{font:inherit}button{cursor:pointer}.shell{height:100vh;display:grid;grid-template-columns:410px 1fr;grid-template-rows:72px 1fr}.topbar{grid-column:1/-1;display:flex;align-items:center;gap:9px;padding:10px 16px;border-bottom:1px solid var(--line);background:#0b0b0c}.brand{display:flex;align-items:center;gap:10px;min-width:230px}.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#AF7AFF,#542287);display:grid;place-items:center;font-weight:900}.brand h1{font-size:13px;margin:0;letter-spacing:.06em}.brand p{font-size:10px;color:var(--muted);margin:3px 0 0}.spacer{flex:1}.status{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--line);border-radius:999px;background:#111113;font-size:11px;white-space:nowrap}.status-dot{width:8px;height:8px;border-radius:50%;background:#888}.status.ok .status-dot{background:var(--ok)}.status.warn .status-dot{background:#f4b940}.avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;display:none}.btn{border:1px solid var(--line);background:#161619;color:#fff;border-radius:8px;padding:9px 11px;font-size:12px;white-space:nowrap}.btn:hover{border-color:#55555e}.btn.primary{background:var(--accent);border-color:var(--accent);font-weight:800}.btn.danger{color:#ff8a92}.btn:disabled{opacity:.55;cursor:wait}.btn.mini{padding:5px 7px;font-size:10px}.sidebar{overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:13px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tab{border:1px solid var(--line);background:#151517;color:#aaa;padding:10px;border-radius:8px}.tab.active{background:#202024;color:#fff;border-color:#4a4a52}.panel{display:none}.panel.active{display:block}.card{border:1px solid var(--line);border-radius:11px;background:var(--panel2);margin-bottom:10px;overflow:hidden}.card>summary{list-style:none;padding:12px 13px;font-weight:800;font-size:12px;cursor:pointer}.card>summary::-webkit-details-marker{display:none}.card-body{padding:0 12px 12px}.field{margin:10px 0}.field label{display:block;font-size:10px;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid #303036;background:#0b0b0d;color:#fff;border-radius:7px;padding:8px 9px;outline:none;font-size:12px}.field textarea{min-height:78px;resize:vertical;line-height:1.4}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;align-items:center;gap:8px;margin:9px 0}.check input{width:auto}.check label{margin:0;text-transform:none;letter-spacing:0;font-size:12px}.color-row{display:grid;grid-template-columns:42px 1fr;gap:7px}.color-row input[type=color]{height:35px;padding:3px}.item{border:1px solid #303036;border-radius:9px;padding:9px;margin:8px 0;background:#101012}.item-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.item-head strong{font-size:11px;overflow-wrap:anywhere}.subitem{border-left:2px solid #3a3a40;padding-left:8px;margin:10px 0}.rule{border:1px dashed #36363d;border-radius:8px;padding:8px;margin:8px 0;background:#0c0c0e}.preview-area{padding:14px;background:#1b1b1d;overflow:hidden}.preview-box{height:100%;border:1px solid #36363d;border-radius:13px;overflow:hidden;background:#000;box-shadow:0 18px 55px rgba(0,0,0,.4)}.preview-bar{height:35px;background:#111113;border-bottom:1px solid #2b2b30;display:flex;align-items:center;gap:7px;padding:0 12px}.dot{width:8px;height:8px;border-radius:50%;background:#555}.preview-label{margin-left:6px;color:#85858f;font-size:11px}iframe{width:100%;height:calc(100% - 35px);border:0;background:#000}.toast{position:fixed;right:20px;bottom:20px;max-width:420px;background:#121214;border:1px solid #3a3a40;border-radius:10px;padding:12px 14px;font-size:12px;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none;z-index:100}.toast.show{opacity:1;transform:none}.toast.error{border-color:#7b252d;color:#ffb7bd}.toast.ok{border-color:#1f6a4c;color:#bff6df}.hint{font-size:11px;color:#7f7f88;line-height:1.45;margin:12px 2px}.inline{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.fixed-note{border:1px solid #49352a;background:#1c1511;color:#d6b7a6;padding:9px;border-radius:8px;font-size:11px;line-height:1.4;margin:8px 0}.small-note{color:#8c8c95;font-size:10px;line-height:1.4;margin-top:5px}
+
+.auth-modal[hidden]{display:none!important}.auth-modal{position:fixed;inset:0;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.78);z-index:200}.auth-card{width:min(520px,100%);max-height:90vh;overflow:auto;background:#111114;border:1px solid #38383f;border-radius:16px;padding:22px;box-shadow:0 25px 80px rgba(0,0,0,.65)}.auth-card h2{font-size:18px;margin:0 0 9px}.auth-card p,.auth-card li{font-size:12px;color:#c7c7cf;line-height:1.55}.auth-card ol{padding-left:20px}.auth-card a{color:#AF7AFF}.auth-card input{width:100%;border:1px solid #38383f;background:#08080a;color:#fff;border-radius:8px;padding:11px;margin:6px 0 12px}.auth-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.auth-warning{border:1px solid #5c4527;background:#20190f;color:#e5ca9e;padding:10px;border-radius:8px;font-size:11px;line-height:1.45;margin:12px 0}
+@media(max-width:1000px){body{overflow:auto}.shell{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto auto 65vh}.topbar{grid-column:1;position:sticky;top:0;z-index:20;flex-wrap:wrap}.brand{min-width:180px}.sidebar{border-right:0;border-bottom:1px solid var(--line);max-height:62vh}.preview-area{min-height:65vh}.spacer{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">SC</div><div><h1>Sin City • EDITOR VISUAL</h1><p>Edite, visualize e publique direto no site</p></div></div>
+  <div id="authStatus" class="status warn"><span class="status-dot"></span><img id="userAvatar" class="avatar" alt=""><span id="authText">Não conectado</span></div>
+  <div class="spacer"></div>
+  <button class="btn" id="reloadBtn">↻ Recarregar</button>
+  <button class="btn" id="draftBtn">💾 Rascunho</button>
+  <button class="btn" id="backupBtn">⬇ Backup</button>
+  <button class="btn" id="siteBtn">SITE ↗</button>
+  <button class="btn" id="loginBtn">Conectar GitHub</button>
+  <button class="btn primary" id="publishBtn">PUBLICAR</button>
+</header>
+<aside class="sidebar">
+  <div class="tabs"><button class="tab active" data-tab="site">SITE</button><button class="tab" data-tab="rules">REGRAS</button></div>
+  <section class="panel active" id="panel-site"></section>
+  <section class="panel" id="panel-rules"></section>
+  <p class="hint"><b>Rascunho</b> salva somente neste navegador. <b>PUBLICAR</b> envia as alterações para o seu repositório e inicia uma nova publicação pelo GitHub Pages.</p>
+  <p class="small-note">Este editor está configurado para o repositório pertubbado/Sin-City. A conta proprietária continua sendo pertubbado. A conexão usa um token limitado a esse repositório. Nunca compartilhe o token; ele fica guardado apenas na sessão atual do navegador.</p>
+</aside>
+<main class="preview-area"><div class="preview-box"><div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="preview-label">prévia real • Sin City Roleplay</span></div><iframe id="preview" src="./index.html" title="Prévia do site"></iframe></div></main>
+</div>
+<div id="tokenModal" class="auth-modal" hidden role="dialog" aria-modal="true" aria-labelledby="tokenModalTitle">
+  <div class="auth-card">
+    <h2 id="tokenModalTitle">Conectar ao GitHub</h2>
+    <p>Esta conexão usa um token de acesso refinado do GitHub, limitado ao repositório Sin-City. O token é solicitado somente no seu navegador e não é incluído no código.</p>
+    <ol>
+      <li>Abra <a href="https://github.com/settings/personal-access-tokens/new?name=Sin%20City%20Roleplay%20Editor&description=Token%20limitado%20para%20editar%20o%20portal%20Sin%20City&target_name=pertubbado&expires_in=30&contents=write" target="_blank" rel="noopener noreferrer">a página para criar um token de acesso refinado</a>.</li>
+      <li>Em <b>Repository access</b>, escolha <b>Only select repositories</b> e marque <code>Sin-City</code>.</li>
+      <li>Em <b>Repository permissions</b>, defina <b>Contents: Read and write</b>. Não conceda permissões extras.</li>
+      <li>Gere o token e cole-o no campo abaixo. O GitHub mostra o valor completo apenas uma vez.</li>
+    </ol>
+    <div class="field"><label for="tokenInput">Token do GitHub (não envie para ninguém)</label><input id="tokenInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…"></div>
+    <div class="auth-warning">Este editor usa o token somente neste navegador, guardando-o na sessão atual. Use apenas num computador confiável e feche a aba quando terminar. Nunca cole o token em conversas ou no código do site.</div>
+    <div class="auth-actions"><button class="btn" id="cancelTokenBtn" type="button">Cancelar</button><button class="btn primary" id="connectTokenBtn" type="button">Validar e conectar</button></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+'use strict';
+// Configuração do novo repositório da Sin City.
+const REPO = 'pertubbado/Sin-City';
+const BRANCH = 'main';
+const SITE_PATH = 'Sin-City-Regras/site/content/site.json';
+const RULES_PATH = 'Sin-City-Regras/site/rules.json';
+const CONTENT_RULES_PATH = 'Sin-City-Regras/site/content/rules.json';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let site = {};
+let data = {categories:[],updates:[]};
+let githubToken = sessionStorage.getItem('sin-city-gh-token') || '';
+let githubUser = null;
+const defaults = {
+ theme:{accent:'#542287',accent_light:'#AF7AFF',background:'#212121',surface:'#111111',text:'#FFFFFF',muted:'#542287'},
+ layout:{show_search:true,show_updates:true,show_notice:true,show_hero_image:true,show_admin_link:false},
+ cursor:{enabled:true,trail_enabled:true,size:38,image:'./assets/pumpkin-cursor.svg',trail_type:'glow',trail_color:'#2D1243',trail_count:16,falling_particles:{enabled:true,type:'mixed',color:'#AF7AFF',count:15,size:13}}
+};
+function mergeSite(a={}, b=defaults){return {...b,...a,theme:{...b.theme,...(a.theme||{})},layout:{...b.layout,...(a.layout||{})},cursor:{...b.cursor,...(a.cursor||{}),falling_particles:{...b.cursor.falling_particles,...(a.cursor?.falling_particles||{})}}};}
+function toast(text,type=''){const el=$('#toast');el.textContent=text;el.className='toast show '+type;clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.className='toast',4200);}
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function getPath(path){return path.split('.').reduce((o,k)=>o?.[k],site) ?? '';}
+function setPath(path,val){const parts=path.split('.');let o=site;for(let i=0;i<parts.length-1;i++){if(!o[parts[i]]||typeof o[parts[i]]!=='object')o[parts[i]]={};o=o[parts[i]];}o[parts.at(-1)]=val;}
+function field(label,path,type='text',opts=''){
+ const val=getPath(path);
+ if(type==='textarea')return `<div class="field"><label>${label}</label><textarea data-path="${path}">${esc(val)}</textarea></div>`;
+ if(type==='check')return `<div class="field"><div class="check"><input type="checkbox" data-path="${path}" ${val?'checked':''}><label>${label}</label></div></div>`;
+ if(type==='select'){const options=opts.split('|').map(x=>{const [v,l]=x.split(':');return `<option value="${esc(v)}" ${String(val)===v?'selected':''}>${esc(l)}</option>`}).join('');return `<div class="field"><label>${label}</label><select data-path="${path}">${options}</select></div>`;}
+ if(type==='color'){const safe=/^#[0-9a-f]{6}$/i.test(String(val))?val:'#542287';return `<div class="field"><label>${label}</label><div class="color-row"><input type="color" data-color-path="${path}" value="${safe}"><input data-path="${path}" value="${esc(val)}"></div></div>`;}
+ return `<div class="field"><label>${label}</label><input data-path="${path}" value="${esc(val)}"></div>`;
+}
+async function load(forceRemote=false){
+ try{
+  const [s,r]=await Promise.all([
+   fetch(`./content/site.json?v=${Date.now()}`,{cache:'no-store'}).then(x=>{if(!x.ok)throw new Error('content/site.json não encontrado');return x.json()}),
+   fetch(`./rules.json?v=${Date.now()}`,{cache:'no-store'}).then(x=>{if(!x.ok)throw new Error('rules.json não encontrado');return x.json()})
+  ]);
+  site=mergeSite(s);data=r||{categories:[],updates:[]};
+  if(!Array.isArray(data.categories))data.categories=[];if(!Array.isArray(data.updates))data.updates=[];
+  if(!forceRemote){const saved=localStorage.getItem('sin-city-editor-draft');if(saved){try{const d=JSON.parse(saved);site=d.site?mergeSite(d.site):site;data=d.data||data;toast('Rascunho local carregado.','ok')}catch{}}}
+  render();sendPreview();
+ }catch(err){console.error(err);toast('Erro ao carregar os arquivos do site: '+err.message,'error');}
+}
+function render(){
+ $('#panel-site').innerHTML=`
+ <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
+ ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Logo','logo')}${field('Favicon','favicon')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}${field('Imagem da capa','hero_image')}${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
+ </div></details>
+ <details class="card"><summary>🎨 Cores do site</summary><div class="card-body">${field('Cor principal','theme.accent','color')}${field('Cor principal clara','theme.accent_light','color')}${field('Fundo','theme.background','color')}${field('Superfície','theme.surface','color')}${field('Texto','theme.text','color')}${field('Texto secundário','theme.muted','color')}</div></details>
+ <details class="card"><summary>👁️ Elementos visíveis</summary><div class="card-body">${field('Mostrar pesquisa','layout.show_search','check')}${field('Mostrar últimas alterações','layout.show_updates','check')}${field('Mostrar aviso','layout.show_notice','check')}${field('Mostrar imagem da capa','layout.show_hero_image','check')}</div></details>
+ <details class="card"><summary>🎃 Cursor e efeitos Halloween</summary><div class="card-body">${field('Ativar cursor de abóbora','cursor.enabled','check')}${field('Ativar rastro roxo','cursor.trail_enabled','check')}${field('Imagem do cursor','cursor.image')}${field('Tamanho do cursor','cursor.size')}${field('Cor do rastro','cursor.trail_color','color')}${field('Quantidade máxima do rastro','cursor.trail_count')}<div class="fixed-note">O cursor especial e o rastro são aplicados somente em dispositivos com mouse ou trackpad. Em telas de toque e com movimento reduzido, o cursor normal é preservado.</div></div></details><details class="card"><summary>🦇 Partículas de ambiente</summary><div class="card-body">${field('Ativar partículas','cursor.falling_particles.enabled','check')}${field('Tipo','cursor.falling_particles.type','select','letters:Letras|logo:Abóboras|mixed:Misto|spark:Brilhos')}${field('Cor','cursor.falling_particles.color','color')}${field('Quantidade','cursor.falling_particles.count')}${field('Tamanho','cursor.falling_particles.size')}</div></details>`;
+ renderRules();bindEditor();
+}
+function renderRules(){
+ const panel=$('#panel-rules');
+ panel.innerHTML=`<details class="card" open><summary>📕 Categorias e regras (${(data.categories||[]).length})</summary><div class="card-body"><button class="btn primary" id="addCat">+ Adicionar categoria</button><div class="small-note">Abra uma categoria e depois a subcategoria para editar o texto de cada regra.</div><div id="cats"></div></div></details><details class="card"><summary>📝 Últimas alterações</summary><div class="card-body"><button class="btn" id="addUpd">+ Adicionar alteração</button><div id="updates"></div></div></details>`;
+ const cats=$('#cats');
+ (data.categories||[]).forEach((c,i)=>{
+  c.subcategories=Array.isArray(c.subcategories)?c.subcategories:[];c.rules=Array.isArray(c.rules)?c.rules:[];
+  const d=document.createElement('details');d.className='item';d.open=false;
+  d.innerHTML=`<summary><b>${esc(c.code||'--')} — ${esc(c.short||c.name||'Categoria')}</b> <span class="small-note">(${c.subcategories.length} subcategorias)</span></summary>
+  <div class="field-row"><div class="field"><label>ID</label><input data-cat="${i}" data-k="id" value="${esc(c.id)}"></div><div class="field"><label>Código</label><input data-cat="${i}" data-k="code" value="${esc(c.code)}"></div></div>
+  <div class="field-row"><div class="field"><label>Nome curto</label><input data-cat="${i}" data-k="short" value="${esc(c.short)}"></div><div class="field"><label>Nome completo</label><input data-cat="${i}" data-k="name" value="${esc(c.name)}"></div></div>
+  <div class="field"><label>Descrição</label><textarea data-cat="${i}" data-k="desc">${esc(c.desc)}</textarea></div><div class="field"><label>Imagem</label><input data-cat="${i}" data-k="image" value="${esc(c.image)}"></div>
+  <div class="inline"><button class="btn mini" data-add-sub="${i}">+ Subcategoria</button><button class="btn mini" data-add-rule="${i}">+ Regra direta</button><button class="btn mini danger" data-del-cat="${i}">Excluir categoria</button></div>
+  <div class="sub-list">${c.subcategories.map((sub,j)=>subEditor(sub,i,j)).join('')}</div>
+  <div class="direct-list">${c.rules.map((r,j)=>ruleEditor(r,`data-rule="${i}:${j}"`,`data-del-rule="${i}:${j}"`)).join('')}</div>`;
+  cats.appendChild(d);
+ });
+ const up=$('#updates');(data.updates||[]).forEach((u,i)=>{const d=document.createElement('div');d.className='item';d.innerHTML=`<div class="field-row">${['date','title','tag'].map(k=>`<div class="field"><label>${k==='date'?'Data':k==='title'?'Título':'Tag'}</label><input data-upd="${i}" data-k="${k}" value="${esc(u[k]||'')}"></div>`).join('')}</div><div class="field"><label>Texto</label><textarea data-upd="${i}" data-k="text">${esc(u.text||'')}</textarea></div><button class="btn mini danger" data-del-upd="${i}">Excluir alteração</button>`;up.appendChild(d);});
+}
+function subEditor(sub,i,j){sub.rules=Array.isArray(sub.rules)?sub.rules:[];return `<details class="subitem"><summary><b>📂 ${esc(sub.name||'Nova subcategoria')}</b> — ${sub.rules.length} regra(s)</summary><div class="field-row"><div class="field"><label>ID</label><input data-sub="${i}:${j}" data-k="id" value="${esc(sub.id||'')}"></div><div class="field"><label>Ícone</label><input data-sub="${i}:${j}" data-k="icon" value="${esc(sub.icon||'◈')}"></div></div><div class="field"><label>Nome da subcategoria</label><input data-sub="${i}:${j}" data-k="name" value="${esc(sub.name||'')}"></div><div class="inline"><button class="btn mini" data-add-sub-rule="${i}:${j}">+ Regra</button><button class="btn mini danger" data-del-sub="${i}:${j}">Excluir subcategoria</button></div>${sub.rules.map((r,k)=>ruleEditor(r,`data-sub-rule="${i}:${j}:${k}"`,`data-del-sub-rule="${i}:${j}:${k}"`)).join('')}</details>`;}
+function ruleEditor(r,attrs,delAttr){return `<div class="rule"><div class="item-head"><strong>${esc(r.code||'')} • ${esc(r.title||'Sem título')}</strong><button class="btn mini danger" ${delAttr}>Excluir</button></div><div class="field-row"><div class="field"><label>Código</label><input ${attrs} data-k="code" value="${esc(r.code||'')}"></div><div class="field"><label>Tag</label><input ${attrs} data-k="tag" value="${esc(r.tag||'REGRA')}"></div></div><div class="field"><label>Título</label><input ${attrs} data-k="title" value="${esc(r.title||'')}"></div><div class="field"><label>Texto da regra (Markdown permitido)</label><textarea ${attrs} data-k="text">${esc(r.text||'')}</textarea></div><div class="field"><label>Imagem (opcional)</label><input ${attrs} data-k="image" value="${esc(r.image||'')}"></div></div>`;}
+function bindEditor(){
+ $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
+ $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
+ $$('[data-cat]').forEach(el=>el.oninput=()=>{data.categories[+el.dataset.cat][el.dataset.k]=el.value;sendPreview();});
+ $$('[data-sub]').forEach(el=>el.oninput=()=>{const [i,j]=el.dataset.sub.split(':').map(Number);data.categories[i].subcategories[j][el.dataset.k]=el.value;sendPreview();});
+ $$('[data-rule]').forEach(el=>el.oninput=()=>{const [i,j]=el.dataset.rule.split(':').map(Number);data.categories[i].rules[j][el.dataset.k]=el.value;sendPreview();});
+ $$('[data-sub-rule]').forEach(el=>el.oninput=()=>{const [i,j,k]=el.dataset.subRule.split(':').map(Number);data.categories[i].subcategories[j].rules[k][el.dataset.k]=el.value;sendPreview();});
+ $$('[data-upd]').forEach(el=>el.oninput=()=>{data.updates[+el.dataset.upd][el.dataset.k]=el.value;sendPreview();});
+ $('#addCat')?.addEventListener('click',()=>{data.categories.push({id:'nova-categoria',code:String(data.categories.length+1).padStart(2,'0'),name:'NOVA CATEGORIA',short:'Nova Categoria',desc:'',image:'',rules:[],subcategories:[]});renderRules();bindEditor();sendPreview();});
+ $('#addUpd')?.addEventListener('click',()=>{data.updates.push({date:new Date().toLocaleDateString('pt-BR'),title:'Nova alteração',text:'Descrição da alteração',tag:'ATUALIZAÇÃO'});renderRules();bindEditor();sendPreview();});
+ $$('[data-add-sub]').forEach(b=>b.onclick=()=>{const i=+b.dataset.addSub;data.categories[i].subcategories.push({id:'nova-subcategoria',name:'Nova subcategoria',icon:'◈',desc:'',rules:[]});renderRules();bindEditor();sendPreview();});
+ $$('[data-add-rule]').forEach(b=>b.onclick=()=>{const i=+b.dataset.addRule;data.categories[i].rules.push({code:'',title:'Nova regra',text:'',tag:'REGRA',image:''});renderRules();bindEditor();sendPreview();});
+ $$('[data-add-sub-rule]').forEach(b=>b.onclick=()=>{const [i,j]=b.dataset.addSubRule.split(':').map(Number);data.categories[i].subcategories[j].rules.push({code:'',title:'Nova regra',text:'',tag:'REGRA',image:''});renderRules();bindEditor();sendPreview();});
+ $$('[data-del-cat]').forEach(b=>b.onclick=()=>{if(confirm('Excluir esta categoria e todas as regras dela?')){data.categories.splice(+b.dataset.delCat,1);renderRules();bindEditor();sendPreview();}});
+ $$('[data-del-sub]').forEach(b=>b.onclick=()=>{if(confirm('Excluir esta subcategoria e todas as regras dela?')){const [i,j]=b.dataset.delSub.split(':').map(Number);data.categories[i].subcategories.splice(j,1);renderRules();bindEditor();sendPreview();}});
+ $$('[data-del-rule]').forEach(b=>b.onclick=()=>{const [i,j]=b.dataset.delRule.split(':').map(Number);if(confirm('Excluir esta regra?')){data.categories[i].rules.splice(j,1);renderRules();bindEditor();sendPreview();}});
+ $$('[data-del-sub-rule]').forEach(b=>b.onclick=()=>{const [i,j,k]=b.dataset.delSubRule.split(':').map(Number);if(confirm('Excluir esta regra?')){data.categories[i].subcategories[j].rules.splice(k,1);renderRules();bindEditor();sendPreview();}});
+ $$('[data-del-upd]').forEach(b=>b.onclick=()=>{data.updates.splice(+b.dataset.delUpd,1);renderRules();bindEditor();sendPreview();});
+}
+function sendPreview(){const f=$('#preview');if(f?.contentWindow){f.contentWindow.postMessage({type:'sin-city-preview',site,data},location.origin);}}
+function saveDraft(){localStorage.setItem('sin-city-editor-draft',JSON.stringify({site,data,savedAt:new Date().toISOString()}));toast('Rascunho salvo somente neste navegador.','ok');}
+function login(){
+ const modal=$('#tokenModal');
+ modal.hidden=false;
+ $('#tokenInput').value='';
+ setTimeout(()=>$('#tokenInput').focus(),50);
+}
+async function connectWithToken(){
+ const token=$('#tokenInput').value.trim();
+ if(!token){toast('Cole o token gerado no GitHub.','error');return;}
+ const btn=$('#connectTokenBtn');
+ btn.disabled=true;btn.textContent='VALIDANDO...';
+ const headers={'Accept':'application/vnd.github+json','Authorization':'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28'};
+ try{
+  const userRes=await fetch('https://api.github.com/user',{headers});
+  let userBody={};try{userBody=await userRes.json()}catch{}
+  if(!userRes.ok)throw new Error(userRes.status===401?'Token inválido ou expirado. Gere outro token no GitHub.':(userBody.message||`GitHub respondeu ${userRes.status} ao validar o token.`));
+  const repoRes=await fetch(`https://api.github.com/repos/${REPO}`,{headers});
+  let repoBody={};try{repoBody=await repoRes.json()}catch{}
+  if(!repoRes.ok)throw new Error(repoRes.status===404?'Este token não tem acesso ao repositório Sin-City. Confira o Repository access.':(repoBody.message||`Não foi possível validar o repositório (${repoRes.status}).`));
+  githubToken=token;
+  githubUser=userBody;
+  sessionStorage.setItem('sin-city-gh-token',githubToken);
+  updateAuthUI();
+  $('#tokenModal').hidden=true;
+  $('#tokenInput').value='';
+  toast(`GitHub conectado como @${githubUser.login}.`,'ok');
+ }catch(err){
+  console.error(err);
+  toast(err.message||'Não foi possível conectar. Confira as permissões do token.','error');
+ }finally{btn.disabled=false;btn.textContent='Validar e conectar';}
+}
+async function gh(path,options={}){if(!githubToken)throw new Error('Entre com GitHub primeiro.');const res=await fetch('https://api.github.com'+path,{...options,headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+githubToken,'X-GitHub-Api-Version':'2022-11-28',...(options.headers||{})}});if(res.status===401){logout(false);throw new Error('Sessão do GitHub expirada. Entre novamente.');}let body=null;try{body=await res.json()}catch{}if(!res.ok)throw new Error(body?.message||`GitHub respondeu ${res.status}`);return body;}
+async function loadGitHubUser(){if(!githubToken){updateAuthUI();return;}try{githubUser=await gh('/user');updateAuthUI();}catch(err){githubUser=null;updateAuthUI();if(githubToken)toast(err.message,'error');}}
+function updateAuthUI(){const box=$('#authStatus'),text=$('#authText'),avatar=$('#userAvatar'),btn=$('#loginBtn');if(githubToken&&githubUser){box.className='status ok';text.textContent=githubUser.login;avatar.src=githubUser.avatar_url||'';avatar.style.display=githubUser.avatar_url?'block':'none';btn.textContent='Sair';btn.onclick=()=>logout();}else{box.className='status warn';text.textContent='Não conectado';avatar.style.display='none';btn.textContent='Conectar GitHub';btn.onclick=login;}}
+function logout(show=true){githubToken='';githubUser=null;sessionStorage.removeItem('sin-city-gh-token');updateAuthUI();if(show)toast('Sessão do editor encerrada.');}
+async function createBlob(content){return gh(`/repos/${REPO}/git/blobs`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,encoding:'utf-8'})});}
+async function publish(){
+ if(!githubToken){login();toast('Entre com a conta GitHub que tem acesso de escrita ao repositório.');return;}
+ if(!confirm('Publicar as alterações do editor no GitHub? Isso atualiza o site para todos os visitantes.'))return;
+ const btn=$('#publishBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='PUBLICANDO...';
+ try{
+  site=mergeSite(site);
+  const siteText=JSON.stringify(site,null,2)+'\n';const rulesText=JSON.stringify(data,null,2)+'\n';
+  toast('Preparando arquivos para publicação...');
+  const ref=await gh(`/repos/${REPO}/git/ref/heads/${BRANCH}`);
+  const parent=await gh(`/repos/${REPO}/git/commits/${ref.object.sha}`);
+  const [siteBlob,rulesBlob,contentRulesBlob]=await Promise.all([createBlob(siteText),createBlob(rulesText),createBlob(rulesText)]);
+  const tree=await gh(`/repos/${REPO}/git/trees`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_tree:parent.tree.sha,tree:[
+   {path:SITE_PATH,mode:'100644',type:'blob',sha:siteBlob.sha},
+   {path:RULES_PATH,mode:'100644',type:'blob',sha:rulesBlob.sha},
+   {path:CONTENT_RULES_PATH,mode:'100644',type:'blob',sha:contentRulesBlob.sha}
+  ]})});
+  const stamp=new Date().toLocaleString('pt-BR');
+  const commit=await gh(`/repos/${REPO}/git/commits`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:`Sin City Editor: atualizar site e regras (${stamp})`,tree:tree.sha,parents:[ref.object.sha]})});
+  await gh(`/repos/${REPO}/git/refs/heads/${BRANCH}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({sha:commit.sha,force:false})});
+  localStorage.removeItem('sin-city-editor-draft');toast('Publicado no GitHub! O GitHub Actions vai atualizar o site em instantes.','ok');
+ }catch(err){console.error(err);let msg=err.message||'Erro ao publicar.';if(/403|Resource not accessible|permission|Forbidden/i.test(msg))msg='Sua conta não tem permissão de escrita nesse repositório. Confira se entrou no GitHub correto.';if(/409|422|fast.forward|reference update failed/i.test(msg))msg+=' A branch mudou durante a publicação; recarregue os dados e tente novamente.';toast(msg,'error');}
+ finally{btn.disabled=false;btn.textContent=old;}
+}
+function backup(){const payload={exportedAt:new Date().toISOString(),site,data};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='sin-city-editor-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup baixado.','ok');}
+$$('.tab').forEach(b=>b.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));$$('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#panel-'+b.dataset.tab).classList.add('active');});
+$('#preview').addEventListener('load',sendPreview);$('#reloadBtn').onclick=()=>{if(confirm('Recarregar os dados publicados? Um rascunho não salvo pode ser perdido.'))load(true);};$('#draftBtn').onclick=saveDraft;$('#backupBtn').onclick=backup;$('#siteBtn').onclick=()=>window.open('./index.html','_blank','noopener');$('#loginBtn').onclick=login;$('#publishBtn').onclick=publish;$('#cancelTokenBtn').onclick=()=>{$('#tokenModal').hidden=true;$('#tokenInput').value='';};$('#connectTokenBtn').onclick=connectWithToken;$('#tokenInput').addEventListener('keydown',e=>{if(e.key==='Enter')connectWithToken();if(e.key==='Escape')$('#tokenModal').hidden=true;});$('#tokenModal').addEventListener('click',e=>{if(e.target.id==='tokenModal')$('#tokenModal').hidden=true;});
+load();updateAuthUI();if(githubToken)loadGitHubUser();
+</script>
+</body>
+</html>

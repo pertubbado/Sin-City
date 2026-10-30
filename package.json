@@ -1,0 +1,9 @@
+{
+  "name": "sin-city-regras",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Portal independente de regras da Sin City Roleplay.",
+  "scripts": {
+    "rules:build": "python gerar_regras.py"
+  }
+}

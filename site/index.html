@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="Central de regras da Sin City Roleplay.">
+  <link id="favicon" rel="icon" type="image/svg+xml" href="./assets/sin-city-mark.svg">
+  <link rel="preload" as="image" href="./assets/cemetery-night.webp">
+  <title>Sin City — Central de Regras</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="ambient-noise" aria-hidden="true"></div>
+  <div class="ambient-particles" id="ambientParticles" aria-hidden="true"></div>
+  <div class="custom-cursor" id="customCursor" aria-hidden="true">
+    <img src="./assets/pumpkin-cursor.svg" alt="">
+  </div>
+
+  <header class="topbar">
+    <button class="mobile-menu" id="mobileMenu" type="button" aria-label="Abrir navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand" href="#inicio" data-route="inicio" aria-label="Sin City Roleplay — início">
+      <img id="headerLogo" src="./assets/sin-city-mark.svg" alt="">
+      <span class="brand-copy">
+        <strong id="brandTitle">SIN CITY</strong>
+        <small id="brandSite">ROLEPLAY</small>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button id="searchOpen" class="search-button" type="button" aria-label="Pesquisar regras">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <span>Pesquisar regras</span>
+        <kbd>/</kbd>
+      </button>
+      <a id="discordBtn" href="#" class="discord-btn" target="_blank" rel="noopener noreferrer" hidden>Discord <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+      <div class="side-heading">
+        <span class="side-eyebrow">GUIA DA CIDADE</span>
+        <span class="side-line"></span>
+      </div>
+      <button class="side-home active" type="button" data-route="inicio"><span class="side-icon">⌂</span> Visão geral</button>
+      <div class="side-label">CATEGORIAS</div>
+      <nav id="nav" class="category-nav" aria-label="Categorias de regras"></nav>
+      <div class="side-bottom">
+        <div class="side-emblem">✦</div>
+        <p>CONHEÇA AS REGRAS.<br><strong>ESCOLHA SEU CAMINHO.</strong></p>
+        <span class="side-version">SIN CITY · 2026</span>
+      </div>
+    </aside>
+
+    <main class="content" id="mainContent">
+      <section id="inicio" class="page active" aria-labelledby="heroTitle">
+        <section class="hero" id="hero">
+          <div class="hero-backdrop" aria-hidden="true"></div>
+          <div class="hero-vignette" aria-hidden="true"></div>
+          <div class="hero-copy">
+            <p class="eyebrow" id="heroEyebrow">SIN CITY ROLEPLAY</p>
+            <h1 id="heroTitle">QUEM VIVE SIN CITY<br>FAZ HISTÓRIA.</h1>
+            <p class="hero-text" id="heroText">Conheça as diretrizes que organizam a vida em Sin City.</p>
+            <div class="hero-actions">
+              <button class="primary-button" id="exploreButton" data-route="categoria:primeiros-passos" type="button">COMEÇAR A EXPLORAR <span aria-hidden="true">↗</span></button>
+              <button class="ghost-button" id="allRulesButton" data-route="pesquisa" type="button">PESQUISAR REGRAS</button>
+            </div>
+          </div>
+          <div class="hero-signature" aria-hidden="true"><span>SC</span><small>EST. 2026</small></div>
+          <div class="hero-bottom-note"><span class="moon-dot"></span> UM GUIA PARA CADA HISTÓRIA</div>
+        </section>
+
+        <section class="notice" id="notice">
+          <div class="notice-symbol" aria-hidden="true">!</div>
+          <div class="notice-copy"><strong id="noticeTitle">ANTES DE ENTRAR NA CIDADE</strong><p id="noticeText">O desconhecimento das regras não isenta o cidadão de sua responsabilidade.</p></div>
+          <span class="notice-mark" aria-hidden="true">SIN CITY / RULEBOOK</span>
+        </section>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <div><span class="section-index">01 / NAVEGAÇÃO</span><h2>Explore as categorias</h2></div>
+            <p>Encontre rapidamente as diretrizes de cada área da cidade.</p>
+          </div>
+          <div class="category-grid" id="homeCategories"></div>
+        </section>
+
+        <section class="updates section-block" id="updatesWrap">
+          <div class="section-heading compact">
+            <div><span class="section-index">02 / HISTÓRICO</span><h2>Últimas alterações</h2></div>
+            <p>Acompanhe as atualizações do regulamento.</p>
+          </div>
+          <div class="updates-list" id="updatesList"></div>
+        </section>
+      </section>
+
+      <section id="categoryPage" class="page" aria-labelledby="catTitle">
+        <button class="back-button" data-route="inicio" type="button"><span aria-hidden="true">←</span> VOLTAR À VISÃO GERAL</button>
+        <div class="category-hero" id="categoryHero">
+          <div class="category-hero-text">
+            <p class="eyebrow" id="catCode"></p>
+            <h1 id="catTitle"></h1>
+            <p id="catDesc"></p>
+          </div>
+          <div class="category-hero-icon" id="catIcon" aria-hidden="true">✦</div>
+        </div>
+        <div class="rule-layout">
+          <div class="rule-list" id="ruleList"></div>
+          <aside class="rule-toc" id="ruleToc" aria-label="Nesta categoria">
+            <div class="toc-title">NESTA CATEGORIA</div>
+            <div class="toc-items" id="tocItems"></div>
+          </aside>
+        </div>
+        <div class="category-navigation" id="categoryNavigation"></div>
+      </section>
+
+      <section id="searchPage" class="page" aria-labelledby="searchPageTitle">
+        <button class="back-button" data-route="inicio" type="button"><span aria-hidden="true">←</span> VOLTAR À VISÃO GERAL</button>
+        <div class="search-page-hero">
+          <p class="eyebrow">PESQUISA GLOBAL</p>
+          <h1 id="searchPageTitle">O QUE VOCÊ PROCURA?</h1>
+          <p>Pesquise por nomes, termos, códigos ou trechos das regras.</p>
+          <div class="big-search-wrap"><span aria-hidden="true">⌕</span><input id="searchInput" class="big-search" placeholder="Ex.: RDM, PIT, safe zone, denúncia..." autocomplete="off"><kbd>ENTER</kbd></div>
+        </div>
+        <div id="searchResults" class="search-results" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="site-footer" id="footerText">© 2026 Sin City Roleplay. Todos os direitos reservados.</footer>
+
+  <div class="search-overlay" id="searchOverlay" hidden>
+    <button class="search-scrim" id="searchScrim" type="button" aria-label="Fechar pesquisa"></button>
+    <div class="search-modal" role="dialog" aria-modal="true" aria-labelledby="overlaySearchTitle">
+      <div class="search-modal-top"><span class="eyebrow">PESQUISA RÁPIDA</span><button id="searchClose" type="button" aria-label="Fechar pesquisa">×</button></div>
+      <h2 id="overlaySearchTitle">Encontre uma regra.</h2>
+      <div class="overlay-input-wrap"><span aria-hidden="true">⌕</span><input id="overlaySearch" placeholder="Digite o que você procura..." autocomplete="off"><kbd>ESC</kbd></div>
+      <div id="overlayResults" class="overlay-results" aria-live="polite"><p class="search-empty">Comece digitando para encontrar regras.</p></div>
+      <div class="search-modal-foot"><span>ESC PARA FECHAR</span><span>SIN CITY · CENTRAL DE REGRAS</span></div>
+    </div>
+  </div>
+
+  <div id="loadError" class="load-error" hidden role="alert"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>

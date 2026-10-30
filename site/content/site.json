@@ -1,0 +1,47 @@
+{
+  "theme": {
+    "accent": "#542287",
+    "accent_light": "#AF7AFF",
+    "background": "#212121",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#542287"
+  },
+  "layout": {
+    "show_search": true,
+    "show_updates": true,
+    "show_notice": true,
+    "show_hero_image": true,
+    "show_admin_link": false
+  },
+  "cursor": {
+    "enabled": true,
+    "trail_enabled": true,
+    "size": 38,
+    "image": "./assets/pumpkin-cursor.svg",
+    "trail_type": "glow",
+    "trail_color": "#2D1243",
+    "trail_count": 16,
+    "falling_particles": {
+      "enabled": true,
+      "type": "mixed",
+      "color": "#AF7AFF",
+      "count": 15,
+      "size": 13
+    }
+  },
+  "site_name": "Sin City Roleplay",
+  "site_title": "Código da Cidade",
+  "tagline": "Cada escolha deixa sua marca.",
+  "description": "Central de regras da Sin City Roleplay. Consulte as categorias, entenda as diretrizes e faça parte da cidade.",
+  "logo": "./assets/sin-city-mark.svg",
+  "favicon": "./assets/sin-city-mark.svg",
+  "discord_url": "",
+  "hero_eyebrow": "SIN CITY ROLEPLAY",
+  "hero_title": "QUEM VIVE SIN CITY\nFAZ HISTÓRIA.",
+  "hero_text": "O Código da Cidade reúne as regras que mantêm Sin City viva. Leia, entenda e faça parte da história.",
+  "hero_image": "./assets/cemetery-night.webp",
+  "notice_title": "ANTES DE ENTRAR NA CIDADE",
+  "notice_text": "O desconhecimento das regras não isenta o cidadão de sua responsabilidade. Consulte sempre a versão mais recente do regulamento.",
+  "footer_text": "© 2026 Sin City Roleplay. Todos os direitos reservados."
+}

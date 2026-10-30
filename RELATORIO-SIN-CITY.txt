@@ -1,0 +1,49 @@
+SIN CITY ROLEPLAY — RELATÓRIO DA CORREÇÃO VISUAL E FUNCIONAL
+
+IDENTIDADE
+- Nome público: Sin City Roleplay.
+- Paleta roxa: #542287 e #AF7AFF; fundo #212121; superfície #111111; texto #FFFFFF.
+- Tema Halloween com fundo cinematográfico de cemitério em WebP, textura pontilhada, partículas, logo própria e cursor de abóbora sorridente com rastro roxo.
+
+CORREÇÕES DA INTERFACE
+- Tipografia ampliada e normalizada para leitura em desktop e celular.
+- Hero principal com proporções maiores, slogan e fotografia de fundo otimizada.
+- Menu lateral reconstruído com nove categorias expansíveis, setas e 57 links para capítulos.
+- Clique no nome da categoria abre a página e expande sua lista; clique na seta apenas expande/recolhe.
+- Clique em um capítulo abre a categoria e rola até a regra correspondente.
+- Conteúdo das regras exibido em uma lista contínua, sem blocos de subcategoria e sem índice lateral duplicado.
+- Títulos Markdown limitados a h3–h5 para evitar subtítulos h6 sem estilo.
+
+CORREÇÕES DE TEXTO
+- Removidas as 30 ocorrências de entidades HTML literais de espaço dos documentos e dados.
+- Renderizador e snippets de pesquisa também normalizam essas entidades para que não voltem a aparecer.
+- Arquivos site/rules.json e site/content/rules.json continuam sincronizados.
+
+CONTEÚDO
+- 9 categorias e 57 capítulos preservados.
+- Nenhuma regra foi inventada ou excluída nesta correção visual.
+- Referências antigas de identidade continuam removidas dos arquivos textuais do projeto.
+
+ARQUITETURA
+- O site e o editor permanecem dentro de Sin-City-Regras/site.
+- O editor continua configurado para pertubbado/Sin-City e mantém os caminhos de publicação já ajustados.
+- O workflow existente deve permanecer em .github/workflows/deploy.yml, diretamente na raiz do repositório.
+- O workflow não foi alterado nesta correção; o GitHub Pages já está publicando a pasta Sin-City-Regras/site.
+
+TESTES REALIZADOS
+- JavaScript do site validado com node --check.
+- JSON de configuração e regras validados.
+- Dados de regras sincronizados: 9 categorias e 57 capítulos.
+- Teste de navegador desktop: 9 grupos de navegação, 57 links, 57 cartões de capítulos renderizados ao percorrer todas as categorias e zero erros de console.
+- Teste de navegador celular: menu móvel abre, categoria expande, capítulo navega para a regra e o menu fecha; sem rolagem horizontal e sem erros de console.
+- Nenhuma ocorrência das entidades de espaço defeituosas ou das antigas identidades foi encontrada nos arquivos textuais verificados.
+- O editor continua sem token incluído no pacote. A publicação autenticada pelo token não foi repetida nesta correção.
+
+PUBLICAÇÃO
+- Repositório: pertubbado/Sin-City.
+- Branch: main.
+- Site: https://pertubbado.github.io/Sin-City/
+- Editor: https://pertubbado.github.io/Sin-City/editor.html
+
+OBSERVAÇÃO
+- A pasta .github/workflows não deve ser movida para dentro de Sin-City-Regras. Como o workflow já está funcionando na raiz do repositório, não é necessário reenviá-lo nesta atualização.
