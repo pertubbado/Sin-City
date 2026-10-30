@@ -55,9 +55,9 @@
 // Configuração do novo repositório da Sin City.
 const REPO = 'pertubbado/Sin-City';
 const BRANCH = 'main';
-const SITE_PATH = 'Sin-City-Regras/site/content/site.json';
-const RULES_PATH = 'Sin-City-Regras/site/rules.json';
-const CONTENT_RULES_PATH = 'Sin-City-Regras/site/content/rules.json';
+const SITE_PATH = 'site/content/site.json';
+const RULES_PATH = 'site/rules.json';
+const CONTENT_RULES_PATH = 'site/content/rules.json';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 let site = {};
@@ -90,7 +90,7 @@ async function load(forceRemote=false){
   ]);
   site=mergeSite(s);data=r||{categories:[],updates:[]};
   if(!Array.isArray(data.categories))data.categories=[];if(!Array.isArray(data.updates))data.updates=[];
-  if(!forceRemote){const saved=localStorage.getItem('sin-city-editor-draft');if(saved){try{const d=JSON.parse(saved);site=d.site?mergeSite(d.site):site;data=d.data||data;toast('Rascunho local carregado.','ok')}catch{}}}
+   if (forceRemote) {   localStorage.removeItem('sin-city-editor-draft'); } else {   const saved = localStorage.getItem('sin-city-editor-draft');    if (saved) {     try {       const draft = JSON.parse(saved);        site = draft.site ? mergeSite(draft.site) : site;       data = draft.data || data;        toast('Rascunho local carregado.', 'ok');     } catch (error) {       localStorage.removeItem('sin-city-editor-draft');       toast('Rascunho local inválido foi descartado.', 'error');     }   } }
   render();sendPreview();
  }catch(err){console.error(err);toast('Erro ao carregar os arquivos do site: '+err.message,'error');}
 }
