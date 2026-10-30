@@ -356,7 +356,7 @@
     const root = document.documentElement;
     root.classList.toggle('sin-city-cursor-enabled', enabled);
     const cursor = $('#customCursor');
-    const image = $('img', cursor);
+    const image = cursor ? $('img', cursor) : null;
     if (image && config.image) image.src = assetUrl(config.image);
     if (cursor) {
       const size = Math.max(24, Math.min(64, Number(config.size) || 38));
@@ -511,7 +511,12 @@
 
   // O editor visual envia dados temporários para a prévia do iframe, sem gravar nada no visitante.
   window.addEventListener('message', event => {
-    if (event.source !== window.parent || !event.data || event.data.type !== 'sin-city-preview') return;
+  if (
+    event.source !== window.parent ||
+    event.origin !== location.origin ||
+    !event.data ||
+    event.data.type !== 'sin-city-preview'
+  ) return;
     if (event.data.site && event.data.data) {
       state.site = event.data.site;
       state.data = event.data.data;
