@@ -25,8 +25,8 @@
     "falling_particles": {
       "enabled": true,
       "type": "letters",
-      "color": "#AF7AFF",
-      "count": 15,
+      "color": "#ffffff",
+      "count": 12,
       "size": 10
     }
   },
