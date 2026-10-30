@@ -15,7 +15,7 @@
     "show_admin_link": false
   },
   "cursor": {
-    "enabled": true,
+    "enabled": false,
     "trail_enabled": false,
     "size": 33,
     "image": "./assets/pumpkin-cursor.svg",
