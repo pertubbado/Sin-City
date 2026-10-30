@@ -23,7 +23,7 @@
     "trail_color": "#2D1243",
     "trail_count": 4,
     "falling_particles": {
-      "enabled": true,
+      "enabled": false,
       "type": "logo",
       "color": "#7300ff",
       "count": 20,
