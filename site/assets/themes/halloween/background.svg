@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Fundo cartoon discreto com estrelas, luas, abóboras e nuvens lilás">
+<defs>
+ <radialGradient id="ambient"><stop stop-color="#664574"/><stop offset=".56" stop-color="#372440"/><stop offset="1" stop-color="#1b1425"/></radialGradient>
+ <linearGradient id="mist" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b18ac1" stop-opacity=".4"/><stop offset="1" stop-color="#b18ac1" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="1920" height="1080" fill="url(#ambient)"/>
+<g fill="none" stroke="#b18ac1" stroke-width="7" stroke-linecap="round" opacity=".24">
+ <path d="M1330 160q90-66 163 8t159-4q73-70 163-10"/>
+ <path d="M110 720q100-50 198 9t155 0"/>
+ <path d="M1540 875q86-47 165 1t170 0"/>
+</g>
+<g fill="#ffe0a5" opacity=".23">
+ <circle cx="180" cy="132" r="6"/><circle cx="426" cy="250" r="4"/><circle cx="790" cy="94" r="7"/><circle cx="1190" cy="278" r="5"/><circle cx="1540" cy="82" r="6"/><circle cx="1810" cy="323" r="5"/><circle cx="320" cy="939" r="5"/><circle cx="1460" cy="991" r="6"/><circle cx="1749" cy="737" r="5"/>
+</g>
+<g stroke="#ffd8a0" stroke-width="5" stroke-linecap="round" opacity=".37">
+ <path d="M220 405v19m-10-10h20M700 686v18m-9-9h18M1367 471v20m-10-10h20M1733 558v15m-8-8h16M1049 935v20m-10-10h20"/>
+</g>
+<g opacity=".20" stroke="#cb97aa" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="#fdb653">
+ <path d="M95 981q-45-27-65 14-25 71 46 88 33 6 56-10 23 14 60 3 48-23 28-82-15-31-62-14-35-22-63 1z" transform="translate(0 -18)"/>
+ <path d="M102 953q1-21 21-23" stroke="#8ac18b" fill="none"/>
+ <path d="M80 1027q7-13 17 0m37-2q7-15 18 0m-53 25q24 15 40-1" stroke="#5a3a52" fill="none" stroke-width="7"/>
+</g>
+<g opacity=".18" fill="#f9e9ff" stroke="#f9e9ff" stroke-width="7" stroke-linejoin="round">
+ <path d="M1690 236q-4-61 40-74 60-14 72 49l3 91-27-16q-15 25-34 3l-22 15-31-15z"/>
+</g>
+<path d="M0 1038q300-47 600-12t710-8q260-37 610 9v53H0z" fill="#5c3e68" opacity=".22"/>
+</svg>
