@@ -140,6 +140,11 @@
       
     };
     Object.entries(variables).forEach(([key, value]) => root.style.setProperty(key, value));
+    // Fundo opcional independente da cor base do site.
+    const backgroundAsset = assetUrl(site.background_image);
+    document.body.classList.toggle('sin-city-custom-bg', Boolean(backgroundAsset));
+    if (backgroundAsset) root.style.setProperty('--site-background-image', 'url("' + backgroundAsset.replace(/["\\]/g, '') + '")');
+    else root.style.removeProperty('--site-background-image');
     root.style.setProperty('--muted-readable', theme.accent_light || '#AF7AFF');
     
 const labelColor = theme.label_color;
