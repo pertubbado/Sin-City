@@ -140,6 +140,11 @@
       
     };
     Object.entries(variables).forEach(([key, value]) => root.style.setProperty(key, value));
+    // Fundo opcional independente da cor base do site.
+    const backgroundAsset = assetUrl(site.background_image);
+    document.body.classList.toggle('sin-city-custom-bg', Boolean(backgroundAsset));
+    if (backgroundAsset) root.style.setProperty('--site-background-image', 'url("' + backgroundAsset.replace(/["\\]/g, '') + '")');
+    else root.style.removeProperty('--site-background-image');
     root.style.setProperty('--muted-readable', theme.accent_light || '#AF7AFF');
     
 const labelColor = theme.label_color;
@@ -187,7 +192,16 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
     setText('#sideFooterBottom', site.side_footer_bottom ?? 'SIN CITY · 2026');
     const logo = assetUrl(site.logo || './assets/sin-city-mark.svg');
     const logoEl = $('#headerLogo'); if (logoEl) { logoEl.src = logo; logoEl.alt = site.site_name || 'Sin City Roleplay'; }
-    const favicon = $('#favicon'); if (favicon) favicon.href = assetUrl(site.favicon || site.logo || './assets/sin-city-mark.svg');
+    const favicon = $('#favicon');
+    if (favicon) {
+      const faviconURL = assetUrl(site.favicon || site.logo || './assets/sin-city-mark.svg');
+      favicon.href = faviconURL;
+      favicon.type = /^(data:image\/svg\+xml|.*\.svg(?:[?#].*)?$)/i.test(faviconURL) ? 'image/svg+xml'
+        : /^(data:image\/png|.*\.png(?:[?#].*)?$)/i.test(faviconURL) ? 'image/png'
+        : /^(data:image\/webp|.*\.webp(?:[?#].*)?$)/i.test(faviconURL) ? 'image/webp'
+        : /^(data:image\/jpeg|.*\.jpe?g(?:[?#].*)?$)/i.test(faviconURL) ? 'image/jpeg'
+        : /\.ico(?:[?#].*)?$/i.test(faviconURL) ? 'image/x-icon' : '';
+    }
     const title = site.site_title || 'Sin City — Central de Regras'; document.title = title;
     const description = $('meta[name="description"]'); if (description) description.content = site.description || 'Central de regras da Sin City Roleplay.';
     const discord = $('#discordBtn');
