@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 800" width="1920" height="800" role="img" aria-label="Noite de Halloween cartoon com lua, nuvens, casinhas, fantasminha e abóboras sorridentes">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#23172f"/><stop offset=".5" stop-color="#392447"/><stop offset="1" stop-color="#53345b"/></linearGradient>
+ <radialGradient id="moonlight"><stop stop-color="#ffe8af" stop-opacity=".52"/><stop offset="1" stop-color="#ffe8af" stop-opacity="0"/></radialGradient>
+ <linearGradient id="hills" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#61416d"/><stop offset="1" stop-color="#2f233e"/></linearGradient>
+ <linearGradient id="pumpkin" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#ffbc55"/><stop offset=".5" stop-color="#ff962f"/><stop offset="1" stop-color="#e96d2f"/></linearGradient>
+ <linearGradient id="ghost" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffaf4"/><stop offset="1" stop-color="#dcd7fc"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-40%" width="170%" height="190%"><feGaussianBlur in="SourceAlpha" stdDeviation="12"/><feOffset dy="11"/><feComponentTransfer><feFuncA type="linear" slope=".25"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1920" height="800" fill="url(#sky)"/>
+<g opacity=".55" fill="#a96aaf"><circle cx="110" cy="96" r="4"/><circle cx="410" cy="231" r="3"/><circle cx="755" cy="112" r="3"/><circle cx="987" cy="82" r="5"/><circle cx="1640" cy="254" r="3"/><circle cx="1816" cy="120" r="4"/></g>
+<g fill="#ffd88c" stroke="#ffd88c" stroke-linecap="round" opacity=".87">
+ <path d="M860 208v16m-8-8h16" stroke-width="4"/><path d="M1090 120v22m-11-11h22" stroke-width="4"/><path d="M1678 110v17m-9-8h18" stroke-width="3"/><path d="M1775 334v13m-6-6h12" stroke-width="4"/><path d="M1305 85v10m-5-5h10" stroke-width="3"/><path d="M1004 316v13m-7-6h14" stroke-width="3"/>
+</g>
+<ellipse cx="1500" cy="178" rx="232" ry="227" fill="url(#moonlight)"/>
+<circle cx="1500" cy="178" r="95" fill="#ffe9b7" stroke="#f8d29e" stroke-width="9"/>
+<circle cx="1468" cy="152" r="14" fill="#f5d7a4" opacity=".66"/><circle cx="1534" cy="211" r="23" fill="#f5d7a4" opacity=".66"/><circle cx="1518" cy="118" r="9" fill="#f5d7a4"/>
+<g fill="#b98aac" opacity=".22"><ellipse cx="915" cy="338" rx="190" ry="42"/><ellipse cx="1790" cy="293" rx="150" ry="42"/></g>
+<g fill="#72527c" opacity=".72"><path d="M824 365q76-69 162-12t156-6q65-45 123 12v82H824z"/><path d="M1608 358q82-55 155-9t157-3v95h-312z"/></g>
+<path d="M0 665q270-65 490-19t410-20q230-107 443-22t577-50v246H0z" fill="#43314f"/>
+<path d="M0 723q245-68 510-16t435-2q208-72 413-15t562-42v152H0z" fill="url(#hills)"/>
+<g opacity=".95" stroke="#211829" stroke-width="7" stroke-linejoin="round">
+ <path d="M930 605v-117l73-61 77 62v116z" fill="#30223d"/><path d="M906 501l97-87 101 89" stroke-width="18" fill="none"/><rect x="970" y="520" width="54" height="50" rx="10" fill="#ffd783"/><path d="M996 520v50m-26-25h54" stroke-width="5"/><path d="M1050 602v-56q0-28-22-28t-22 28v56" fill="#65465b"/>
+ <path d="M1740 550V449l66-49 67 49v101z" fill="#37233e"/><path d="M1725 461l81-72 84 72" fill="none" stroke-width="16"/><rect x="1774" y="477" width="42" height="43" rx="7" fill="#ffd783"/><path d="M1795 477v43m-21-22h42" stroke-width="4"/>
+</g>
+<!-- happy floating ghost -->
+<g filter="url(#shadow)" transform="translate(1170 254)">
+ <path d="M4 174Q-2 44 87 20q94-21 113 97l2 96q-18-18-33-5t-34-2q-18-15-35 6t-38-5q-14-12-27 3L4 226z" fill="url(#ghost)" stroke="#735777" stroke-width="9" stroke-linejoin="round"/>
+ <ellipse cx="69" cy="124" rx="12" ry="18" fill="#382840"/><ellipse cx="137" cy="124" rx="12" ry="18" fill="#382840"/>
+ <circle cx="39" cy="150" r="14" fill="#ffafbf" opacity=".73"/><circle cx="169" cy="150" r="14" fill="#ffafbf" opacity=".73"/>
+ <path d="M87 154q18 22 38 0" fill="none" stroke="#382840" stroke-width="7" stroke-linecap="round"/>
+ <path d="M0 165Q-24 137-37 147M198 164q33-32 45-13" fill="none" stroke="#eee8ff" stroke-width="21" stroke-linecap="round"/>
+</g>
+<!-- cute pumpkins -->
+<g filter="url(#shadow)">
+ <ellipse cx="1539" cy="689" rx="248" ry="48" fill="#211829" opacity=".47"/>
+ <path d="M1526 480q-1-64 43-67 7 38-17 65" fill="#6eae65" stroke="#3c693c" stroke-width="10" stroke-linejoin="round"/>
+ <path d="M1524 486q-67-40-105 1-79-19-92 72-12 113 93 145 64 21 111-12 56 32 114 13 115-42 90-147-16-88-101-72-41-36-110 0z" fill="url(#pumpkin)" stroke="#8f462d" stroke-width="11"/>
+ <path d="M1437 493q-56 60-15 195M1608 488q58 65 16 201" fill="none" stroke="#e8792f" stroke-width="15" stroke-linecap="round" opacity=".74"/>
+ <path d="M1467 569q-1-21 20-21 24 0 24 21M1557 565q0-21 22-21 22 0 22 21" stroke="#4b2a3f" stroke-width="10" fill="none" stroke-linecap="round"/>
+ <path d="M1499 618q34 33 77-2" fill="none" stroke="#4b2a3f" stroke-width="11" stroke-linecap="round"/>
+ <ellipse cx="1447" cy="600" rx="18" ry="9" fill="#ffcf9c" opacity=".85"/><ellipse cx="1628" cy="599" rx="18" ry="9" fill="#ffcf9c" opacity=".85"/>
+</g>
+<g filter="url(#shadow)" transform="translate(1262 593) scale(.69)">
+ <path d="M36-20q2-40 38-42 4 27-18 51" fill="#74b878" stroke="#3b673a" stroke-width="8"/>
+ <path d="M58-11q-40-25-66 7-55-7-63 62-7 81 68 103 43 12 66-12 47 23 93 8 64-24 51-101-10-64-72-62-28-32-77-5z" fill="#ffb04e" stroke="#8d492f" stroke-width="11"/>
+ <path d="M-10 53q11-24 30 1M83 56q14-24 29-1M29 99q25 18 54-2" fill="none" stroke="#462c3c" stroke-width="10" stroke-linecap="round"/>
+ <circle cx="-26" cy="81" r="12" fill="#ffc59f"/><circle cx="128" cy="81" r="12" fill="#ffc59f"/>
+</g>
+<!-- candy corn and tiny stars -->
+<g transform="translate(1820 638) rotate(19)" stroke="#73506c" stroke-width="8" stroke-linejoin="round"><path d="M0-55L-39 43Q0 79 39 43z" fill="#ffdc89"/><path d="M-13-23L-28 23Q0 46 28 23L13-23z" fill="#ff9b47"/><path d="M-26 38Q0 55 26 38L39 43Q0 79-39 43z" fill="#fff7da" stroke="none"/></g>
+<g fill="#ffc977" opacity=".9"><circle cx="1104" cy="624" r="6"/><circle cx="1722" cy="684" r="8"/><circle cx="1190" cy="671" r="4"/><circle cx="1830" cy="540" r="5"/></g>
+<path d="M0 790q320-38 650-4t623-3q356-39 647-1v18H0z" fill="#292139" opacity=".55"/>
+</svg>
