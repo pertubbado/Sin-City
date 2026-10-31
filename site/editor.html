@@ -36,6 +36,12 @@
 .carnaval-brasil-theme-preview{background:#342143;border-color:#AE678F}
 .namorados-theme-preview{background:#65354E;border-color:#C17D9D}
 .lgbtqia-theme-preview{background:#5B4C86;border-color:#C4A5FF}
+
+/* C7.8 — biblioteca de temas pessoais */
+.saved-theme-manager{border:2px solid var(--accent,#AF7AFF);border-radius:16px;padding:15px;margin:14px 0 20px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent,#AF7AFF) 12%,var(--surface,#17121F)),var(--surface,#17121F));box-shadow:0 8px 24px #0002;}
+.saved-theme-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.saved-theme-heading strong{font-size:1.08rem}.saved-theme-heading p,.saved-theme-note,.saved-theme-date{font-size:.82rem;opacity:.78;margin:5px 0 0}.saved-theme-heading span{font-size:.75rem;opacity:.72;white-space:nowrap}.saved-theme-label{display:block;font-size:.83rem;font-weight:650;margin:8px 0 6px}.saved-theme-create{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.saved-theme-create input{min-width:0;width:100%;border:1px solid var(--border-color,#655477);border-radius:9px;padding:10px;background:var(--background,#211a2b);color:var(--text,#fff)}.saved-theme-save-btn{font-weight:800;border:1px solid var(--accent-light,#AF7AFF);background:var(--accent,#542287);color:#fff;white-space:nowrap}.saved-theme-note{line-height:1.45;margin:10px 0 13px}.saved-theme-list{display:grid;gap:9px}.saved-theme-empty{font-size:.86rem;opacity:.75;padding:12px;border:1px dashed var(--border-color,#655477);border-radius:10px}.saved-theme-entry{border:1px solid var(--border-color,#655477);border-radius:11px;padding:11px;background:color-mix(in srgb,var(--background,#211a2b) 68%,transparent)}.saved-theme-entry-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.saved-theme-entry-head strong{overflow-wrap:anywhere}.saved-theme-swatches{display:flex;gap:3px;flex-shrink:0}.saved-theme-swatch{width:15px;height:20px;border:1px solid #ffffff40;border-radius:4px}.saved-theme-date{font-size:.74rem}.saved-theme-actions,.saved-theme-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.saved-theme-actions .btn,.saved-theme-tools .btn{font-size:.76rem}.saved-theme-actions .danger{border-color:#B94B62;color:#E88A9B}.saved-theme-warning{color:#D98282;font-size:.82rem}.saved-theme-tools{border-top:1px solid var(--border-color,#655477);padding-top:12px;margin-top:14px}
+@media(max-width:540px){.saved-theme-create{grid-template-columns:1fr}.saved-theme-save-btn{width:100%}.saved-theme-heading{display:block}.saved-theme-heading span{display:block;margin-top:6px}.saved-theme-actions .btn{flex:1 1 42%}}
+
 </style>
 </head>
 <body>
@@ -76,6 +82,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
+<script src="./saved-themes.js"></script>
 <script>
 'use strict';
 // Configuração do novo repositório da Sin City.
@@ -512,11 +519,37 @@ function applyLgbtqiaPreview(){
  toast('Tema LGBTQIA+ aplicado na prévia! Personalize tudo no editor.','ok');
 }
 
+
+/* C7.8 — temas salvos: apenas propriedades visuais, sem marca nem conteúdo. */
+let savedThemesManager;
+function getSavedThemesManager(){
+ if(!savedThemesManager)savedThemesManager=window.SinCitySavedThemes.create({
+  esc,toast,
+  canSwitch:()=>pendingImageUploads.size===0,
+  capture:()=>{
+   const clean=snapshotForStorage();
+   return {theme:clean.theme,layout:clean.layout,hero_image:clean.hero_image||'',background_image:clean.background_image||'',cursor:clean.cursor};
+  },
+  apply:visual=>{
+   const current=structuredClone(site);
+   current.theme=structuredClone(visual.theme);
+   current.layout={...current.layout,...visual.layout};
+   current.hero_image=visual.hero_image;
+   current.background_image=visual.background_image;
+   current.cursor=structuredClone(visual.cursor);
+   site=mergeSite(current);
+   render();sendPreview();return true;
+  }
+ });
+ return savedThemesManager;
+}
+
 function cleanGalleryMarkup(){
  return `<details class="card" id="cleanThemeCard">
   <summary>🎨 Temas</summary>
   <div class="card-body">
    <div class="fixed-note">Escolha o visual que combina com sua cidade. Os temas são opcionais, aparecem na prévia antes da publicação e continuam totalmente personalizáveis.</div>
+   ${getSavedThemesManager().managerMarkup()}
    <div class="item" role="group" aria-label="Tema Clean">
     <div class="item-head"><strong>🫧 Tema Clean</strong></div>
     <p class="small-note">Visual neutro, organizado e sem efeitos extras, com cores livres para editar.</p>
@@ -732,6 +765,7 @@ function renderRules(){
 function subEditor(sub,i,j){sub.rules=Array.isArray(sub.rules)?sub.rules:[];return `<details class="subitem"><summary><b>📂 ${esc(sub.name||'Nova subcategoria')}</b> — ${sub.rules.length} regra(s)</summary><div class="field-row"><div class="field"><label>ID</label><input data-sub="${i}:${j}" data-k="id" value="${esc(sub.id||'')}"></div><div class="field"><label>Ícone</label><input data-sub="${i}:${j}" data-k="icon" value="${esc(sub.icon||'◈')}"></div></div><div class="field"><label>Nome da subcategoria</label><input data-sub="${i}:${j}" data-k="name" value="${esc(sub.name||'')}"></div><div class="inline"><button class="btn mini" data-add-sub-rule="${i}:${j}">+ Regra</button><button class="btn mini danger" data-del-sub="${i}:${j}">Excluir subcategoria</button></div>${sub.rules.map((r,k)=>ruleEditor(r,`data-sub-rule="${i}:${j}:${k}"`,`data-del-sub-rule="${i}:${j}:${k}"`)).join('')}</details>`;}
 function ruleEditor(r,attrs,delAttr){return `<div class="rule"><div class="item-head"><strong>${esc(r.code||'')} • ${esc(r.title||'Sem título')}</strong><button class="btn mini danger" ${delAttr}>Excluir</button></div><div class="field-row"><div class="field"><label>Código</label><input ${attrs} data-k="code" value="${esc(r.code||'')}"></div><div class="field"><label>Tag</label><input ${attrs} data-k="tag" value="${esc(r.tag||'REGRA')}"></div></div><div class="field"><label>Título</label><input ${attrs} data-k="title" value="${esc(r.title||'')}"></div><div class="field"><label>Texto da regra (Markdown permitido)</label><textarea ${attrs} data-k="text">${esc(r.text||'')}</textarea></div><div class="field"><label>Imagem (opcional)</label><input ${attrs} data-k="image" value="${esc(r.image||'')}"></div></div>`;}
 function bindEditor(){
+ getSavedThemesManager().bind();
  $('#applyCleanPreviewBtn')?.addEventListener('click',applyCleanPreview);
  $('#restoreBeforeCleanBtn')?.addEventListener('click',restoreBeforeClean);
  $('#applyHalloweenPreviewBtn')?.addEventListener('click',applyHalloweenPreview);
