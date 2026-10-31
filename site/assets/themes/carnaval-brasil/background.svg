@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Fundo de Carnaval brasileiro cartoon com serpentinas e confetes discretos">
+<defs><radialGradient id="night"><stop stop-color="#57336C"/><stop offset=".62" stop-color="#302542"/><stop offset="1" stop-color="#211C32"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="url(#night)"/>
+<g fill="none" stroke-width="9" stroke-linecap="round" opacity=".22">
+<path d="M177 67q63 51 0 99t17 90" stroke="#FFBD70"/><path d="M1584 69q-72 63-8 106t-10 83" stroke="#F78BB6"/><path d="M1824 712q-41 39 8 77t-15 85" stroke="#67DACC"/><path d="M369 773q65-42 21-89t18-78" stroke="#BA96F0"/></g>
+<g opacity=".26"><circle cx="214" cy="411" r="7" fill="#FBE5B4"/><circle cx="909" cy="208" r="6" fill="#FA98C2"/><circle cx="1430" cy="331" r="6" fill="#65D7CA"/><circle cx="1753" cy="507" r="5" fill="#FFD78B"/><circle cx="742" cy="909" r="7" fill="#BBA1FF"/><circle cx="1372" cy="988" r="6" fill="#FFA1B4"/></g>
+<g opacity=".22"><rect x="446" y="229" width="17" height="7" rx="3" fill="#6BDCCA" transform="rotate(22 446 229)"/><rect x="1133" y="112" width="19" height="8" rx="3" fill="#FEB45F" transform="rotate(-28 1133 112)"/><rect x="1659" y="394" width="19" height="8" rx="3" fill="#FE9DC8" transform="rotate(34 1659 394)"/><rect x="511" y="892" width="20" height="8" rx="3" fill="#CFB2FB" transform="rotate(-18 511 892)"/></g>
+<path d="M0 1044q280-29 576 0t659-12q331-45 685-6v54H0z" fill="#EFB0D0" opacity=".08"/>
+</svg>
