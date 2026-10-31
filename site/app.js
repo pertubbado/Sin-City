@@ -436,6 +436,15 @@ function closeSearchOverlay() {
       count: Math.max(6, Math.min(30, Number(config.trail_count) || 16))
     };
     root.style.setProperty('--trail-color', cursorConfig.color);
+    
+const cursorGlow = config.glow_color;
+
+if (/^#[0-9a-f]{6}$/i.test(String(cursorGlow || ''))) {
+  root.style.setProperty('--cursor-glow-color', cursorGlow);
+} else {
+  root.style.removeProperty('--cursor-glow-color');
+}
+
     if (!cursorListenersAttached) {
       cursorListenersAttached = true;
       let lastTrail = 0, previousX = 0, previousY = 0, trailNodes = [];
