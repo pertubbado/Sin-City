@@ -227,3 +227,18 @@ html.sin-city-cursor-enabled .custom-cursor.hovering {
 .sidebar::-webkit-scrollbar-thumb {
   background-color: var(--custom-scrollbar-color, #4d3268);
 }
+
+
+/* ==========================================
+   C6.9 - RODAPE DO MENU LATERAL
+   Cores independentes e automaticas
+   ========================================== */
+.side-bottom p {
+  color: var(--custom-side-footer-top-color, var(--muted));
+}
+.side-bottom strong {
+  color: var(--custom-side-footer-highlight-color, #e6d9f0);
+}
+.side-bottom .side-version {
+  color: var(--custom-side-footer-bottom-color, var(--custom-label-color, #675672));
+}
