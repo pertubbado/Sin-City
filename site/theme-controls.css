@@ -242,3 +242,11 @@ html.sin-city-cursor-enabled .custom-cursor.hovering {
 .side-bottom .side-version {
   color: var(--custom-side-footer-bottom-color, var(--custom-label-color, #675672));
 }
+
+/* C6.11 - imagem opcional de fundo, por baixo de camada de contraste */
+body.sin-city-custom-bg {
+  background-image: linear-gradient(180deg,rgba(8,8,11,.84),rgba(8,8,11,.89)), var(--site-background-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
