@@ -34,6 +34,7 @@
 .natal-theme-preview{background:#1d3836;border-color:#598679}
 .pascoa-theme-preview{background:#453652;border-color:#9B81AB}
 .carnaval-brasil-theme-preview{background:#342143;border-color:#AE678F}
+.namorados-theme-preview{background:#65354E;border-color:#C17D9D}
 </style>
 </head>
 <body>
@@ -254,7 +255,7 @@ function applyCleanPreview(){
   accent:'#b7bec5',accent_light:'#e4e7eb',background:'#14171a',
   surface:'#21252a',text:'#f5f6f8',muted:'#c4cad0'
  });
- current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false};
+ current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false};
  current.cursor = {...current.cursor,enabled:false,trail_enabled:false,
   falling_particles:{...(current.cursor?.falling_particles||{}),enabled:false}};
  // Não apagar URLs do logo, do banner ou do fundo: só ocultar as decorações no modo Clean.
@@ -300,7 +301,7 @@ function applyHalloweenPreview(){
  };
  // Substitui apenas as cores do tema, todas permanecem livremente editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,carnaval_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/halloween/hero.svg';
  current.background_image='./assets/themes/halloween/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -339,7 +340,7 @@ function applyNatalPreview(){
   hero_signature_color:'#FFE0A0'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,carnaval_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/natal/hero.svg';
  current.background_image='./assets/themes/natal/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -379,7 +380,7 @@ function applyPascoaPreview(){
   hero_signature_color:'#FBE2AD'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,carnaval_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,carnaval_mode:false,namorados_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/pascoa/hero.svg';
  current.background_image='./assets/themes/pascoa/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -419,7 +420,7 @@ function applyCarnavalPreview(){
  };
  // Mantém os textos, logo e favicon, e deixa todas as cores editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:true,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:true,namorados_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/carnaval-brasil/hero.svg';
  current.background_image='./assets/themes/carnaval-brasil/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -430,6 +431,45 @@ function applyCarnavalPreview(){
  site=mergeSite(current);
  render();sendPreview();
  toast('Carnaval brasileiro cartoon aplicado! Tudo continua personalizável na prévia.','ok');
+}
+
+
+/* C7.6 — Dia dos Namorados: doodles e caneta de carta, reversível e editável. */
+function applyNamoradosPreview(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de trocar de tema.','error');
+  return;
+ }
+ if(!readCleanBackup()){
+  try{localStorage.setItem(CLEAN_BACKUP_KEY,JSON.stringify(snapshotForStorage()));}
+  catch{toast('Não foi possível guardar o visual anterior. Libere espaço no navegador.','error');return;}
+ }
+ const current=structuredClone(site);
+ const palette={
+  accent:'#F47598',accent_light:'#FFD8D9',background:'#2F1B2F',
+  surface:'#44263D',text:'#FFF7F4',muted:'#EACEDB',
+  header_bg:'#341F37',sidebar_bg:'#38223B',card_bg:'#4B2E46',
+  glow_color:'#F89DBA',label_color:'#FFD7BD',scrollbar_color:'#D38DB4',
+  nav_text_color:'#FFF2F3',action_text_color:'#FFF8F2',
+  content_text_color:'#FAE9EF',category_panel_color:'#4A2D46',
+  navigation_button_color:'#52304B',search_panel_color:'#432940',
+  rule_bold_color:'#FFD6CA',side_footer_top_color:'#FFCCDA',
+  side_footer_highlight_color:'#FFE6DB',side_footer_bottom_color:'#EDC6DC',
+  nav_highlight_color:'#F4779C',border_color:'#BF87A7',
+  hero_signature_color:'#FFD7CC'
+ };
+ current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:true,show_hero_image:true};
+ current.hero_image='./assets/themes/namorados/hero.svg';
+ current.background_image='./assets/themes/namorados/background.svg';
+ current.cursor={...current.cursor,enabled:true,trail_enabled:false,
+  image:'./assets/themes/namorados/cursor.svg',size:30,
+  trail_color:'#FFAFCA',glow_color:'#FFD5DC',
+  falling_particles:{...(current.cursor?.falling_particles||{}),
+   enabled:true,type:'spark',color:'#F9B2C7',count:9,size:12}};
+ site=mergeSite(current);
+ render();sendPreview();
+ toast('Tema Dia dos Namorados aplicado na prévia! Personalize tudo no editor.','ok');
 }
 
 function cleanGalleryMarkup(){
@@ -485,7 +525,17 @@ function cleanGalleryMarkup(){
      <button class="btn" type="button" id="restoreBeforeCarnavalBtn">↩ Restaurar visual anterior</button>
     </div>
    </div>
-   <p class="small-note">Testar não publica nada. O visual anterior fica guardado neste navegador. Dia dos Namorados e LGBTQIA+ terão etapas próprias.</p>
+   <div class="item" role="group" aria-label="Tema Dia dos Namorados">
+    <div class="item-head"><strong>💝 Tema Dia dos Namorados</strong></div>
+    <div class="halloween-theme-preview namorados-theme-preview"><img src="./assets/themes/namorados/hero.svg" alt="Doodles cartoon com corações, cartinhas, laços e presentes" loading="lazy"></div>
+    <div class="halloween-theme-colors" aria-label="Cores de Dia dos Namorados"><span style="background:#F47598"></span><span style="background:#FFD8D9"></span><span style="background:#2F1B2F"></span><span style="background:#BF87A7"></span><span style="background:#FFF7F4"></span></div>
+    <p class="small-note">Corações desenhados à mão, cartinhas, presentes e flores. Cursor de caneta-tinteiro com coração, discreto e compacto. Todas as cores são editáveis.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyNamoradosPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforeNamoradosBtn">↩ Restaurar visual anterior</button>
+    </div>
+   </div>
+   <p class="small-note">Testar não publica nada. O visual anterior fica guardado neste navegador. O tema LGBTQIA+ será feito na próxima etapa.</p>
   </div>
  </details>`;
 }
@@ -642,6 +692,8 @@ function bindEditor(){
  $('#restoreBeforePascoaBtn')?.addEventListener('click',restoreBeforeClean);
  $('#applyCarnavalPreviewBtn')?.addEventListener('click',applyCarnavalPreview);
  $('#restoreBeforeCarnavalBtn')?.addEventListener('click',restoreBeforeClean);
+ $('#applyNamoradosPreviewBtn')?.addEventListener('click',applyNamoradosPreview);
+ $('#restoreBeforeNamoradosBtn')?.addEventListener('click',restoreBeforeClean);
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
