@@ -175,6 +175,14 @@ Object.entries(detailedColors).forEach(([property, value]) => {
   }
 });
 
+// C6.14 — cor individual da assinatura da capa (com modo automático).
+const signatureColor = theme.hero_signature_color;
+if (/^#[0-9a-f]{6}$/i.test(String(signatureColor || ''))) {
+  root.style.setProperty('--custom-hero-signature-color', signatureColor);
+} else {
+  root.style.removeProperty('--custom-hero-signature-color');
+}
+
 const scrollbarColor = theme.scrollbar_color;
 if (/^#[0-9a-f]{6}$/i.test(String(scrollbarColor || ''))) {
   root.style.setProperty('--custom-scrollbar-color', scrollbarColor);
@@ -204,6 +212,11 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
     setText('#heroEyebrow', site.hero_eyebrow || 'SIN CITY ROLEPLAY');
     setText('#heroTitle', site.hero_title || 'A CIDADE NÃO DORME.\nAS REGRAS MANTÊM A ORDEM.');
     setText('#heroText', site.hero_text || 'Conheça as diretrizes da cidade.');
+    // C6.14 — Assinatura da capa, configurável sem alterar a marca principal.
+    setText('#heroSignatureInitials', site.hero_signature_initials ?? 'SC');
+    const signaturePrefix = String(site.hero_signature_prefix ?? 'EST.').trim();
+    const signatureYear = String(site.hero_signature_year ?? '2026').trim();
+    setText('#heroSignatureMeta', [signaturePrefix, signatureYear].filter(Boolean).join(' '));
     setText('#noticeTitle', site.notice_title || 'ANTES DE ENTRAR NA CIDADE');
     setText('#noticeText', site.notice_text || 'O desconhecimento das regras não isenta o cidadão de sua responsabilidade.');
     setText('#footerText', site.footer_text || '© 2026 Sin City Roleplay. Todos os direitos reservados.');
