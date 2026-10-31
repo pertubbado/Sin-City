@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cursor natalino cartoon: árvore de Natal sorridente">
+<path d="M31 48h11v14H27V48z" fill="#9e7051" stroke="#695047" stroke-width="3" stroke-linejoin="round"/>
+<path d="M32 4L12 29h8L5 51q26 18 54 0L44 29h8z" fill="#64b28b" stroke="#2b725b" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M32 15L15 34h10L13 48q20 14 38 0L39 34h10z" fill="#3c9774" opacity=".75"/>
+<path d="M32 1l3 5 6 1-4 5 1 6-6-3-6 3 1-6-4-5 6-1z" fill="#ffe8a1" stroke="#a88554" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="20" cy="37" r="4.5" fill="#fca5a4" stroke="#e5d49a" stroke-width="1.5"/>
+<circle cx="45" cy="42" r="4.5" fill="#f6d791" stroke="#e5d49a" stroke-width="1.5"/>
+<circle cx="32" cy="26" r="3.5" fill="#fff3be"/>
+<path d="M25 44q2-5 6 0m8 0q2-5 6 0" fill="none" stroke="#214a44" stroke-width="2.7" stroke-linecap="round"/>
+<path d="M32 49q5 5 10 0" fill="none" stroke="#214a44" stroke-width="2.7" stroke-linecap="round"/>
+<circle cx="25" cy="48" r="3" fill="#ffb8bb" opacity=".7"/><circle cx="49" cy="48" r="3" fill="#ffb8bb" opacity=".7"/>
+</svg>
