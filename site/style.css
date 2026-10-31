@@ -86,7 +86,7 @@ kbd{padding:3px 6px;border:1px solid rgba(255,255,255,.16);border-radius:4px;col
 .primary-button span{font-size:16px}
 .ghost-button{border-color:rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:var(--text)}
 .ghost-button:hover{border-color:var(--accent-light);background:color-mix(in srgb,var(--accent) 28%,transparent);transform:translateY(-2px)}
-.hero-signature{position:absolute;right:clamp(24px,4vw,64px);bottom:48px;display:flex;align-items:center;gap:11px;color:rgba(227,203,255,.62);font:11px ui-monospace,monospace;letter-spacing:.24em}
+.hero-signature{position:absolute;right:clamp(24px,4vw,64px);bottom:48px;display:flex;align-items:center;gap:11px;color:color-mix(in srgb,var(--accent-light) 62%,transparent);font:11px ui-monospace,monospace;letter-spacing:.24em}
 .hero-signature span{font-size:42px;font-weight:900;letter-spacing:-.1em;opacity:.45}
 .hero-signature small{font-size:8px;letter-spacing:.2em}
 .hero-bottom-note{position:absolute;left:clamp(30px,5vw,72px);bottom:22px;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:8px;letter-spacing:.2em;font-weight:800}
@@ -104,9 +104,9 @@ kbd{padding:3px 6px;border:1px solid rgba(255,255,255,.16);border-radius:4px;col
 .section-heading>p{max-width:330px;margin:0 0 3px;color:var(--muted);font-size:11px;line-height:1.6;text-align:right}
 .section-index{color:var(--muted)}
 .category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.category-card{position:relative;min-height:164px;display:flex;flex-direction:column;align-items:flex-start;padding:19px 18px 17px;overflow:hidden;border:1px solid var(--line-soft);border-radius:9px;background:linear-gradient(145deg,rgba(31,25,37,.97),rgba(17,17,17,.98));color:#fff;text-align:left;cursor:pointer;transition:border-color .22s,transform .22s,background .22s,box-shadow .22s}
+.category-card{position:relative;min-height:164px;display:flex;flex-direction:column;align-items:flex-start;padding:19px 18px 17px;overflow:hidden;border:1px solid var(--line-soft);border-radius:9px;background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 97%,var(--accent) 3%),rgba(17,17,17,.98));color:#fff;text-align:left;cursor:pointer;transition:border-color .22s,transform .22s,background .22s,box-shadow .22s}
 .category-card::before{content:"";position:absolute;inset:auto -30px -55px auto;width:145px;height:145px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 24%,transparent),transparent 68%);transition:transform .3s}
-.category-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent-light) 56%,transparent);background:linear-gradient(145deg,rgba(41,29,52,.98),rgba(17,17,17,.98));box-shadow:0 12px 35px rgba(0,0,0,.22)}
+.category-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent-light) 56%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 92%,var(--accent) 8%),rgba(17,17,17,.98));box-shadow:0 12px 35px rgba(0,0,0,.22)}
 .category-card:hover::before{transform:scale(1.25)}
 .card-topline{position:relative;z-index:1;width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}
 .card-index{color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em}
@@ -131,7 +131,7 @@ kbd{padding:3px 6px;border:1px solid rgba(255,255,255,.16);border-radius:4px;col
 .back-button{display:inline-flex;align-items:center;gap:9px;margin:0 0 18px;padding:9px 0;border:0;background:transparent;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.13em;cursor:pointer;transition:color .2s}
 .back-button:hover{color:var(--accent-light)}
 .back-button span{font-size:17px}
-.category-hero{position:relative;min-height:190px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:32px 36px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:linear-gradient(105deg,rgba(25,17,34,.98),rgba(17,17,17,.93)),url("./assets/cemetery-halloween.svg") center/cover}
+.category-hero{position:relative;min-height:190px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:32px 36px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:linear-gradient(105deg,color-mix(in srgb,var(--surface) 96%,var(--accent) 4%),rgba(17,17,17,.93)),url("./assets/cemetery-halloween.svg") center/cover}
 .category-hero::after{content:"";position:absolute;top:-120px;right:80px;width:310px;height:310px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 27%,transparent),transparent 68%);pointer-events:none}
 .category-hero-text{position:relative;z-index:1;max-width:760px}
 .category-hero .eyebrow{margin-bottom:11px}
@@ -145,7 +145,7 @@ kbd{padding:3px 6px;border:1px solid rgba(255,255,255,.16);border-radius:4px;col
 .subcategory-code{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--accent-light) 30%,transparent);border-radius:7px;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent-light);font:10px ui-monospace,monospace}
 .subcategory-heading h2{margin:0;font-size:16px;line-height:1.25;font-weight:850}
 .subcategory-heading p{margin:4px 0 0;color:var(--muted);font-size:10px}
-.rule-card{margin:0 0 12px;overflow:hidden;border:1px solid var(--line-soft);border-radius:9px;background:linear-gradient(135deg,rgba(25,22,29,.98),rgba(17,17,17,.98));scroll-margin-top:100px}
+.rule-card{margin:0 0 12px;overflow:hidden;border:1px solid var(--line-soft);border-radius:9px;background:linear-gradient(135deg,color-mix(in srgb,var(--surface) 98%,var(--accent) 2%),rgba(17,17,17,.98));scroll-margin-top:100px}
 .rule-card-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.018)}
 .rule-card-title{display:flex;align-items:center;gap:9px;min-width:0}
 .rule-code{flex:0 0 auto;color:var(--accent-light);font:10px ui-monospace,monospace}
@@ -193,7 +193,7 @@ kbd{padding:3px 6px;border:1px solid rgba(255,255,255,.16);border-radius:4px;col
 .category-navigation button span{display:block;margin-bottom:5px;color:var(--muted);font:9px ui-monospace,monospace}
 
 /* Pesquisa */
-.search-page-hero{padding:35px 36px 31px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(110deg,rgba(35,23,47,.94),rgba(17,17,17,.95)),url("./assets/cemetery-halloween.svg") center/cover}
+.search-page-hero{padding:35px 36px 31px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(110deg,color-mix(in srgb,var(--surface) 94%,var(--accent) 6%),rgba(17,17,17,.95)),url("./assets/cemetery-halloween.svg") center/cover}
 .search-page-hero h1{font-size:clamp(30px,3.3vw,43px)}
 .search-page-hero>p:not(.eyebrow){color:var(--muted);font-size:12px}
 .big-search-wrap,.overlay-input-wrap{display:flex;align-items:center;gap:11px;margin-top:24px;padding:0 14px;border:1px solid color-mix(in srgb,var(--accent-light) 35%,transparent);border-radius:7px;background:rgba(7,6,9,.62)}
