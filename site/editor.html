@@ -189,7 +189,9 @@ function bindImageEditor(){
    };
  });
  document.querySelectorAll('[data-image-file]').forEach(input=>{input.onchange=async()=>{const path=input.dataset.imageFile,spec=Object.values(IMAGE_SPECS).find(x=>x.path===path);const file=input.files?.[0];if(!file)return;try{
+   const previous=pendingImageUploads.get(path);
    const item=await prepareImageFile(file,spec);
+   if(previous)item.original=previous.original;
    pendingImageUploads.set(path,item);setPath(path,item.dataUrl);
    const urlInput=document.querySelector('[data-image-url="'+path+'"]');if(urlInput)urlInput.value='';
    displayImageAsset(path,item.warning+' Arquivo local pendente de publicação.',item.dimensions.width===spec.width&&item.dimensions.height===spec.height?'':'warn');sendPreview();
