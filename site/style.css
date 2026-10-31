@@ -650,3 +650,98 @@ body {
 .search-modal {
   border-color: color-mix(in srgb, var(--accent-light) 35%, transparent);
 }
+
+
+
+/* ==========================================
+   C4 - SUPERFICIE DINAMICA
+   Paineis, cartoes e areas internas
+   ========================================== */
+
+/* Cabecalho e menu lateral */
+.topbar {
+  background: color-mix(in srgb, color-mix(in srgb, var(--surface) 55%, #010005) 94%, transparent);
+}
+
+.sidebar {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface) 60%, #07020f),
+    var(--surface)
+  );
+}
+
+/* Cartoes da pagina inicial */
+.category-card {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--surface) 80%, #5a3875),
+    var(--surface)
+  );
+}
+
+.category-card:hover {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--surface) 65%, #5a3875),
+    var(--surface)
+  );
+}
+
+.update-card {
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+/* Cartoes de regras e navegacao */
+.rule-card {
+  background: color-mix(in srgb, color-mix(in srgb, var(--surface) 70%, #0a0415) 94%, transparent);
+}
+
+.rule-toc,
+.search-result {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.category-navigation button {
+  background: color-mix(in srgb, var(--surface) 80%, #250f3e);
+}
+
+/* Fundos dos paineis de categoria e pesquisa */
+.category-hero {
+  background:
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, color-mix(in srgb, var(--surface) 75%, #311155) 98%, transparent),
+      color-mix(in srgb, var(--surface) 93%, transparent)
+    ),
+    url("./assets/cemetery-halloween.svg") center/cover;
+}
+
+.search-page-hero {
+  background:
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, color-mix(in srgb, var(--surface) 70%, #4b256f) 94%, transparent),
+      color-mix(in srgb, var(--surface) 95%, transparent)
+    ),
+    url("./assets/cemetery-halloween.svg") center/cover;
+}
+
+/* Janela e campos da pesquisa */
+.search-modal {
+  background: color-mix(in srgb, var(--surface) 80%, #25113d);
+}
+
+.big-search-wrap,
+.overlay-input-wrap {
+  background: color-mix(in srgb, color-mix(in srgb, var(--surface) 55%, #010005) 62%, transparent);
+}
+
+/* Aviso: a barra lateral continua usando Cor Principal */
+.notice {
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--accent) 17%, transparent),
+    color-mix(in srgb, var(--surface) 92%, transparent) 55%
+  );
+}
