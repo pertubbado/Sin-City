@@ -317,3 +317,10 @@ body.sin-city-custom-bg {
   background:var(--custom-nav-highlight);
   box-shadow:0 9px 25px color-mix(in srgb,var(--custom-nav-highlight) 36%,transparent);
 }
+
+/* C6.13 — cor independente dos negritos nas regras.
+   Automatico respeita o texto principal original; titulos e botoes nao sao afetados. */
+.rule-content strong,
+.rule-content b {
+  color: var(--custom-rule-bold-color, var(--text));
+}
