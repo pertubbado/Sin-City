@@ -119,7 +119,7 @@
       '--background': theme.background || '#212121',
       '--surface': theme.surface || '#111111',
       '--text': theme.text || '#FFFFFF',
-      '--muted': theme.muted || '#542287'
+      '--muted': theme.muted || '#B6A9BF'
     };
     Object.entries(variables).forEach(([key, value]) => root.style.setProperty(key, value));
     root.style.setProperty('--muted-readable', theme.accent_light || '#AF7AFF');
