@@ -220,6 +220,67 @@ async function load(forceRemote=false){
   render();sendPreview();
  }catch(err){console.error(err);toast('Erro ao carregar os arquivos do site: '+err.message,'error');}
 }
+
+// C7.1 — Tema Padrão Clean: módulo isolado, sem presets de eventos.
+// Guarda o visual anterior para recuperação e não altera regras ou textos.
+const CLEAN_BACKUP_KEY = 'sin-city-clean-before-v1';
+function readCleanBackup(){
+ try{
+  const saved = JSON.parse(localStorage.getItem(CLEAN_BACKUP_KEY) || 'null');
+  return saved && typeof saved === 'object' && saved.theme && saved.layout ? saved : null;
+ }catch{return null;}
+}
+function applyCleanPreview(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de trocar o tema.','error');
+  return;
+ }
+ if(!readCleanBackup()){
+  try{localStorage.setItem(CLEAN_BACKUP_KEY,JSON.stringify(snapshotForStorage()));}
+  catch{toast('Não foi possível guardar o visual anterior. Libere espaço no navegador e tente novamente.','error');return;}
+ }
+ const current = structuredClone(site);
+ // Os tons neutros são somente valores iniciais, nunca restrições.
+ current.theme = Object.fromEntries(Object.keys(current.theme || {}).map(key=>[key,'']));
+ Object.assign(current.theme,{
+  accent:'#b7bec5',accent_light:'#e4e7eb',background:'#14171a',
+  surface:'#21252a',text:'#f5f6f8',muted:'#c4cad0'
+ });
+ current.layout = {...current.layout,show_hero_image:false,clean_mode:true};
+ current.cursor = {...current.cursor,enabled:false,trail_enabled:false,
+  falling_particles:{...(current.cursor?.falling_particles||{}),enabled:false}};
+ // Não apagar URLs do logo, do banner ou do fundo: só ocultar as decorações no modo Clean.
+ site = mergeSite(current);
+ render();sendPreview();toast('Tema Clean aplicado na prévia. Todas as cores continuam editáveis.','ok');
+}
+function restoreBeforeClean(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de restaurar.','error');
+  return;
+ }
+ const old = readCleanBackup();
+ if(!old){toast('Não há visual anterior salvo neste navegador.','error');return;}
+ site = mergeSite(old);
+ localStorage.removeItem(CLEAN_BACKUP_KEY);
+ render();sendPreview();toast('Visual anterior restaurado na prévia.','ok');
+}
+function cleanGalleryMarkup(){
+ return `<details class="card" id="cleanThemeCard">
+  <summary>🎨 Temas</summary>
+  <div class="card-body">
+   <div class="fixed-note">Escolha o visual que combina com sua cidade. Os temas são opcionais e todas as cores, imagens e configurações continuam editáveis no editor.</div>
+   <div class="item" role="group" aria-label="Tema Clean">
+    <div class="item-head"><strong>🫧 Tema Clean</strong></div>
+    <p class="small-note">Visual leve, neutro e sem efeitos extras. Personalize as cores como quiser, sem alterar textos, regras ou logo.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyCleanPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforeCleanBtn">↩ Restaurar visual anterior</button>
+    </div>
+   </div>
+   <p class="small-note">A prévia não publica alterações. Os próximos temas serão adicionados aqui, um por etapa, depois dos testes.</p>
+  </div>
+ </details>`;
+}
 function render(){
  $('#panel-site').innerHTML=`
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
@@ -335,7 +396,8 @@ ${optionalColorField('Cor dos Indicadores e Etiquetas',
     ${field('Quantidade','cursor.falling_particles.count')}
     ${field('Tamanho','cursor.falling_particles.size')}
   </div>
-</details>`;
+</details>
+${cleanGalleryMarkup()}`;
 
 renderRules();
 bindEditor();
@@ -362,6 +424,8 @@ function renderRules(){
 function subEditor(sub,i,j){sub.rules=Array.isArray(sub.rules)?sub.rules:[];return `<details class="subitem"><summary><b>📂 ${esc(sub.name||'Nova subcategoria')}</b> — ${sub.rules.length} regra(s)</summary><div class="field-row"><div class="field"><label>ID</label><input data-sub="${i}:${j}" data-k="id" value="${esc(sub.id||'')}"></div><div class="field"><label>Ícone</label><input data-sub="${i}:${j}" data-k="icon" value="${esc(sub.icon||'◈')}"></div></div><div class="field"><label>Nome da subcategoria</label><input data-sub="${i}:${j}" data-k="name" value="${esc(sub.name||'')}"></div><div class="inline"><button class="btn mini" data-add-sub-rule="${i}:${j}">+ Regra</button><button class="btn mini danger" data-del-sub="${i}:${j}">Excluir subcategoria</button></div>${sub.rules.map((r,k)=>ruleEditor(r,`data-sub-rule="${i}:${j}:${k}"`,`data-del-sub-rule="${i}:${j}:${k}"`)).join('')}</details>`;}
 function ruleEditor(r,attrs,delAttr){return `<div class="rule"><div class="item-head"><strong>${esc(r.code||'')} • ${esc(r.title||'Sem título')}</strong><button class="btn mini danger" ${delAttr}>Excluir</button></div><div class="field-row"><div class="field"><label>Código</label><input ${attrs} data-k="code" value="${esc(r.code||'')}"></div><div class="field"><label>Tag</label><input ${attrs} data-k="tag" value="${esc(r.tag||'REGRA')}"></div></div><div class="field"><label>Título</label><input ${attrs} data-k="title" value="${esc(r.title||'')}"></div><div class="field"><label>Texto da regra (Markdown permitido)</label><textarea ${attrs} data-k="text">${esc(r.text||'')}</textarea></div><div class="field"><label>Imagem (opcional)</label><input ${attrs} data-k="image" value="${esc(r.image||'')}"></div></div>`;}
 function bindEditor(){
+ $('#applyCleanPreviewBtn')?.addEventListener('click',applyCleanPreview);
+ $('#restoreBeforeCleanBtn')?.addEventListener('click',restoreBeforeClean);
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
