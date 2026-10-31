@@ -374,3 +374,14 @@ body.sin-city-pascoa .category-card::before{opacity:.45;}
 body.sin-city-pascoa .category-hero,body.sin-city-pascoa .search-page-hero{background:linear-gradient(110deg,color-mix(in srgb,var(--custom-category-panel) 97%,transparent),color-mix(in srgb,var(--custom-category-panel) 89%,transparent)),url("./assets/themes/pascoa/background.svg") center/cover;}
 body.sin-city-pascoa .category-hero{border-radius:15px;}
 @media(max-width:620px){body.sin-city-pascoa .hero{border-radius:14px;}body.sin-city-pascoa .hero-backdrop{background-position:62% center;}body.sin-city-pascoa .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 97%,transparent),color-mix(in srgb,var(--background) 70%,transparent) 66%,color-mix(in srgb,var(--background) 20%,transparent));}}
+
+/* C7.5 — Carnaval cartoon: decoração localizada no modo Carnaval.
+   Cores de texto, botões e painéis continuam editáveis. */
+body.sin-city-carnaval .hero{border-radius:19px;border-color:color-mix(in srgb,var(--accent-light) 44%,transparent);box-shadow:0 18px 44px color-mix(in srgb,var(--background) 76%,transparent);}
+body.sin-city-carnaval .hero-backdrop{background-position:center center;opacity:.98;}
+body.sin-city-carnaval .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 96%,transparent) 0%,color-mix(in srgb,var(--background) 88%,transparent) 32%,color-mix(in srgb,var(--background) 40%,transparent) 56%,transparent 83%),linear-gradient(0deg,color-mix(in srgb,var(--background) 31%,transparent),transparent 58%);}
+body.sin-city-carnaval .category-card,body.sin-city-carnaval .rule-card,body.sin-city-carnaval .update-card,body.sin-city-carnaval .notice{border-radius:15px;}
+body.sin-city-carnaval .category-card::before{opacity:.54;}
+body.sin-city-carnaval .category-hero,body.sin-city-carnaval .search-page-hero{background:linear-gradient(110deg,color-mix(in srgb,var(--custom-category-panel) 97%,transparent),color-mix(in srgb,var(--custom-category-panel) 89%,transparent)),url("./assets/themes/carnaval/background.svg") center/cover;}
+body.sin-city-carnaval .category-hero{border-radius:15px;}
+@media(max-width:620px){body.sin-city-carnaval .hero{border-radius:14px;}body.sin-city-carnaval .hero-backdrop{background-position:62% center;}body.sin-city-carnaval .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 97%,transparent),color-mix(in srgb,var(--background) 70%,transparent) 66%,color-mix(in srgb,var(--background) 20%,transparent));}}
