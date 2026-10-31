@@ -43,6 +43,7 @@
 @media(max-width:540px){.saved-theme-create{grid-template-columns:1fr}.saved-theme-save-btn{width:100%}.saved-theme-heading{display:block}.saved-theme-heading span{display:block;margin-top:6px}.saved-theme-actions .btn{flex:1 1 42%}}
 
 </style>
+<link rel="stylesheet" href="./editor-studio.css">
 </head>
 <body>
 <div class="shell">
@@ -55,16 +56,90 @@
   <button class="btn" id="backupBtn">⬇ Backup</button>
   <button class="btn" id="siteBtn">SITE ↗</button>
   <button class="btn" id="loginBtn">Conectar GitHub</button>
-  <button class="btn primary" id="publishBtn">PUBLICAR</button>
+  <button class="btn primary preview-publish-blocked" id="publishBtn" type="button" disabled title="Publicação bloqueada nesta versão de avaliação">PUBLICAÇÃO DESATIVADA</button>
 </header>
-<aside class="sidebar">
-  <div class="tabs"><button class="tab active" data-tab="site">SITE</button><button class="tab" data-tab="rules">REGRAS</button></div>
-  <section class="panel active" id="panel-site"></section>
-  <section class="panel" id="panel-rules"></section>
-  <p class="hint"><b>Rascunho</b> salva somente neste navegador. <b>PUBLICAR</b> envia as alterações para o seu repositório e inicia uma nova publicação pelo GitHub Pages.</p>
-  <p class="small-note">Este editor está configurado para o repositório pertubbado/Sin-City. A conta proprietária continua sendo pertubbado. A conexão usa um token limitado a esse repositório. Nunca compartilhe o token; ele fica guardado apenas na sessão atual do navegador.</p>
+<aside class="studio-nav" id="studioNav" aria-label="Navegação do editor">
+  <div class="studio-nav-heading"><span class="studio-nav-mark">SC</span><span class="studio-nav-heading-label">WORKSPACE</span></div>
+  <button class="studio-nav-item tab active" type="button" data-tab="dashboard" title="Visão geral" aria-label="Visão geral"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Visão geral</span></button>
+  <div class="studio-nav-divider"></div>
+  <span class="studio-nav-caption">GERENCIAMENTO</span>
+  <button class="studio-nav-item tab" type="button" data-tab="site" title="Configurações do site" aria-label="Configurações do site"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-label">Site</span></button>
+  <button class="studio-nav-item tab" type="button" data-tab="rules" title="Categorias e regras" aria-label="Categorias e regras"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Regras</span></button>
+  <button class="studio-nav-item" type="button" data-jump="cleanThemeCard" data-nav-key="themes" title="Biblioteca de temas" aria-label="Biblioteca de temas"><span class="nav-icon" aria-hidden="true">✧</span><span class="nav-label">Temas</span></button>
+  <button class="studio-nav-item" type="button" data-jump="mediaSection" data-nav-key="media" title="Central de imagens" aria-label="Central de imagens"><span class="nav-icon" aria-hidden="true">▧</span><span class="nav-label">Mídias</span></button>
+  <div class="studio-nav-bottom">
+    <div class="studio-nav-note">C7.9 · VERSÃO DE AVALIAÇÃO</div>
+    <button class="studio-nav-toggle" id="toggleNavBtn" type="button" aria-expanded="false" aria-label="Expandir navegação" title="Expandir navegação"><span class="nav-icon" aria-hidden="true">⇥</span><span class="nav-label">Expandir navegação</span></button>
+  </div>
 </aside>
-<main class="preview-area"><div class="preview-box"><div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="preview-label">prévia real • Sin City Roleplay</span></div><iframe id="preview" src="./index.html" title="Prévia do site"></iframe></div></main>
+<main class="editor-workspace" id="editorWorkspace">
+  <section class="panel active dashboard-panel" id="panel-dashboard" aria-labelledby="dashboardTitle">
+    <div class="dashboard-hero">
+      <div class="dashboard-hero-copy">
+        <p class="dashboard-eyebrow">CENTRAL DE CONTROLE · SIN CITY ROLEPLAY</p>
+        <h2 id="dashboardTitle">Seu espaço de trabalho.</h2>
+        <p>Gerencie o conteúdo, personalize a identidade visual e acompanhe o estado do projeto em um só lugar.</p>
+        <strong class="dashboard-city-name" id="dashboardProjectName">Carregando projeto...</strong>
+      </div>
+      <div class="dashboard-hero-mark" aria-hidden="true"><span>SC</span><small>STUDIO</small></div>
+    </div>
+    <div class="dashboard-stats" aria-label="Resumo do projeto">
+      <article class="dashboard-stat"><span>CATEGORIAS</span><strong id="dashboardCategoryCount">—</strong><small>Grupos de conteúdo</small></article>
+      <article class="dashboard-stat"><span>REGRAS</span><strong id="dashboardRuleCount">—</strong><small>Regras cadastradas</small></article>
+      <article class="dashboard-stat"><span>ATUALIZAÇÕES</span><strong id="dashboardUpdateCount">—</strong><small>Comunicados registrados</small></article>
+      <article class="dashboard-stat"><span>TEMAS OFICIAIS</span><strong>7</strong><small>Mais seus visuais salvos</small></article>
+    </div>
+    <section class="dashboard-section">
+      <div class="dashboard-section-heading"><div><p class="dashboard-eyebrow">NAVEGAÇÃO RÁPIDA</p><h3>Acesso rápido</h3></div><span>Escolha por onde continuar</span></div>
+      <div class="dashboard-shortcuts">
+        <button class="dashboard-shortcut" type="button" data-dashboard-tab="site"><span class="shortcut-icon">▣</span><span class="shortcut-copy"><strong>Configurar o site</strong><small>Identidade, imagens, cores e efeitos</small></span><span class="shortcut-arrow">↗</span></button>
+        <button class="dashboard-shortcut" type="button" data-dashboard-tab="rules"><span class="shortcut-icon">▤</span><span class="shortcut-copy"><strong>Gerenciar regras</strong><small>Categorias, subcategorias e atualizações</small></span><span class="shortcut-arrow">↗</span></button>
+        <button class="dashboard-shortcut" type="button" data-dashboard-jump="cleanThemeCard"><span class="shortcut-icon">✧</span><span class="shortcut-copy"><strong>Biblioteca de temas</strong><small>Sete temas e seus visuais personalizados</small></span><span class="shortcut-arrow">↗</span></button>
+        <button class="dashboard-shortcut" type="button" data-dashboard-jump="mediaSection"><span class="shortcut-icon">▧</span><span class="shortcut-copy"><strong>Central de imagens</strong><small>Logo, favicon, banner, fundo e cursor</small></span><span class="shortcut-arrow">↗</span></button>
+      </div>
+    </section>
+    <div class="dashboard-bottom-grid">
+      <section class="dashboard-info-card">
+        <div class="dashboard-card-heading"><span class="dashboard-card-icon">⚙</span><div><h3>Ferramentas rápidas</h3><p>Ações locais disponíveis nesta versão.</p></div></div>
+        <div class="dashboard-quick-actions">
+          <button class="btn" type="button" data-dashboard-action="draft">💾 Salvar rascunho</button>
+          <button class="btn" type="button" data-dashboard-action="backup">⬇ Baixar backup</button>
+          <button class="btn" type="button" data-dashboard-action="open-site">↗ Abrir site público</button>
+        </div>
+        <p class="dashboard-footnote" id="dashboardDraftStatus">Rascunho local: verificando...</p>
+      </section>
+      <section class="dashboard-info-card">
+        <div class="dashboard-card-heading"><span class="dashboard-card-icon">◉</span><div><h3>Estado da sessão</h3><p>Informações desta versão de avaliação.</p></div></div>
+        <div class="dashboard-status-row"><span>GitHub</span><strong id="dashboardGithubStatus">Não conectado nesta sessão</strong></div>
+        <div class="dashboard-status-row"><span>Prévia</span><strong class="status-live-text">Atualização automática</strong></div>
+        <div class="dashboard-status-row"><span>Publicação</span><strong class="status-preview-text">Bloqueada nesta versão de teste</strong></div>
+      </section>
+    </div>
+    <section class="dashboard-roadmap">
+      <div><p class="dashboard-eyebrow">PRÓXIMAS EVOLUÇÕES</p><h3>O Studio pode crescer com o projeto.</h3><p>As ferramentas abaixo são ideias planejadas, não estão disponíveis nesta versão.</p></div>
+      <div class="dashboard-roadmap-tags"><span>C8.0 · Diagnóstico</span><span>C8.1 · Histórico de versões</span><span>C8.2 · Gerenciador de mídias</span></div>
+    </section>
+  </section>
+  <section class="panel" id="panel-site" aria-label="Configurações do site"></section>
+  <section class="panel" id="panel-rules" aria-label="Gerenciamento de regras"></section>
+</main>
+<section class="preview-area" id="previewArea" aria-label="Prévia ao vivo do site">
+  <div class="preview-box" id="previewBox" data-device="desktop">
+    <div class="preview-bar">
+      <div class="preview-window-controls" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="preview-label">PRÉVIA AO VIVO · SIN CITY ROLEPLAY</span>
+      <div class="preview-actions">
+        <div class="preview-device-group" role="group" aria-label="Tamanho da prévia">
+          <button class="preview-device active" type="button" data-preview-device="desktop" aria-pressed="true">Desktop</button>
+          <button class="preview-device" type="button" data-preview-device="tablet" aria-pressed="false">Tablet</button>
+          <button class="preview-device" type="button" data-preview-device="mobile" aria-pressed="false">Mobile</button>
+        </div>
+        <button class="btn mini preview-fullscreen-btn" id="previewFullscreenBtn" type="button" aria-pressed="false">⛶ Tela cheia</button>
+      </div>
+    </div>
+    <div class="preview-viewport"><iframe class="preview-iframe" id="preview" src="./index.html" title="Prévia do site"></iframe></div>
+  </div>
+</section>
 </div>
 <div id="tokenModal" class="auth-modal" hidden role="dialog" aria-modal="true" aria-labelledby="tokenModalTitle">
   <div class="auth-card">
@@ -88,6 +163,8 @@
 // Configuração do novo repositório da Sin City.
 const REPO = 'pertubbado/Sin-City';
 const BRANCH = 'main';
+// C7.9 preview safety: publishing stays disabled until the approved PR is prepared for merge.
+const PREVIEW_BUILD = true;
 const SITE_PATH = 'site/content/site.json';
 const RULES_PATH = 'site/rules.json';
 const CONTENT_RULES_PATH = 'site/content/rules.json';
@@ -640,7 +717,7 @@ function render(){
  ${field('Texto inferior do menu lateral', 'side_footer_bottom')}
  ${optionalColorField('Cor do texto inferior', 'theme.side_footer_bottom_color', 'theme.label_color|#675672')}
  </div></details>
- <details class="card" open>
+ <details class="card" open id="mediaSection">
  <summary>🖼️ Central de Imagens</summary>
  <div class="card-body">
  <div class="fixed-note">Escolha arquivos do computador ou cole URLs HTTPS. As medidas abaixo são recomendações exatas; proporções diferentes podem sofrer recorte na prévia. O botão PUBLICAR envia os arquivos selecionados ao GitHub junto dos dados do site.</div>
@@ -742,6 +819,7 @@ ${cleanGalleryMarkup()}`;
 
 renderRules();
 bindEditor();
+updateDashboard();
 
 }
 function renderRules(){
@@ -819,7 +897,7 @@ if (picker) {
  $$('[data-del-upd]').forEach(b=>b.onclick=()=>{data.updates.splice(+b.dataset.delUpd,1);renderRules();bindEditor();sendPreview();});
 }
 function sendPreview(){const f=$('#preview');if(f?.contentWindow){f.contentWindow.postMessage({type:'sin-city-preview',site,data},location.origin);}}
-function saveDraft(){localStorage.setItem('sin-city-editor-draft',JSON.stringify({site:snapshotForStorage(),data,savedAt:new Date().toISOString()}));toast(pendingImageUploads.size?'Rascunho salvo. Arquivos locais precisam ser selecionados novamente ao reabrir.':'Rascunho salvo somente neste navegador.','ok');}
+function saveDraft(){localStorage.setItem('sin-city-editor-draft',JSON.stringify({site:snapshotForStorage(),data,savedAt:new Date().toISOString()}));toast(pendingImageUploads.size?'Rascunho salvo. Arquivos locais precisam ser selecionados novamente ao reabrir.':'Rascunho salvo somente neste navegador.','ok');updateDashboard();}
 function login(){
  const modal=$('#tokenModal');
  modal.hidden=false;
@@ -853,10 +931,11 @@ async function connectWithToken(){
 }
 async function gh(path,options={}){if(!githubToken)throw new Error('Entre com GitHub primeiro.');const res=await fetch('https://api.github.com'+path,{...options,headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+githubToken,'X-GitHub-Api-Version':'2022-11-28',...(options.headers||{})}});if(res.status===401){logout(false);throw new Error('Sessão do GitHub expirada. Entre novamente.');}let body=null;try{body=await res.json()}catch{}if(!res.ok)throw new Error(body?.message||`GitHub respondeu ${res.status}`);return body;}
 async function loadGitHubUser(){if(!githubToken){updateAuthUI();return;}try{githubUser=await gh('/user');updateAuthUI();}catch(err){githubUser=null;updateAuthUI();if(githubToken)toast(err.message,'error');}}
-function updateAuthUI(){const box=$('#authStatus'),text=$('#authText'),avatar=$('#userAvatar'),btn=$('#loginBtn');if(githubToken&&githubUser){box.className='status ok';text.textContent=githubUser.login;avatar.src=githubUser.avatar_url||'';avatar.style.display=githubUser.avatar_url?'block':'none';btn.textContent='Sair';btn.onclick=()=>logout();}else{box.className='status warn';text.textContent='Não conectado';avatar.style.display='none';btn.textContent='Conectar GitHub';btn.onclick=login;}}
+function updateAuthUI(){const box=$('#authStatus'),text=$('#authText'),avatar=$('#userAvatar'),btn=$('#loginBtn');if(githubToken&&githubUser){box.className='status ok';text.textContent=githubUser.login;avatar.src=githubUser.avatar_url||'';avatar.style.display=githubUser.avatar_url?'block':'none';btn.textContent='Sair';btn.onclick=()=>logout();}else{box.className='status warn';text.textContent='Não conectado';avatar.style.display='none';btn.textContent='Conectar GitHub';btn.onclick=login;}updateDashboard();}
 function logout(show=true){githubToken='';githubUser=null;sessionStorage.removeItem('sin-city-gh-token');updateAuthUI();if(show)toast('Sessão do editor encerrada.');}
 async function createBlob(content){return gh(`/repos/${REPO}/git/blobs`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,encoding:'utf-8'})});}
 async function publish(){
+ if(PREVIEW_BUILD){toast('A publicação está bloqueada nesta versão de avaliação. Nenhum arquivo será enviado ao GitHub.','error');return;}
  if(!githubToken){login();toast('Entre com GitHub para publicar.');return;}
  if(!confirm('Publicar as alterações e imagens no GitHub? Isso atualiza o site para todos os visitantes.'))return;
  const btn=$('#publishBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='PUBLICANDO...';
@@ -889,7 +968,83 @@ async function publish(){
  finally{btn.disabled=false;btn.textContent=old;}
 }
 function backup(){const payload={exportedAt:new Date().toISOString(),site:snapshotForStorage(),data};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='sin-city-editor-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup baixado.','ok');}
-$$('.tab').forEach(b=>b.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));$$('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#panel-'+b.dataset.tab).classList.add('active');});
+function updateDashboard(){
+ const categories=Array.isArray(data.categories)?data.categories:[];
+ const totalRules=categories.reduce((total,category)=>total+(Array.isArray(category.rules)?category.rules.length:0)+(Array.isArray(category.subcategories)?category.subcategories.reduce((sum,sub)=>sum+(Array.isArray(sub.rules)?sub.rules.length:0),0):0),0);
+ const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
+ setText('dashboardProjectName',site.site_name||'Sin City Roleplay');
+ setText('dashboardCategoryCount',categories.length);
+ setText('dashboardRuleCount',totalRules);
+ setText('dashboardUpdateCount',Array.isArray(data.updates)?data.updates.length:0);
+ setText('dashboardGithubStatus',githubUser?'Conectado como @'+githubUser.login:'Não conectado nesta sessão');
+ let hasDraft=false;try{hasDraft=!!localStorage.getItem('sin-city-editor-draft');}catch{}
+ setText('dashboardDraftStatus',hasDraft?'Há um rascunho local salvo neste navegador.':'Nenhum rascunho local salvo no momento.');
+}
+function activateStudioPanel(name){
+ $('.panel').forEach(panel=>panel.classList.remove('active'));
+ $('.studio-nav-item[data-tab]').forEach(button=>{const active=button.dataset.tab===name;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+ const target=$('#panel-'+name);if(target)target.classList.add('active');
+ const workspace=$('#editorWorkspace');if(workspace)workspace.scrollTop=0;
+ if(name==='dashboard')updateDashboard();
+}
+function activateStudioJump(id,key){
+ activateStudioPanel('site');
+ $('.studio-nav-item').forEach(button=>button.classList.remove('active'));
+ const navButton=$('.studio-nav-item[data-nav-key="'+key+'"]');if(navButton){navButton.classList.add('active');navButton.setAttribute('aria-current','location');}
+ requestAnimationFrame(()=>{const target=document.getElementById(id);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});
+}
+$('.studio-nav-item[data-tab]').forEach(button=>button.addEventListener('click',()=>activateStudioPanel(button.dataset.tab)));
+$('.studio-nav-item[data-jump]').forEach(button=>button.addEventListener('click',()=>activateStudioJump(button.dataset.jump,button.dataset.navKey)));
+$('[data-dashboard-tab]').forEach(button=>button.addEventListener('click',()=>activateStudioPanel(button.dataset.dashboardTab)));
+$('[data-dashboard-jump]').forEach(button=>button.addEventListener('click',()=>activateStudioJump(button.dataset.dashboardJump,button.dataset.dashboardJump==='cleanThemeCard'?'themes':'media')));
+$('[data-dashboard-action]').forEach(button=>button.addEventListener('click',()=>{
+ const action=button.dataset.dashboardAction;
+ if(action==='draft')saveDraft();
+ if(action==='backup')backup();
+ if(action==='open-site')window.open('./index.html','_blank','noopener');
+}));
+$('#toggleNavBtn').addEventListener('click',()=>{
+ const shell=$('.shell'),expanded=shell.classList.toggle('nav-expanded'),button=$('#toggleNavBtn');
+ button.setAttribute('aria-expanded',String(expanded));
+ button.setAttribute('aria-label',expanded?'Recolher navegação':'Expandir navegação');
+ button.title=expanded?'Recolher navegação':'Expandir navegação';
+ const label=button.querySelector('.nav-label');if(label)label.textContent=expanded?'Recolher navegação':'Expandir navegação';
+});
+function setPreviewDevice(device){
+ const box=$('#previewBox');if(!box)return;
+ box.dataset.device=device;
+ document.querySelectorAll('[data-preview-device]').forEach(button=>{
+  const active=button.dataset.previewDevice===device;
+  button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+ });
+}
+document.querySelectorAll('[data-preview-device]').forEach(button=>button.addEventListener('click',()=>setPreviewDevice(button.dataset.previewDevice)));
+function updateFullscreenButton(){
+ const area=$('#previewArea'),button=$('#previewFullscreenBtn');if(!area||!button)return;
+ const active=document.fullscreenElement===area||area.classList.contains('is-fullscreen');
+ button.textContent=active?'↙ Voltar ao editor':'⛶ Tela cheia';
+ button.setAttribute('aria-pressed',String(active));
+}
+async function togglePreviewFullscreen(){
+ const area=$('#previewArea');if(!area)return;
+ try{
+  if(document.fullscreenElement===area){await document.exitFullscreen();return;}
+  if(area.classList.contains('is-fullscreen')){area.classList.remove('is-fullscreen');document.body.classList.remove('preview-fallback-open');updateFullscreenButton();return;}
+  if(area.requestFullscreen){await area.requestFullscreen();}
+  else{area.classList.add('is-fullscreen');document.body.classList.add('preview-fallback-open');}
+ }catch{
+  area.classList.add('is-fullscreen');document.body.classList.add('preview-fallback-open');
+ }
+ updateFullscreenButton();
+}
+$('#previewFullscreenBtn').addEventListener('click',togglePreviewFullscreen);
+document.addEventListener('fullscreenchange',updateFullscreenButton);
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&$('#previewArea')?.classList.contains('is-fullscreen')){
+  $('#previewArea').classList.remove('is-fullscreen');document.body.classList.remove('preview-fallback-open');updateFullscreenButton();
+ }
+});
+
 $('#preview').addEventListener('load',sendPreview);$('#reloadBtn').onclick=()=>{if(confirm('Recarregar os dados publicados? Um rascunho não salvo pode ser perdido.'))load(true);};$('#draftBtn').onclick=saveDraft;$('#backupBtn').onclick=backup;$('#siteBtn').onclick=()=>window.open('./index.html','_blank','noopener');$('#loginBtn').onclick=login;$('#publishBtn').onclick=publish;$('#cancelTokenBtn').onclick=()=>{$('#tokenModal').hidden=true;$('#tokenInput').value='';};$('#connectTokenBtn').onclick=connectWithToken;$('#tokenInput').addEventListener('keydown',e=>{if(e.key==='Enter')connectWithToken();if(e.key==='Escape')$('#tokenModal').hidden=true;});$('#tokenModal').addEventListener('click',e=>{if(e.target.id==='tokenModal')$('#tokenModal').hidden=true;});
 load();updateAuthUI();if(githubToken)loadGitHubUser();
 </script>
