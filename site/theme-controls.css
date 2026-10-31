@@ -324,3 +324,13 @@ body.sin-city-custom-bg {
 .rule-content b {
   color: var(--custom-rule-bold-color, var(--text));
 }
+
+/* C6.14 — assinatura da capa: cor opcional separada dos indicadores. */
+.hero-signature {
+  color: var(--custom-hero-signature-color, var(--custom-label-color, var(--accent-light)));
+  max-width: min(46%, 320px);
+}
+.hero-signature > span,
+.hero-signature > small {
+  overflow-wrap: anywhere;
+}
