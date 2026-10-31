@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cursor cartoon de copo de drink tropical com rodela de limão e mini guarda-chuva">
+<defs><linearGradient id="juice" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFE59A"/><stop offset=".55" stop-color="#FFBC53"/><stop offset="1" stop-color="#F77F8D"/></linearGradient></defs>
+<!-- umbrella and fruit, compact and symmetric -->
+<path d="M34 13l18-9" stroke="#F7E6D5" stroke-width="3" stroke-linecap="round"/>
+<path d="M39 8q9-12 20-3l-8 11z" fill="#F685B7" stroke="#754568" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M43 7l8 9" stroke="#FBEACB" stroke-width="2" opacity=".75"/>
+<circle cx="43" cy="19" r="9" fill="#F2BD6F" stroke="#FFF2CD" stroke-width="3"/>
+<circle cx="43" cy="19" r="5" fill="#FFE79F" stroke="#F29D62" stroke-width="1.4"/>
+<path d="M43 14v10m-5-5h10" stroke="#F4AF68" stroke-width="1.2"/>
+<!-- straw -->
+<path d="M24 19L29 5l8-2" fill="none" stroke="#FFF0DC" stroke-width="4" stroke-linecap="round"/>
+<path d="M24 18L29 5l8-2" fill="none" stroke="#E7829B" stroke-width="1.7" stroke-dasharray="4 3" stroke-linecap="round"/>
+<!-- glass: clearly recognizable at small size -->
+<path d="M10 23h34l-5 22q-2 5-12 7-10-2-12-7z" fill="url(#juice)" stroke="#FFF4E8" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M8 23h38" stroke="#FFF6E9" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M27 52v7m-10 2h20" stroke="#FFF1E4" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M15 30l7-3m-3 11l5-2" stroke="#FFF8E2" stroke-width="2.4" opacity=".7" stroke-linecap="round"/>
+<path d="M31 33l6 4-4 6-6-4z" fill="#FFF2D1" opacity=".72"/>
+<path d="M44 45l4-3m-1 8l3-1" stroke="#FFE6A4" stroke-width="2.8" stroke-linecap="round"/>
+</svg>
