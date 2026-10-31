@@ -141,6 +141,14 @@
     };
     Object.entries(variables).forEach(([key, value]) => root.style.setProperty(key, value));
     root.style.setProperty('--muted-readable', theme.accent_light || '#AF7AFF');
+    
+const labelColor = theme.label_color;
+
+if (/^#[0-9a-f]{6}$/i.test(String(labelColor || ''))) {
+  root.style.setProperty('--custom-label-color', labelColor);
+} else {
+  root.style.removeProperty('--custom-label-color');
+}
   }
 
   function updateBrand(site) {
