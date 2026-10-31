@@ -228,7 +228,8 @@ $$('[data-reset-color]').forEach(btn => {
 const fallback =
   path === 'theme.glow_color'
     ? 'theme.accent'
-    : path === 'theme.label_color'
+    : path === 'theme.label_color' ||
+      path === 'cursor.glow_color'
       ? 'theme.accent_light'
       : 'theme.surface';
 
