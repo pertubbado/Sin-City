@@ -524,7 +524,10 @@ function setupAmbientParticles(config = {}) {
     Math.min(22, Number.isFinite(parsedSize) ? parsedSize : 13)
   );
 
-  const color = config.color || '#AF7AFF';
+  // A cor da paleta precisa chegar a cada particula, nao so ao contêiner.
+  const configuredColor = String(config.color || '').trim();
+  const color = /^#[0-9a-f]{6}$/i.test(configuredColor) ? configuredColor : '#AF7AFF';
+  host.style.setProperty('--ambient-particle-color', color);
 
   const particleSets = {
     letters: ['S', 'C'],
@@ -535,12 +538,16 @@ function setupAmbientParticles(config = {}) {
 
   const symbols = particleSets[config.type] || particleSets.mixed;
 
-  host.style.color = color;
-
   for (let i = 0; i < count; i++) {
     const particle = document.createElement('span');
     particle.className = 'ambient-particle';
-    particle.textContent = symbols[i % symbols.length];
+    const symbol = symbols[i % symbols.length];
+    // Emojis coloridos nao obedecem ao CSS color: usar icones vetoriais monocromaticos.
+    if (symbol === '🎃' || symbol === '🦇') {
+      particle.classList.add('ambient-particle-icon', symbol === '🎃' ? 'particle-pumpkin' : 'particle-bat');
+    } else {
+      particle.textContent = symbol;
+    }
     particle.style.left = `${Math.random() * 100}%`;
     particle.style.fontSize = `${size * (.65 + Math.random() * .6)}px`;
     particle.style.animationDuration = `${13 + Math.random() * 15}s`;
