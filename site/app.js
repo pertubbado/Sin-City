@@ -113,6 +113,7 @@
   function applyTheme(site) {
     const theme = site.theme || {};
     const root = document.documentElement;
+    document.body.classList.toggle('sin-city-clean',site.layout?.clean_mode === true);
     const safeOverride = (key, fallback) =>
   /^#[0-9a-f]{6}$/i.test(String(theme[key] || ''))
     ? theme[key]
