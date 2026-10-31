@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" width="1920" height="800" role="img" aria-label="Tema Dia dos Namorados cartoon com doodles de corações, envelope, presente, laços, flores e cartinha">
+<defs>
+ <linearGradient id="back" x1="0" y1="0" x2="1" y2=".1"><stop stop-color="#441B33"/><stop offset=".47" stop-color="#853652"/><stop offset=".72" stop-color="#F8BFC5"/><stop offset="1" stop-color="#FFF0E9"/></linearGradient>
+ <radialGradient id="softpink"><stop stop-color="#FFF4EF" stop-opacity=".78"/><stop offset="1" stop-color="#FFF4EF" stop-opacity="0"/></radialGradient>
+ <linearGradient id="redheart" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FF7C97"/><stop offset=".55" stop-color="#F63E64"/><stop offset="1" stop-color="#B91E4C"/></linearGradient>
+ <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF9EE"/><stop offset="1" stop-color="#FFE4DE"/></linearGradient>
+ <filter id="shadow" x="-35%" y="-40%" width="180%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="11"/><feComponentTransfer><feFuncA type="linear" slope=".19"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ </defs>
+<rect width="1920" height="800" fill="url(#back)"/>
+<ellipse cx="1606" cy="400" rx="510" ry="382" fill="url(#softpink)"/>
+<!-- doodles: warm sketch lines like the supplied reference -->
+<g stroke="#B02D55" stroke-width="7" fill="none" opacity=".82" stroke-linecap="round">
+ <path d="M65 190Q124 113 180 158t111-9q62-38 104 7" stroke="#FF95B1" opacity=".52"/>
+ <path d="M916 402q45-63 88-16t104-1q37-40 80-3" stroke="#FFF0E6" opacity=".72"/>
+ <path d="M1652 129q57-36 104 5t99-4" opacity=".75"/>
+ <path d="M1477 742q-18-44 23-57t71 10q48 34 91-9" opacity=".54"/>
+</g>
+<g><path transform="translate(888 109) rotate(15) scale(0.65)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FF7393" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1076 178) rotate(-16) scale(0.48)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFF0DA" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1111 550) rotate(-18) scale(0.52)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFB8C8" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1881 605) rotate(25) scale(0.48)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#ED406A" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1021 318) rotate(22) scale(0.55)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFF4E8" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1808 102) rotate(-10) scale(0.59)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFD6DD" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1613 687) rotate(15) scale(0.47)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFF1ED" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1180 688) rotate(-28) scale(0.51)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#F46583" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(184 100) rotate(7) scale(0.41)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FF91AC" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(698 70) rotate(-14) scale(0.4)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFE1D9" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(946 714) rotate(-23) scale(0.33)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FFD8E1" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1418 77) rotate(27) scale(0.5)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FA668C" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path transform="translate(1744 342) rotate(-14) scale(0.37)" d="M0 23C-11 10-31 5-29-13C-27-35-4-40 0-22C9-42 33-34 32-13C31 6 11 11 0 23Z" fill="#FF91B0" stroke="#92213D" stroke-width="4" stroke-linejoin="round"/><path d="M810 24v16m-8 -8h16" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1002 180v20m-10 -10h20" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1232 430v24m-12 -12h24" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1500 40v28m-14 -14h28" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1806 486v16m-8 -8h16" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1070 284v20m-10 -10h20" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1452 176v24m-12 -12h24" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1872 162v28m-14 -14h28" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1250 250v16m-8 -8h16" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1746 424v20m-10 -10h20" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1200 692v24m-12 -12h24" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1772 320v28m-14 -14h28" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1302 50v16m-8 -8h16" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M870 600v20m-10 -10h20" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1556 510v24m-12 -12h24" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1200 514v28m-14 -14h28" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M882 620v16m-8 -8h16" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1682 78v20m-10 -10h20" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1440 364v24m-12 -12h24" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1236 744v28m-14 -14h28" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1070 492v16m-8 -8h16" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M942 326v20m-10 -10h20" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M852 254v24m-12 -12h24" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1880 276v28m-14 -14h28" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1866 400v16m-8 -8h16" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M810 610v20m-10 -10h20" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M872 180v24m-12 -12h24" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M972 578v28m-14 -14h28" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1110 344v16m-8 -8h16" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1286 196v20m-10 -10h20" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1500 142v24m-12 -12h24" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1752 182v28m-14 -14h28" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M962 324v16m-8 -8h16" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1290 552v20m-10 -10h20" stroke="#FFF5E7" stroke-width="3" opacity=".55" stroke-linecap="round"/><path d="M1656 140v24m-12 -12h24" stroke="#E9466F" stroke-width="3" opacity=".55" stroke-linecap="round"/></g>
+<!-- looping love-note dotted line -->
+<path d="M791 608q114-105 173-22t135 20q68-13 85-60t-23-41q-30 10-8 47t83 43" fill="none" stroke="#FFE6E5" stroke-width="7" stroke-linecap="round" stroke-dasharray="3 18" opacity=".75"/>
+<!-- big lovely doodle heart, right upper -->
+<g filter="url(#shadow)">
+ <path d="M1655 360Q1520 259 1560 181Q1620 67 1736 166Q1845 72 1906 172Q1974 300 1742 461Z" fill="url(#redheart)" stroke="#8C1E46" stroke-width="15" stroke-linejoin="round"/>
+ <path d="M1654 334Q1578 280 1597 201Q1627 160 1674 187M1746 175q48-63 92-29" fill="none" stroke="#FFF3E7" stroke-width="13" opacity=".75" stroke-linecap="round"/>
+ <path d="M1674 355q69 37 139-5" stroke="#FFB3BA" stroke-width="8" fill="none" stroke-linecap="round" opacity=".6"/>
+</g>
+<!-- big love-letter envelope below heart on the right, with a heart seal -->
+<g filter="url(#shadow)" stroke="#982A4D" stroke-linejoin="round">
+ <rect x="1212" y="363" width="375" height="234" rx="18" fill="url(#paper)" stroke-width="13"/>
+ <path d="M1223 382l176 132q15 12 30 0l149-129" fill="none" stroke="#D77C88" stroke-width="9"/>
+ <path d="M1224 578l120-109m233 110l-109-110" fill="none" stroke="#EAA0A2" stroke-width="7"/>
+ <path d="M1337 396q-28-55 9-76 35-15 55 10 33-36 63-10 41 42-64 106Z" fill="#FFD2DE" stroke-width="8"/>
+ <path d="M1379 461c-13-13-28-10-29 5-1 12 22 30 29 36 7-7 33-24 30-38-3-16-23-14-30-3z" fill="#F14F72" stroke-width="5"/>
+</g>
+<!-- adorable ribbon and gift, bottom right -->
+<g filter="url(#shadow)" stroke="#A73355" stroke-linejoin="round">
+ <rect x="1609" y="534" width="235" height="181" rx="13" fill="#FFDFE3" stroke-width="12"/>
+ <rect x="1589" y="517" width="273" height="52" rx="12" fill="#FFEDE3" stroke-width="12"/>
+ <path d="M1726 528v186" stroke="#F04B70" stroke-width="32"/><path d="M1609 543h236" stroke="#F04B70" stroke-width="15"/>
+ <path d="M1726 525Q1620 510 1663 467q39-33 63 58m0 0q61-116 113-66 34 47-113 66Z" fill="#F45C82" stroke-width="10"/>
+ <circle cx="1726" cy="528" r="19" fill="#FFD1A8" stroke-width="8"/>
+ <path d="M1644 622c-8-8-18-5-18 5 0 9 14 22 18 24 6-6 21-16 20-24 0-11-14-13-20-5z" fill="#F6799E" stroke-width="3"/>
+ <path d="M1818 634c-7-7-15-5-15 4 0 9 11 18 15 20 5-5 17-14 17-20-1-10-12-12-17-4z" fill="#F6799E" stroke-width="3"/>
+</g>
+<!-- rose-like hand-drawn flower and stems -->
+<g transform="translate(1165 704) rotate(-14)" stroke="#A33A58" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M25 28Q33-66 67-150" fill="none" stroke="#609B72" stroke-width="10"/>
+ <path d="M41-49q-70-35-72 0Q-20-16 42-30m16-33q75-38 85-9Q120-39 60-44" fill="#83C49A" stroke="#609B72" stroke-width="6"/>
+ <path d="M63-144q-69-28-31-79 13-12 30-11 27-59 65-13 43 11 26 51-10 45-83 64z" fill="#F46183"/>
+ <path d="M56-177q25-22 53-7m-37-28q37-8 53 25M75-147q20-15 38-13" fill="none" stroke="#FFD7D9" stroke-width="7"/>
+</g>
+<!-- little Valentine cloud, heart arrow and corner doodles -->
+<g stroke="#A13A55" stroke-linejoin="round" stroke-width="6">
+ <path d="M1024 144q-20-38 16-46 19-26 50-7 32-18 45 16 38 18 10 46Z" fill="#FFF6E9"/>
+ <path d="M1049 128q26-24 53 0" fill="none" stroke="#E6A0AE" stroke-width="4"/>
+</g>
+<path d="M1462 171l120 54" stroke="#A9445C" stroke-width="8" stroke-linecap="round"/>
+<path d="M1450 162l22 13-22 14m125 23l-10 20 23-10" fill="none" stroke="#A9445C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(1345 95) scale(0.65)" stroke="#A43D58" stroke-width="6" stroke-linecap="round" fill="none"><path d="M0 0Q60 54 122 0Q180-49 239 0"/><path d="M69 23q-29-39-48-23q-7 23 48 23m59-13q11-45 37-37q11 28-37 37m59-24q24-31 43-23q0 27-43 23" fill="#F6B0B7" stroke-width="4"/></g>
+<path d="M0 766q387-37 765 8t644-3q247-43 511-1v30H0z" fill="#5C2342" opacity=".25"/>
+</svg>
