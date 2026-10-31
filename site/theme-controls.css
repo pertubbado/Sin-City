@@ -174,3 +174,8 @@
 .search-result-meta {
   color: var(--custom-label-color, var(--muted));
 }
+
+/* C6.3 - Setas do menu lateral */
+.category-nav .nav-expand {
+  color: var(--custom-label-color, #a58cbb);
+}
