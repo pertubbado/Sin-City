@@ -69,6 +69,9 @@ let githubToken = sessionStorage.getItem('sin-city-gh-token') || '';
 let githubUser = null;
 const defaults = {
  theme:{accent:'#542287',accent_light:'#AF7AFF',background:'#212121',surface:'#111111',text:'#FFFFFF',muted:'#B6A9BF'},
+ side_footer_top:'CONHEÇA AS REGRAS.',
+ side_footer_highlight:'ESCOLHA SEU CAMINHO.',
+ side_footer_bottom:'SIN CITY · 2026',
  layout:{show_search:true,show_updates:true,show_notice:true,show_hero_image:true,show_admin_link:false},
  cursor:{enabled:true,trail_enabled:true,size:38,image:'./assets/pumpkin-cursor.svg',trail_type:'glow',trail_color:'#2D1243',trail_count:16,falling_particles:{enabled:true,type:'mixed',color:'#AF7AFF',count:15,size:13}}
 };
@@ -88,11 +91,13 @@ function field(label,path,type='text',opts=''){
 
 function resolveColorFallback(fallback) {
   const isHex = value => /^#[0-9a-f]{6}$/i.test(String(value || ''));
-  if (isHex(fallback)) return fallback;
-  const current = getPath(fallback);
+  const [path, backup] = String(fallback || '').split('|');
+  if (isHex(path)) return path;
+  const current = getPath(path);
   if (isHex(current)) return current;
-  const original = String(fallback).split('.').reduce((obj, key) => obj?.[key], defaults);
-  return isHex(original) ? original : '#111111';
+  const original = path.split('.').reduce((obj, key) => obj?.[key], defaults);
+  if (isHex(original)) return original;
+  return isHex(backup) ? backup : '#111111';
 }
 
 function optionalColorField(label, path, fallback) {
@@ -139,6 +144,13 @@ function render(){
  $('#panel-site').innerHTML=`
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
  ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Logo','logo')}${field('Favicon','favicon')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}${field('Imagem da capa','hero_image')}${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
+ <div class="fixed-note">✦ Rodapé do menu lateral — abaixo das categorias</div>
+ ${field('Texto superior do menu lateral', 'side_footer_top')}
+ ${optionalColorField('Cor do texto superior', 'theme.side_footer_top_color', 'theme.muted')}
+ ${field('Texto em destaque do menu lateral', 'side_footer_highlight')}
+ ${optionalColorField('Cor do texto em destaque', 'theme.side_footer_highlight_color', '#e6d9f0')}
+ ${field('Texto inferior do menu lateral', 'side_footer_bottom')}
+ ${optionalColorField('Cor do texto inferior', 'theme.side_footer_bottom_color', 'theme.label_color|#675672')}
  </div></details>
  <details class="card">
   <summary>🎨 Cores do site</summary>

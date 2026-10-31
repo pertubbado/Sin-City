@@ -156,6 +156,20 @@ if (/^#[0-9a-f]{6}$/i.test(String(scrollbarColor || ''))) {
 } else {
   root.style.removeProperty('--custom-scrollbar-color');
 }
+
+// C6.9: cores independentes do rodape lateral.
+const sideFooterColors = {
+  '--custom-side-footer-top-color': theme.side_footer_top_color,
+  '--custom-side-footer-highlight-color': theme.side_footer_highlight_color,
+  '--custom-side-footer-bottom-color': theme.side_footer_bottom_color
+};
+Object.entries(sideFooterColors).forEach(([property, value]) => {
+  if (/^#[0-9a-f]{6}$/i.test(String(value || ''))) {
+    root.style.setProperty(property, value);
+  } else {
+    root.style.removeProperty(property);
+  }
+});
   }
 
   function updateBrand(site) {
@@ -168,6 +182,9 @@ if (/^#[0-9a-f]{6}$/i.test(String(scrollbarColor || ''))) {
     setText('#noticeTitle', site.notice_title || 'ANTES DE ENTRAR NA CIDADE');
     setText('#noticeText', site.notice_text || 'O desconhecimento das regras não isenta o cidadão de sua responsabilidade.');
     setText('#footerText', site.footer_text || '© 2026 Sin City Roleplay. Todos os direitos reservados.');
+    setText('#sideFooterTop', site.side_footer_top ?? 'CONHEÇA AS REGRAS.');
+    setText('#sideFooterHighlight', site.side_footer_highlight ?? 'ESCOLHA SEU CAMINHO.');
+    setText('#sideFooterBottom', site.side_footer_bottom ?? 'SIN CITY · 2026');
     const logo = assetUrl(site.logo || './assets/sin-city-mark.svg');
     const logoEl = $('#headerLogo'); if (logoEl) { logoEl.src = logo; logoEl.alt = site.site_name || 'Sin City Roleplay'; }
     const favicon = $('#favicon'); if (favicon) favicon.href = assetUrl(site.favicon || site.logo || './assets/sin-city-mark.svg');
