@@ -185,8 +185,12 @@ $$('[data-reset-color]').forEach(btn => {
     if (input) input.value = '';
 
     const picker = $(`[data-color-path="${path}"]`);
-    const fallback = path === 'theme.glow_color'
-      ? 'theme.accent'
+
+const fallback =
+  path === 'theme.glow_color'
+    ? 'theme.accent'
+    : path === 'theme.label_color'
+      ? 'theme.accent_light'
       : 'theme.surface';
 
     if (picker) {
