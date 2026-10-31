@@ -334,3 +334,10 @@ body.sin-city-custom-bg {
 .hero-signature > small {
   overflow-wrap: anywhere;
 }
+
+/* C7.1 — Clean remove ornamentos, mas não bloqueia nenhuma cor editável. */
+body.sin-city-clean{background-image:none!important;}
+body.sin-city-clean .ambient-noise{display:none;}
+body.sin-city-clean .hero{box-shadow:none;}
+body.sin-city-clean .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 94%,transparent),color-mix(in srgb,var(--background) 55%,transparent));}
+body.sin-city-clean .notice,body.sin-city-clean .category-card{box-shadow:none;}
