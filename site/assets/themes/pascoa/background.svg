@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Fundo suave de Páscoa com flores, bolinhas pastéis e graminhas decorativas">
+<defs><radialGradient id="bg"><stop stop-color="#635173"/><stop offset=".6" stop-color="#3C3152"/><stop offset="1" stop-color="#292438"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="url(#bg)"/>
+<g fill="#F7DBE9" opacity=".2"><circle cx="119" cy="114" r="7"/><circle cx="452" cy="256" r="5"/><circle cx="802" cy="99" r="6"/><circle cx="1098" cy="265" r="4"/><circle cx="1490" cy="104" r="7"/><circle cx="1824" cy="314" r="4"/><circle cx="189" cy="809" r="5"/><circle cx="1470" cy="971" r="6"/></g>
+<g stroke="#BDE7D3" stroke-width="6" stroke-linecap="round" opacity=".24"><path d="M259 345v20m-10-10h20M1187 165v19m-9-10h19M1726 658v21m-10-10h21M762 913v20m-10-10h20"/></g>
+<g transform="translate(150 928)" opacity=".22"><path d="M0 47V-30" stroke="#A6D6B9" stroke-width="7"/><ellipse cx="-21" cy="-49" rx="19" ry="26" fill="#FFC2DE"/><ellipse cx="21" cy="-49" rx="19" ry="26" fill="#FFC2DE"/><ellipse cy="-70" rx="19" ry="26" fill="#FFC2DE"/><ellipse cy="-21" rx="19" ry="26" fill="#FFC2DE"/><circle cy="-44" r="13" fill="#FFF3B9"/></g>
+<g transform="translate(1770 918) scale(1.3)" opacity=".19"><path d="M0 47V-30" stroke="#A6D6B9" stroke-width="7"/><ellipse cx="-21" cy="-49" rx="19" ry="26" fill="#E0C6FF"/><ellipse cx="21" cy="-49" rx="19" ry="26" fill="#E0C6FF"/><ellipse cy="-70" rx="19" ry="26" fill="#E0C6FF"/><ellipse cy="-21" rx="19" ry="26" fill="#E0C6FF"/><circle cy="-44" r="13" fill="#FFF3B9"/></g>
+<g fill="#BCE0C8" opacity=".16"><path d="M0 1015q290-46 576 1t694-11q374-43 650 1v74H0z"/></g>
+<g fill="#FFEAC5" opacity=".12"><ellipse cx="1358" cy="415" rx="88" ry="24"/><ellipse cx="356" cy="522" rx="99" ry="25"/></g>
+</svg>
