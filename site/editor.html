@@ -33,6 +33,7 @@
 .halloween-theme-colors span{height:16px;flex:1;border-radius:5px;border:1px solid #ffffff33}
 .natal-theme-preview{background:#1d3836;border-color:#598679}
 .pascoa-theme-preview{background:#453652;border-color:#9B81AB}
+.carnaval-brasil-theme-preview{background:#342143;border-color:#AE678F}
 </style>
 </head>
 <body>
@@ -253,7 +254,7 @@ function applyCleanPreview(){
   accent:'#b7bec5',accent_light:'#e4e7eb',background:'#14171a',
   surface:'#21252a',text:'#f5f6f8',muted:'#c4cad0'
  });
- current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false};
+ current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false};
  current.cursor = {...current.cursor,enabled:false,trail_enabled:false,
   falling_particles:{...(current.cursor?.falling_particles||{}),enabled:false}};
  // Não apagar URLs do logo, do banner ou do fundo: só ocultar as decorações no modo Clean.
@@ -299,7 +300,7 @@ function applyHalloweenPreview(){
  };
  // Substitui apenas as cores do tema, todas permanecem livremente editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,carnaval_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/halloween/hero.svg';
  current.background_image='./assets/themes/halloween/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -338,7 +339,7 @@ function applyNatalPreview(){
   hero_signature_color:'#FFE0A0'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,carnaval_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/natal/hero.svg';
  current.background_image='./assets/themes/natal/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -378,7 +379,7 @@ function applyPascoaPreview(){
   hero_signature_color:'#FBE2AD'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,carnaval_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/pascoa/hero.svg';
  current.background_image='./assets/themes/pascoa/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -389,6 +390,46 @@ function applyPascoaPreview(){
  site=mergeSite(current);
  render();sendPreview();
  toast('Páscoa cartoon aplicada na prévia! Cores e imagens continuam editáveis.','ok');
+}
+
+
+/* C7.5 REFEITO — Carnaval brasileiro cartoon: tambor, máscara, maracas, drink tropical. */
+function applyCarnavalPreview(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de trocar de tema.','error');
+  return;
+ }
+ if(!readCleanBackup()){
+  try{localStorage.setItem(CLEAN_BACKUP_KEY,JSON.stringify(snapshotForStorage()));}
+  catch{toast('Não foi possível guardar o visual anterior. Libere espaço no navegador.','error');return;}
+ }
+ const current=structuredClone(site);
+ const palette={
+  accent:'#F9BC66',accent_light:'#FFE1A4',background:'#251A37',
+  surface:'#342744',text:'#FFF7ED',muted:'#E5D2E7',
+  header_bg:'#2D1F3C',sidebar_bg:'#30223E',card_bg:'#3B2A4E',
+  glow_color:'#F5B1C9',label_color:'#FFD590',scrollbar_color:'#B78CCC',
+  nav_text_color:'#FFF6F4',action_text_color:'#FFF9E9',
+  content_text_color:'#F5E9F6',category_panel_color:'#3B2A4E',
+  navigation_button_color:'#402D55',search_panel_color:'#3B2A4D',
+  rule_bold_color:'#FFE0A5',side_footer_top_color:'#FAC3D9',
+  side_footer_highlight_color:'#FFF1B7',side_footer_bottom_color:'#E3CCF0',
+  nav_highlight_color:'#FF87B4',border_color:'#AC8EBB',
+  hero_signature_color:'#FFE6AB'
+ };
+ // Mantém os textos, logo e favicon, e deixa todas as cores editáveis.
+ current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:true,show_hero_image:true};
+ current.hero_image='./assets/themes/carnaval-brasil/hero.svg';
+ current.background_image='./assets/themes/carnaval-brasil/background.svg';
+ current.cursor={...current.cursor,enabled:true,trail_enabled:false,
+  image:'./assets/themes/carnaval-brasil/cursor.svg',size:30,
+  trail_color:'#FBA4C8',glow_color:'#FFE4B3',
+  falling_particles:{...(current.cursor?.falling_particles||{}),
+   enabled:true,type:'spark',color:'#F4BBD6',count:9,size:12}};
+ site=mergeSite(current);
+ render();sendPreview();
+ toast('Carnaval brasileiro cartoon aplicado! Tudo continua personalizável na prévia.','ok');
 }
 
 function cleanGalleryMarkup(){
@@ -434,7 +475,17 @@ function cleanGalleryMarkup(){
      <button class="btn" type="button" id="restoreBeforePascoaBtn">↩ Restaurar visual anterior</button>
     </div>
    </div>
-   <p class="small-note">Testar não publica nada. O visual anterior é guardado neste navegador. Carnaval e os próximos temas serão adicionados nas etapas seguintes.</p>
+   <div class="item" role="group" aria-label="Tema Carnaval">
+    <div class="item-head"><strong>🎭 Tema Carnaval</strong></div>
+    <div class="halloween-theme-preview carnaval-brasil-theme-preview"><img src="./assets/themes/carnaval-brasil/hero.svg" alt="Carnaval brasileiro cartoon com tambor, máscara, maracas, serpentinas e drink tropical" loading="lazy"></div>
+    <div class="halloween-theme-colors" aria-label="Cores de Carnaval"><span style="background:#F9BC66"></span><span style="background:#FF87B4"></span><span style="background:#251A37"></span><span style="background:#57CFC5"></span><span style="background:#B78CCC"></span></div>
+    <p class="small-note">Carnaval do Brasil com tambor, máscara de plumas, maracas, confetes e drink tropical decorativo. Cursor pequeno e todos os detalhes editáveis.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyCarnavalPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforeCarnavalBtn">↩ Restaurar visual anterior</button>
+    </div>
+   </div>
+   <p class="small-note">Testar não publica nada. O visual anterior fica guardado neste navegador. Dia dos Namorados e LGBTQIA+ terão etapas próprias.</p>
   </div>
  </details>`;
 }
@@ -589,6 +640,8 @@ function bindEditor(){
  $('#restoreBeforeNatalBtn')?.addEventListener('click',restoreBeforeClean);
  $('#applyPascoaPreviewBtn')?.addEventListener('click',applyPascoaPreview);
  $('#restoreBeforePascoaBtn')?.addEventListener('click',restoreBeforeClean);
+ $('#applyCarnavalPreviewBtn')?.addEventListener('click',applyCarnavalPreview);
+ $('#restoreBeforeCarnavalBtn')?.addEventListener('click',restoreBeforeClean);
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
