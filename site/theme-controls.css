@@ -1,0 +1,95 @@
+
+/* ==========================================
+   SIN CITY - PALETA AVANCADA
+   C6.2 - Primeiros controles independentes
+   ========================================== */
+
+:root {
+  --custom-header-bg: var(--surface);
+  --custom-sidebar-bg: var(--surface);
+  --custom-card-bg: var(--surface);
+  --custom-glow: var(--accent);
+}
+
+/* Cabecalho independente */
+.topbar {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--custom-header-bg) 55%, #010005) 94%,
+    transparent
+  );
+}
+
+/* Menu lateral independente */
+.sidebar {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--custom-sidebar-bg) 60%, #07020f),
+    var(--custom-sidebar-bg)
+  );
+}
+
+/* Cartoes de categorias */
+.category-card {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--custom-card-bg) 86%, var(--accent)),
+    var(--custom-card-bg)
+  );
+}
+
+.category-card:hover {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--custom-card-bg) 75%, var(--accent)),
+    var(--custom-card-bg)
+  );
+}
+
+/* Cartoes de regras e atualizacoes */
+.rule-card {
+  background: color-mix(
+    in srgb,
+    var(--custom-card-bg) 95%,
+    var(--accent)
+  );
+}
+
+.update-card {
+  background: color-mix(
+    in srgb,
+    var(--custom-card-bg) 70%,
+    transparent
+  );
+}
+
+.search-result,
+.rule-toc {
+  background: color-mix(
+    in srgb,
+    var(--custom-card-bg) 88%,
+    transparent
+  );
+}
+
+/* Brilhos independentes */
+.category-card::before {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--custom-glow) 24%, transparent),
+    transparent 68%
+  );
+}
+
+.category-hero::after {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--custom-glow) 27%, transparent),
+    transparent 68%
+  );
+}
+
+.category-hero-icon {
+  box-shadow: 0 0 45px
+    color-mix(in srgb, var(--custom-glow) 16%, transparent);
+}
