@@ -32,6 +32,7 @@
 .halloween-theme-colors{display:flex;gap:5px;margin:8px 0}
 .halloween-theme-colors span{height:16px;flex:1;border-radius:5px;border:1px solid #ffffff33}
 .natal-theme-preview{background:#1d3836;border-color:#598679}
+.pascoa-theme-preview{background:#453652;border-color:#9B81AB}
 </style>
 </head>
 <body>
@@ -252,7 +253,7 @@ function applyCleanPreview(){
   accent:'#b7bec5',accent_light:'#e4e7eb',background:'#14171a',
   surface:'#21252a',text:'#f5f6f8',muted:'#c4cad0'
  });
- current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false};
+ current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false};
  current.cursor = {...current.cursor,enabled:false,trail_enabled:false,
   falling_particles:{...(current.cursor?.falling_particles||{}),enabled:false}};
  // Não apagar URLs do logo, do banner ou do fundo: só ocultar as decorações no modo Clean.
@@ -298,7 +299,7 @@ function applyHalloweenPreview(){
  };
  // Substitui apenas as cores do tema, todas permanecem livremente editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/halloween/hero.svg';
  current.background_image='./assets/themes/halloween/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -337,7 +338,7 @@ function applyNatalPreview(){
   hero_signature_color:'#FFE0A0'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/natal/hero.svg';
  current.background_image='./assets/themes/natal/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -348,6 +349,46 @@ function applyNatalPreview(){
  site=mergeSite(current);
  render();sendPreview();
  toast('Natal cartoon aplicado na prévia! Todas as cores e imagens continuam editáveis.','ok');
+}
+
+
+/* C7.4 — Páscoa cartoon: prévia reversível e personalização livre. */
+function applyPascoaPreview(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de trocar de tema.','error');
+  return;
+ }
+ // Compartilha o backup já aprovado nos temas anteriores.
+ if(!readCleanBackup()){
+  try{localStorage.setItem(CLEAN_BACKUP_KEY,JSON.stringify(snapshotForStorage()));}
+  catch{toast('Não foi possível guardar o visual anterior. Libere espaço no navegador.','error');return;}
+ }
+ const current=structuredClone(site);
+ const palette={
+  accent:'#F4A5C5',accent_light:'#FBE1A9',background:'#2C253B',
+  surface:'#403450',text:'#FFF9F5',muted:'#E9D5E9',
+  header_bg:'#332B45',sidebar_bg:'#352E48',card_bg:'#493B58',
+  glow_color:'#F4C1DD',label_color:'#FFD8A3',scrollbar_color:'#C8ABD9',
+  nav_text_color:'#FFF4FA',action_text_color:'#FFFAF5',
+  content_text_color:'#F2E7F3',category_panel_color:'#473956',
+  navigation_button_color:'#4D3D5C',search_panel_color:'#463954',
+  rule_bold_color:'#FFE0AC',side_footer_top_color:'#F9CDDF',
+  side_footer_highlight_color:'#FFF1C9',side_footer_bottom_color:'#DECDF0',
+  nav_highlight_color:'#EBA3C8',border_color:'#B9A4D4',
+  hero_signature_color:'#FBE2AD'
+ };
+ current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,show_hero_image:true};
+ current.hero_image='./assets/themes/pascoa/hero.svg';
+ current.background_image='./assets/themes/pascoa/background.svg';
+ current.cursor={...current.cursor,enabled:true,trail_enabled:false,
+  image:'./assets/themes/pascoa/cursor.svg',size:46,
+  trail_color:'#F7C3DE',glow_color:'#FFE0BA',
+  falling_particles:{...(current.cursor?.falling_particles||{}),
+   enabled:true,type:'spark',color:'#F5CBEB',count:10,size:13}};
+ site=mergeSite(current);
+ render();sendPreview();
+ toast('Páscoa cartoon aplicada na prévia! Cores e imagens continuam editáveis.','ok');
 }
 
 function cleanGalleryMarkup(){
@@ -383,7 +424,17 @@ function cleanGalleryMarkup(){
      <button class="btn" type="button" id="restoreBeforeNatalBtn">↩ Restaurar visual anterior</button>
     </div>
    </div>
-   <p class="small-note">Testar não publica nada. O visual anterior é guardado neste navegador. Páscoa e os próximos temas serão criados individualmente nas etapas seguintes.</p>
+   <div class="item" role="group" aria-label="Tema Páscoa">
+    <div class="item-head"><strong>🐰 Tema Páscoa</strong></div>
+    <div class="halloween-theme-preview pascoa-theme-preview"><img src="./assets/themes/pascoa/hero.svg" alt="Ilustração cartoon com coelhinho sorridente, ovos decorados e flores" loading="lazy"></div>
+    <div class="halloween-theme-colors" aria-label="Cores de Páscoa"><span style="background:#F4A5C5"></span><span style="background:#FBE1A9"></span><span style="background:#2C253B"></span><span style="background:#B9A4D4"></span><span style="background:#FFF9F5"></span></div>
+    <p class="small-note">Coelhinho sorridente, ovinhos coloridos, flores e borboletas, em tons pastéis com contraste agradável. Totalmente editável.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyPascoaPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforePascoaBtn">↩ Restaurar visual anterior</button>
+    </div>
+   </div>
+   <p class="small-note">Testar não publica nada. O visual anterior é guardado neste navegador. Carnaval e os próximos temas serão adicionados nas etapas seguintes.</p>
   </div>
  </details>`;
 }
@@ -536,6 +587,8 @@ function bindEditor(){
  $('#restoreBeforeHalloweenBtn')?.addEventListener('click',restoreBeforeClean);
  $('#applyNatalPreviewBtn')?.addEventListener('click',applyNatalPreview);
  $('#restoreBeforeNatalBtn')?.addEventListener('click',restoreBeforeClean);
+ $('#applyPascoaPreviewBtn')?.addEventListener('click',applyPascoaPreview);
+ $('#restoreBeforePascoaBtn')?.addEventListener('click',restoreBeforeClean);
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cursor cartoon de coelhinho branco sorridente">
+<path d="M18 24q-10-25-4-30 11-4 18 28m0 0q6-33 17-28 8 8-1 32" fill="#FFF9F5" stroke="#8C788F" stroke-width="4" stroke-linejoin="round"/>
+<path d="M20 16q-4-16-1-17 7 7 8 21m11-4q4-16 8-18 5 8-2 24" fill="#F7B9D1" stroke="none" opacity=".85"/>
+<path d="M31 17q-27-2-29 21-1 23 30 25 30-2 30-25Q58 15 31 17z" fill="#FFFAF5" stroke="#8C788F" stroke-width="4"/>
+<ellipse cx="19" cy="40" rx="5" ry="7" fill="#494256"/><ellipse cx="44" cy="40" rx="5" ry="7" fill="#494256"/>
+<circle cx="17" cy="38" r="1.8" fill="#FFF"/><circle cx="42" cy="38" r="1.8" fill="#FFF"/>
+<ellipse cx="10" cy="47" rx="7" ry="4" fill="#F7B9D1" opacity=".75"/><ellipse cx="53" cy="47" rx="7" ry="4" fill="#F7B9D1" opacity=".75"/>
+<path d="M27 47q5-5 10 0l-5 6z" fill="#DE9CAF"/><path d="M32 53q-6 9-12 1m12-1q6 9 12 1" fill="none" stroke="#66526D" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
