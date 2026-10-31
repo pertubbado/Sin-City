@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Fundo cartoon de Carnaval com confetes suaves, serpentinas e pequenos brilhos">
+<defs><radialGradient id="bg"><stop stop-color="#4C356F"/><stop offset=".63" stop-color="#27234F"/><stop offset="1" stop-color="#191D3B"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="url(#bg)"/>
+<g opacity=".26" stroke-width="7" fill="none" stroke-linecap="round"><path d="M150 147q70 30 15 92t18 86" stroke="#FFBF77"/><path d="M1552 81q-43 62 14 111t-9 97" stroke="#F995BF"/><path d="M1783 675q-64 37-16 93t-12 88" stroke="#83E8D1"/><path d="M432 824q67-43 18-83t22-84" stroke="#D3B4FF"/></g>
+<g opacity=".32" fill="#FFCC87"><circle cx="222" cy="104" r="6"/><circle cx="1083" cy="214" r="5"/><circle cx="1581" cy="408" r="6"/><circle cx="915" cy="829" r="5"/><circle cx="1850" cy="996" r="6"/></g>
+<g opacity=".29"><rect x="350" y="240" width="19" height="9" rx="3" fill="#6DDFC9" transform="rotate(31 350 240)"/><rect x="828" y="110" width="18" height="9" rx="3" fill="#F7A2C5" transform="rotate(-27 828 110)"/><rect x="1229" y="545" width="18" height="9" rx="3" fill="#FBE090" transform="rotate(20 1229 545)"/><rect x="1743" y="351" width="20" height="9" rx="3" fill="#BBA2FF" transform="rotate(-35 1743 351)"/><rect x="546" y="912" width="18" height="9" rx="3" fill="#FFB286" transform="rotate(-12 546 912)"/><rect x="1468" y="906" width="19" height="9" rx="3" fill="#7BE5D7" transform="rotate(41 1468 906)"/></g>
+<g opacity=".27" stroke="#F9E2E8" stroke-width="4" stroke-linecap="round"><path d="M130 528v20m-10-10h20M1320 176v24m-12-12h24M1856 516v19m-9-9h19M1029 971v20m-10-10h20"/></g>
+<path d="M0 1035q366-42 636-4t567-12q374-56 717 0v61H0z" fill="#A98BDD" opacity=".12"/>
+</svg>
