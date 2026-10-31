@@ -83,10 +83,19 @@ function field(label,path,type='text',opts=''){
  return `<div class="field"><label>${label}</label><input data-path="${path}" value="${esc(val)}"></div>`;
 }
 
+function resolveColorFallback(fallback) {
+  const isHex = value => /^#[0-9a-f]{6}$/i.test(String(value || ''));
+  if (isHex(fallback)) return fallback;
+  const current = getPath(fallback);
+  if (isHex(current)) return current;
+  const original = String(fallback).split('.').reduce((obj, key) => obj?.[key], defaults);
+  return isHex(original) ? original : '#111111';
+}
+
 function optionalColorField(label, path, fallback) {
   const actual = getPath(path);
   const active = /^#[0-9a-f]{6}$/i.test(String(actual));
-  const defaultColor = getPath(fallback) || '#111111';
+  const defaultColor = resolveColorFallback(fallback);
   const color = active ? actual : defaultColor;
 
   return `
@@ -103,7 +112,8 @@ function optionalColorField(label, path, fallback) {
       </div>
       <button class="btn mini"
         type="button"
-        data-reset-color="${path}">
+        data-reset-color="${path}"
+        data-color-fallback="${esc(fallback)}">
         Usar cor automática
       </button>
     </div>
@@ -127,7 +137,17 @@ function render(){
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
  ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Logo','logo')}${field('Favicon','favicon')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}${field('Imagem da capa','hero_image')}${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
  </div></details>
- <details class="card"><summary>🎨 Cores do site</summary><div class="card-body">${field('Cor principal','theme.accent','color')}${field('Cor principal clara','theme.accent_light','color')}${field('Fundo','theme.background','color')}${field('Superfície','theme.surface','color')}${field('Texto','theme.text','color')}${field('Texto secundário','theme.muted','color')}</div></details>
+ <details class="card">
+  <summary>🎨 Cores do site</summary>
+  <div class="card-body">
+    ${optionalColorField('Cor principal', 'theme.accent', '#542287')}
+    ${optionalColorField('Cor principal clara', 'theme.accent_light', '#AF7AFF')}
+    ${optionalColorField('Fundo', 'theme.background', '#212121')}
+    ${optionalColorField('Superfície', 'theme.surface', '#111111')}
+    ${optionalColorField('Texto', 'theme.text', '#FFFFFF')}
+    ${optionalColorField('Texto secundário', 'theme.muted', '#B6A9BF')}
+  </div>
+ </details>
  <details class="card">
   <summary>🌈 Paleta avançada</summary>
   <div class="card-body">
@@ -161,7 +181,7 @@ ${optionalColorField('Cor dos Indicadores e Etiquetas',
 
     ${field('Tamanho do cursor','cursor.size')}
 
-    ${field('Cor do rastro','cursor.trail_color','color')}
+    ${optionalColorField('Cor do rastro', 'cursor.trail_color', '#2D1243')}
 
     ${optionalColorField('Cor do Brilho do Cursor',
       'cursor.glow_color', 'theme.accent_light')}
@@ -225,16 +245,8 @@ $$('[data-reset-color]').forEach(btn => {
 
     const picker = $(`[data-color-path="${path}"]`);
 
-const fallback =
-  path === 'theme.glow_color'
-    ? 'theme.accent'
-    : path === 'theme.label_color' ||
-      path === 'cursor.glow_color'
-      ? 'theme.accent_light'
-      : 'theme.surface';
-
-    if (picker) {
-      picker.value = getPath(fallback) || '#111111';
+if (picker) {
+      picker.value = resolveColorFallback(btn.dataset.colorFallback || '');
     }
 
     sendPreview();
