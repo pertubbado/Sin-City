@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Fundo de Dia dos Namorados com corações desenhados, cartinhas, lacinhos e pequenos brilhos">
+<defs><radialGradient id="bg"><stop stop-color="#733752"/><stop offset=".58" stop-color="#4B273F"/><stop offset="1" stop-color="#2B2035"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="url(#bg)"/>
+<g fill="none" stroke="#F7A5B6" stroke-width="7" opacity=".22" stroke-linejoin="round">
+ <path d="M178 155Q115 88 84 145Q65 199 177 265Q281 195 268 146Q243 90 178 155Z"/>
+ <path d="M1594 855Q1540 803 1513 841Q1490 886 1594 948Q1692 888 1673 841Q1644 796 1594 855Z"/>
+ <path d="M1057 132Q1035 106 1018 121Q1001 153 1057 185Q1113 149 1090 121Q1070 103 1057 132Z"/>
+</g>
+<g fill="none" stroke-width="8" stroke-linecap="round" opacity=".26">
+ <path d="M67 622q119-114 226-11t190-26" stroke="#FFE1DF" stroke-dasharray="5 20"/>
+ <path d="M1454 202q105-74 183-5t189-1" stroke="#FF9EBD" stroke-dasharray="4 22"/>
+ <path d="M670 934q123-91 232 2t202-21" stroke="#F6C4D0" stroke-dasharray="4 21"/>
+</g>
+<g fill="#FFE8CE" opacity=".27">
+ <circle cx="285" cy="384" r="6"/><circle cx="599" cy="98" r="5"/><circle cx="971" cy="360" r="7"/><circle cx="1382" cy="114" r="5"/><circle cx="1752" cy="492" r="6"/><circle cx="1194" cy="843" r="5"/>
+</g>
+<g stroke="#FFE8E2" stroke-width="5" stroke-linecap="round" opacity=".32">
+ <path d="M439 237v20m-10-10h20M1278 556v26m-13-13h26M1832 705v22m-11-11h22M852 731v18m-9-9h18"/>
+</g>
+<g transform="translate(1729 182)" stroke="#F2B4BD" stroke-width="7" stroke-linejoin="round" fill="#FFF0EC" opacity=".18">
+ <rect x="-78" y="-42" width="156" height="104" rx="8"/>
+ <path d="M-75-36L0 28L75-36M-75 58L-26 14M75 58L26 14" fill="none"/>
+ <path d="M-1-4q-15-17-26-3t26 30q33-28 24-35-13-12-24 8z" fill="#F96686"/>
+</g>
+<g transform="translate(305 886)" stroke="#F2B4BD" stroke-width="7" stroke-linejoin="round" fill="#FFF0EC" opacity=".14">
+ <rect x="-78" y="-42" width="156" height="104" rx="8"/>
+ <path d="M-75-36L0 28L75-36M-75 58L-26 14M75 58L26 14" fill="none"/>
+ <path d="M-1-4q-15-17-26-3t26 30q33-28 24-35-13-12-24 8z" fill="#F96686"/>
+</g>
+<path d="M0 1038q295-44 585-10t605-12q380-52 730-3v67H0z" fill="#F6A2BB" opacity=".10"/>
+</svg>
