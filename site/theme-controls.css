@@ -212,3 +212,18 @@ html.sin-city-cursor-enabled .custom-cursor.hovering {
       transparent
     );
 }
+
+
+/* ==========================================
+   C6.6 - COR DA BARRA DE ROLAGEM LATERAL
+   ========================================== */
+
+/* Firefox e navegadores com suporte a scrollbar-color */
+.sidebar {
+  scrollbar-color: var(--custom-scrollbar-color, #4d3268) transparent;
+}
+
+/* Compatibilidade com navegadores WebKit antigos */
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--custom-scrollbar-color, #4d3268);
+}

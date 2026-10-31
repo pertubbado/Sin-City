@@ -149,6 +149,13 @@ if (/^#[0-9a-f]{6}$/i.test(String(labelColor || ''))) {
 } else {
   root.style.removeProperty('--custom-label-color');
 }
+
+const scrollbarColor = theme.scrollbar_color;
+if (/^#[0-9a-f]{6}$/i.test(String(scrollbarColor || ''))) {
+  root.style.setProperty('--custom-scrollbar-color', scrollbarColor);
+} else {
+  root.style.removeProperty('--custom-scrollbar-color');
+}
   }
 
   function updateBrand(site) {
