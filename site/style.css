@@ -745,3 +745,51 @@ body {
     color-mix(in srgb, var(--surface) 92%, transparent) 55%
   );
 }
+
+
+
+/* ==========================================
+   C5.1 - TEXTO PRINCIPAL DINAMICO
+   Controlado pela opcao Texto do editor
+   ========================================== */
+
+/* Identidade e titulos principais */
+.brand,
+.hero h1,
+.category-hero h1,
+.search-page-hero h1,
+.section-heading h2,
+.search-modal h2 {
+  color: var(--text);
+}
+
+/* Titulos dos cartoes e avisos */
+.category-card,
+.category-card strong,
+.update-card h3,
+.notice-copy strong,
+.search-result h3 {
+  color: var(--text);
+}
+
+/* Titulos das regras e subcategorias */
+.subcategory-heading h2,
+.rule-card-title h3,
+.rule-content h3,
+.rule-content h4,
+.rule-content strong {
+  color: var(--text);
+}
+
+/* Campos de pesquisa */
+.big-search,
+.overlay-input-wrap input {
+  color: var(--text);
+}
+
+/* Textos de navegacao selecionados */
+.side-home.active,
+.category-nav button.active,
+.category-nav .nav-category.active {
+  color: var(--text);
+}
