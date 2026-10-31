@@ -117,6 +117,7 @@
     document.body.classList.toggle('sin-city-halloween',site.layout?.halloween_mode === true);
     document.body.classList.toggle('sin-city-natal',site.layout?.natal_mode === true);
     document.body.classList.toggle('sin-city-pascoa',site.layout?.pascoa_mode === true);
+    document.body.classList.toggle('sin-city-carnaval',site.layout?.carnaval_mode === true);
     const safeOverride = (key, fallback) =>
   /^#[0-9a-f]{6}$/i.test(String(theme[key] || ''))
     ? theme[key]
