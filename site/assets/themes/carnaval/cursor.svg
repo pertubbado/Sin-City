@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cursor máscara de Carnaval cartoon com olhos alegres">
+<defs><linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF4D3"/><stop offset="1" stop-color="#F1C9E9"/></linearGradient></defs>
+<path d="M31 17q-8-13-4-20 9-2 12 21" fill="#F8B4D8" stroke="#735B96" stroke-width="3" stroke-linejoin="round"/>
+<path d="M21 17Q7 6 4 15q0 14 17 13M41 17Q57 5 61 15q2 13-20 13" fill="#7EDFCB" stroke="#735B96" stroke-width="3" stroke-linejoin="round"/>
+<path d="M9 26q10-11 23-7 14-4 23 7l5 12q-11 22-29 23Q12 58 4 38z" fill="url(#m)" stroke="#735B96" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M12 32q10-12 19 1-6 14-19 4z" fill="#4A426C"/><path d="M33 33q9-13 19-1l0 5q-13 10-19-4z" fill="#4A426C"/>
+<circle cx="18" cy="32" r="2" fill="#FFF"/><circle cx="45" cy="32" r="2" fill="#FFF"/>
+<path d="M26 47q5 6 12 0" fill="none" stroke="#725B86" stroke-width="3.4" stroke-linecap="round"/>
+<circle cx="14" cy="44" r="4" fill="#F7A8B8" opacity=".8"/><circle cx="49" cy="44" r="4" fill="#F7A8B8" opacity=".8"/>
+<path d="M31 11l4 7 8 2-6 5 2 8-8-4-8 4 2-8-6-5 8-2z" fill="#FFD37C" stroke="#8C7397" stroke-width="2.5" transform="translate(0 -9) scale(.96)"/>
+</svg>
