@@ -31,6 +31,7 @@
 .halloween-theme-preview img{display:block;width:100%;height:100%;object-fit:cover}
 .halloween-theme-colors{display:flex;gap:5px;margin:8px 0}
 .halloween-theme-colors span{height:16px;flex:1;border-radius:5px;border:1px solid #ffffff33}
+.natal-theme-preview{background:#1d3836;border-color:#598679}
 </style>
 </head>
 <body>
@@ -251,7 +252,7 @@ function applyCleanPreview(){
   accent:'#b7bec5',accent_light:'#e4e7eb',background:'#14171a',
   surface:'#21252a',text:'#f5f6f8',muted:'#c4cad0'
  });
- current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false};
+ current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false};
  current.cursor = {...current.cursor,enabled:false,trail_enabled:false,
   falling_particles:{...(current.cursor?.falling_particles||{}),enabled:false}};
  // Não apagar URLs do logo, do banner ou do fundo: só ocultar as decorações no modo Clean.
@@ -297,7 +298,7 @@ function applyHalloweenPreview(){
  };
  // Substitui apenas as cores do tema, todas permanecem livremente editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:true,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/halloween/hero.svg';
  current.background_image='./assets/themes/halloween/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -308,6 +309,45 @@ function applyHalloweenPreview(){
  site=mergeSite(current);
  render();sendPreview();
  toast('Halloween cartoon aplicado na prévia! Personalize qualquer detalhe antes de publicar.','ok');
+}
+
+
+/* C7.3 — Natal cartoon: aparência reversível; nenhum texto, regra ou logo é modificado. */
+function applyNatalPreview(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de trocar de tema.','error');
+  return;
+ }
+ if(!readCleanBackup()){
+  try{localStorage.setItem(CLEAN_BACKUP_KEY,JSON.stringify(snapshotForStorage()));}
+  catch{toast('Não foi possível guardar o visual anterior. Libere espaço no navegador.','error');return;}
+ }
+ const current=structuredClone(site);
+ const palette={
+  accent:'#70BA8F',accent_light:'#FFE1A2',background:'#142C2D',
+  surface:'#203B38',text:'#FFF9ED',muted:'#D1E6D7',
+  header_bg:'#183432',sidebar_bg:'#193632',card_bg:'#26453E',
+  glow_color:'#FBE3A3',label_color:'#FFDEA1',scrollbar_color:'#83BC9A',
+  nav_text_color:'#F1FBEF',action_text_color:'#FFF9E9',
+  content_text_color:'#E7F4E8',category_panel_color:'#24463E',
+  navigation_button_color:'#2A4C43',search_panel_color:'#25473E',
+  rule_bold_color:'#FFDF9C',side_footer_top_color:'#F4E4B8',
+  side_footer_highlight_color:'#FFF9DD',side_footer_bottom_color:'#D6EEC9',
+  nav_highlight_color:'#D57B7D',border_color:'#A6C8AD',
+  hero_signature_color:'#FFE0A0'
+ };
+ current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,show_hero_image:true};
+ current.hero_image='./assets/themes/natal/hero.svg';
+ current.background_image='./assets/themes/natal/background.svg';
+ current.cursor={...current.cursor,enabled:true,trail_enabled:false,
+  image:'./assets/themes/natal/cursor.svg',size:46,
+  trail_color:'#FFE2AB',glow_color:'#FFF0BE',
+  falling_particles:{...(current.cursor?.falling_particles||{}),
+   enabled:true,type:'spark',color:'#F5E9CD',count:10,size:13}};
+ site=mergeSite(current);
+ render();sendPreview();
+ toast('Natal cartoon aplicado na prévia! Todas as cores e imagens continuam editáveis.','ok');
 }
 
 function cleanGalleryMarkup(){
@@ -333,7 +373,17 @@ function cleanGalleryMarkup(){
      <button class="btn" type="button" id="restoreBeforeHalloweenBtn">↩ Restaurar visual anterior</button>
     </div>
    </div>
-   <p class="small-note">Testar não publica nada. O visual anterior é guardado neste navegador. Natal, Páscoa e os outros temas serão feitos individualmente nas próximas etapas.</p>
+   <div class="item" role="group" aria-label="Tema Natal">
+    <div class="item-head"><strong>🎄 Tema Natal</strong></div>
+    <div class="halloween-theme-preview natal-theme-preview"><img src="./assets/themes/natal/hero.svg" alt="Ilustração cartoon de árvore iluminada, boneco de neve sorridente e presentes" loading="lazy"></div>
+    <div class="halloween-theme-colors" aria-label="Cores de Natal"><span style="background:#70BA8F"></span><span style="background:#FFE1A2"></span><span style="background:#142C2D"></span><span style="background:#D57B7D"></span><span style="background:#FFF9ED"></span></div>
+    <p class="small-note">Árvore de Natal iluminada, boneco de neve fofinho, presentes e céu estrelado. Verde pinheiro, vermelho suave e dourado aconchegante — tudo editável.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyNatalPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforeNatalBtn">↩ Restaurar visual anterior</button>
+    </div>
+   </div>
+   <p class="small-note">Testar não publica nada. O visual anterior é guardado neste navegador. Páscoa e os próximos temas serão criados individualmente nas etapas seguintes.</p>
   </div>
  </details>`;
 }
@@ -484,6 +534,8 @@ function bindEditor(){
  $('#restoreBeforeCleanBtn')?.addEventListener('click',restoreBeforeClean);
  $('#applyHalloweenPreviewBtn')?.addEventListener('click',applyHalloweenPreview);
  $('#restoreBeforeHalloweenBtn')?.addEventListener('click',restoreBeforeClean);
+ $('#applyNatalPreviewBtn')?.addEventListener('click',applyNatalPreview);
+ $('#restoreBeforeNatalBtn')?.addEventListener('click',restoreBeforeClean);
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
