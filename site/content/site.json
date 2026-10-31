@@ -1,12 +1,18 @@
 {
   "theme": {
-    "accent": "#542287",
-    "accent_light": "#AF7AFF",
+    "accent": "#F06000",
+    "accent_light": "#F0B020",
     "background": "#212121",
     "surface": "#111111",
     "text": "#FFFFFF",
-    "muted": "#B6A9BF"
+    "muted": "#e9e1ce",
+    "glow_color": "#f08000",
+    "label_color": "#F0B020",
+    "scrollbar_color": "#F0B020"
   },
+  "side_footer_top": "CONHEÇA AS REGRAS.",
+  "side_footer_highlight": "ESCOLHA SEU CAMINHO.",
+  "side_footer_bottom": "SIN CITY · 2026",
   "layout": {
     "show_search": true,
     "show_updates": true,
@@ -18,30 +24,32 @@
     "enabled": true,
     "trail_enabled": false,
     "size": 34,
-    "image": "./assets/cursor-esqueleto.png",
+    "image": "./assets/uploads/cursor-mvwglquq-bj73ill.png",
     "trail_type": "glow",
     "trail_color": "#2D1243",
     "trail_count": 4,
     "falling_particles": {
       "enabled": true,
-      "type": "logo",
-      "color": "#7300ff",
-      "count": 4,
+      "type": "spark",
+      "color": "#F0B020",
+      "count": 6,
       "size": 20
-    }
+    },
+    "glow_color": "#F0B020"
   },
   "site_name": "Sin City Roleplay",
   "site_title": "Regras da Cidade",
   "tagline": "Cada escolha deixa sua marca.",
   "description": "Central de regras da Sin City Roleplay. Consulte as categorias, entenda as diretrizes e faça parte da cidade.",
-  "logo": "./assets/logo-sin-city.webp",
-  "favicon": "./assets/sin-city-mark.svg",
+  "logo": "./assets/uploads/logo-mvwglquq-7talsuj.png",
+  "favicon": "./assets/uploads/favicon-mvwglquq-u87m9bv.png",
   "discord_url": "",
   "hero_eyebrow": "SIN CITY ROLEPLAY",
   "hero_title": "QUEM VIVE SIN CITY\nFAZ HISTÓRIA.",
   "hero_text": "O Site da Cidade reúne as regras que mantêm Sin City viva. Leia, entenda e faça parte da história.",
-  "hero_image": "./assets/cemetery-night.webp",
+  "hero_image": "./assets/uploads/banner-mvwglquq-qx0k2a1.png",
   "notice_title": "ANTES DE ENTRAR NA CIDADE",
   "notice_text": "O desconhecimento das regras não isenta o cidadão de sua responsabilidade. Consulte sempre a versão mais recente do regulamento.",
-  "footer_text": "© 2026 Sin City. Todos os direitos reservados."
+  "footer_text": "© 2026 Sin City. Todos os direitos reservados.",
+  "background_image": "./assets/uploads/background-mvwglquq-y59d966.png"
 }
