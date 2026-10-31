@@ -526,3 +526,127 @@ body {
 .category-navigation button:hover {
   background: color-mix(in srgb, var(--accent) 20%, transparent);
 }
+
+
+
+/* ==========================================
+   C3 - COR PRINCIPAL CLARA DINAMICA
+   Bordas e destaques luminosos
+   ========================================== */
+
+/* Bordas gerais */
+:root {
+  --line: color-mix(in srgb, var(--accent-light) 18%, transparent);
+}
+
+/* Selecao de texto */
+::selection {
+  background: color-mix(in srgb, var(--accent-light) 34%, transparent);
+}
+
+/* Cabecalho e menu lateral */
+.topbar {
+  border-bottom-color: color-mix(in srgb, var(--accent-light) 20%, transparent);
+}
+
+.side-home.active,
+.category-nav button.active {
+  border-color: color-mix(in srgb, var(--accent-light) 20%, transparent);
+}
+
+.category-nav .nav-category.active {
+  border-color: color-mix(in srgb, var(--accent-light) 23%, transparent);
+}
+
+.nav-rule-list {
+  border-left-color: color-mix(in srgb, var(--accent-light) 25%, transparent);
+}
+
+/* Capa principal */
+.hero {
+  border-color: color-mix(in srgb, var(--accent-light) 23%, transparent);
+}
+
+/* Aviso - preserva a barra da Cor Principal */
+.notice {
+  border-color: color-mix(in srgb, var(--accent-light) 20%, transparent);
+  border-left-color: var(--accent);
+}
+
+.notice-symbol {
+  border-color: color-mix(in srgb, var(--accent-light) 48%, transparent);
+}
+
+/* Cartoes de categorias */
+.category-card:hover {
+  border-color: color-mix(in srgb, var(--accent-light) 56%, transparent);
+}
+
+.card-icon {
+  border-color: color-mix(in srgb, var(--accent-light) 26%, transparent);
+}
+
+.update-tag {
+  border-color: color-mix(in srgb, var(--accent-light) 28%, transparent);
+}
+
+/* Paginas de categorias e regras */
+.category-hero-icon,
+.subcategory-code {
+  border-color: color-mix(in srgb, var(--accent-light) 30%, transparent);
+}
+
+.rule-tag {
+  border-color: color-mix(in srgb, var(--accent-light) 18%, transparent);
+}
+
+.rule-card {
+  border-color: color-mix(in srgb, var(--accent-light) 16%, transparent);
+}
+
+.rule-content blockquote,
+.rule-callout {
+  border-color: color-mix(in srgb, var(--accent-light) 22%, transparent);
+  border-left-color: var(--accent-light);
+}
+
+/* Blocos de codigo e tabelas */
+.rule-content pre,
+.rule-content code {
+  border-color: color-mix(in srgb, var(--accent-light) 18%, transparent);
+}
+
+.rule-content hr {
+  border-top-color: color-mix(in srgb, var(--accent-light) 20%, transparent);
+}
+
+.md-table-wrap {
+  border-color: color-mix(in srgb, var(--accent-light) 17%, transparent);
+}
+
+/* Pesquisa */
+.big-search-wrap,
+.overlay-input-wrap {
+  border-color: color-mix(in srgb, var(--accent-light) 35%, transparent);
+}
+
+.big-search-wrap:focus-within,
+.overlay-input-wrap:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-light) 8%, transparent);
+}
+
+.search-result:hover {
+  border-color: color-mix(in srgb, var(--accent-light) 55%, transparent);
+}
+
+.search-result mark {
+  background: color-mix(in srgb, var(--accent-light) 23%, transparent);
+}
+
+.search-empty {
+  border-color: color-mix(in srgb, var(--accent-light) 22%, transparent);
+}
+
+.search-modal {
+  border-color: color-mix(in srgb, var(--accent-light) 35%, transparent);
+}
