@@ -113,13 +113,31 @@
   function applyTheme(site) {
     const theme = site.theme || {};
     const root = document.documentElement;
+    const safeOverride = (key, fallback) =>
+  /^#[0-9a-f]{6}$/i.test(String(theme[key] || ''))
+    ? theme[key]
+    : fallback;
     const variables = {
       '--accent': theme.accent || '#542287',
       '--accent-light': theme.accent_light || '#AF7AFF',
       '--background': theme.background || '#212121',
       '--surface': theme.surface || '#111111',
       '--text': theme.text || '#FFFFFF',
-      '--muted': theme.muted || '#B6A9BF'
+      '--muted': theme.muted || '#B6A9BF',
+      
+'--custom-header-bg': safeOverride(
+  'header_bg', theme.surface || '#111111'
+),
+'--custom-sidebar-bg': safeOverride(
+  'sidebar_bg', theme.surface || '#111111'
+),
+'--custom-card-bg': safeOverride(
+  'card_bg', theme.surface || '#111111'
+),
+'--custom-glow': safeOverride(
+  'glow_color', theme.accent || '#542287'
+)
+      
     };
     Object.entries(variables).forEach(([key, value]) => root.style.setProperty(key, value));
     root.style.setProperty('--muted-readable', theme.accent_light || '#AF7AFF');
