@@ -35,6 +35,7 @@
 .pascoa-theme-preview{background:#453652;border-color:#9B81AB}
 .carnaval-brasil-theme-preview{background:#342143;border-color:#AE678F}
 .namorados-theme-preview{background:#65354E;border-color:#C17D9D}
+.lgbtqia-theme-preview{background:#5B4C86;border-color:#C4A5FF}
 </style>
 </head>
 <body>
@@ -255,7 +256,7 @@ function applyCleanPreview(){
   accent:'#b7bec5',accent_light:'#e4e7eb',background:'#14171a',
   surface:'#21252a',text:'#f5f6f8',muted:'#c4cad0'
  });
- current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false};
+ current.layout = {...current.layout,show_hero_image:false,clean_mode:true,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,lgbtqia_mode:false};
  current.cursor = {...current.cursor,enabled:false,trail_enabled:false,
   falling_particles:{...(current.cursor?.falling_particles||{}),enabled:false}};
  // Não apagar URLs do logo, do banner ou do fundo: só ocultar as decorações no modo Clean.
@@ -301,7 +302,7 @@ function applyHalloweenPreview(){
  };
  // Substitui apenas as cores do tema, todas permanecem livremente editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:true,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,lgbtqia_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/halloween/hero.svg';
  current.background_image='./assets/themes/halloween/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -340,7 +341,7 @@ function applyNatalPreview(){
   hero_signature_color:'#FFE0A0'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:true,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,lgbtqia_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/natal/hero.svg';
  current.background_image='./assets/themes/natal/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -380,7 +381,7 @@ function applyPascoaPreview(){
   hero_signature_color:'#FBE2AD'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,carnaval_mode:false,namorados_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:true,carnaval_mode:false,namorados_mode:false,lgbtqia_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/pascoa/hero.svg';
  current.background_image='./assets/themes/pascoa/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -420,7 +421,7 @@ function applyCarnavalPreview(){
  };
  // Mantém os textos, logo e favicon, e deixa todas as cores editáveis.
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:true,namorados_mode:false,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:true,namorados_mode:false,lgbtqia_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/carnaval-brasil/hero.svg';
  current.background_image='./assets/themes/carnaval-brasil/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -459,7 +460,7 @@ function applyNamoradosPreview(){
   hero_signature_color:'#FFD7CC'
  };
  current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
- current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:true,show_hero_image:true};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:true,lgbtqia_mode:false,show_hero_image:true};
  current.hero_image='./assets/themes/namorados/hero.svg';
  current.background_image='./assets/themes/namorados/background.svg';
  current.cursor={...current.cursor,enabled:true,trail_enabled:false,
@@ -470,6 +471,45 @@ function applyNamoradosPreview(){
  site=mergeSite(current);
  render();sendPreview();
  toast('Tema Dia dos Namorados aplicado na prévia! Personalize tudo no editor.','ok');
+}
+
+
+/* C7.7 — LGBTQIA+: pessoas, bandeiras e coração arco-íris. */
+function applyLgbtqiaPreview(){
+ if(pendingImageUploads.size){
+  toast('Há imagens locais pendentes. Publique ou remova esses arquivos antes de trocar de tema.','error');
+  return;
+ }
+ if(!readCleanBackup()){
+  try{localStorage.setItem(CLEAN_BACKUP_KEY,JSON.stringify(snapshotForStorage()));}
+  catch{toast('Não foi possível guardar o visual anterior. Libere espaço no navegador.','error');return;}
+ }
+ const current=structuredClone(site);
+ const palette={
+  accent:'#FF6F9D',accent_light:'#FFD7E5',background:'#241B35',
+  surface:'#342347',text:'#FFF8FC',muted:'#E8D9F6',
+  header_bg:'#2A1F3D',sidebar_bg:'#2E2142',card_bg:'#3C2852',
+  glow_color:'#FFADD0',label_color:'#FFE9A8',scrollbar_color:'#C7A4FF',
+  nav_text_color:'#FFF6FA',action_text_color:'#FFF8F3',
+  content_text_color:'#F7EDF9',category_panel_color:'#432C5B',
+  navigation_button_color:'#4A3164',search_panel_color:'#3E2A57',
+  rule_bold_color:'#FFE0A2',side_footer_top_color:'#FFC6DA',
+  side_footer_highlight_color:'#FFF0B6',side_footer_bottom_color:'#DCC5FF',
+  nav_highlight_color:'#FF709E',border_color:'#B996F1',
+  hero_signature_color:'#FFE8B0'
+ };
+ current.theme={...Object.fromEntries(Object.keys(current.theme||{}).map(key=>[key,''])),...palette};
+ current.layout={...current.layout,clean_mode:false,halloween_mode:false,natal_mode:false,pascoa_mode:false,carnaval_mode:false,namorados_mode:false,lgbtqia_mode:true,show_hero_image:true};
+ current.hero_image='./assets/themes/lgbtqia/hero.svg';
+ current.background_image='./assets/themes/lgbtqia/background.svg';
+ current.cursor={...current.cursor,enabled:true,trail_enabled:false,
+  image:'./assets/themes/lgbtqia/cursor.svg',size:30,
+  trail_color:'#D7B7FF',glow_color:'#FFE1EE',
+  falling_particles:{...(current.cursor?.falling_particles||{}),
+   enabled:true,type:'spark',color:'#E8D7FF',count:9,size:12}};
+ site=mergeSite(current);
+ render();sendPreview();
+ toast('Tema LGBTQIA+ aplicado na prévia! Personalize tudo no editor.','ok');
 }
 
 function cleanGalleryMarkup(){
@@ -535,7 +575,17 @@ function cleanGalleryMarkup(){
      <button class="btn" type="button" id="restoreBeforeNamoradosBtn">↩ Restaurar visual anterior</button>
     </div>
    </div>
-   <p class="small-note">Testar não publica nada. O visual anterior fica guardado neste navegador. O tema LGBTQIA+ será feito na próxima etapa.</p>
+   <div class="item" role="group" aria-label="Tema LGBTQIA+">
+    <div class="item-head"><strong>🏳️‍🌈 Tema LGBTQIA+</strong></div>
+    <div class="halloween-theme-preview lgbtqia-theme-preview"><img src="./assets/themes/lgbtqia/hero.svg" alt="Pessoas cartoon caminhando com bandeiras arco-íris" loading="lazy"></div>
+    <div class="halloween-theme-colors" aria-label="Cores do tema LGBTQIA+"><span style="background:#FF6F9D"></span><span style="background:#FFD7E5"></span><span style="background:#241B35"></span><span style="background:#B996F1"></span><span style="background:#FFF8FC"></span></div>
+    <p class="small-note">Pessoas caminhando com bandeiras arco-íris, fundo discreto e cursor de coração colorido. Todas as cores são editáveis.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyLgbtqiaPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforeLgbtqiaBtn">↩ Restaurar visual anterior</button>
+    </div>
+   </div>
+   <p class="small-note">Testar não publica nada. O visual anterior fica guardado neste navegador.</p>
   </div>
  </details>`;
 }
@@ -694,6 +744,8 @@ function bindEditor(){
  $('#restoreBeforeCarnavalBtn')?.addEventListener('click',restoreBeforeClean);
  $('#applyNamoradosPreviewBtn')?.addEventListener('click',applyNamoradosPreview);
  $('#restoreBeforeNamoradosBtn')?.addEventListener('click',restoreBeforeClean);
+ $('#applyLgbtqiaPreviewBtn')?.addEventListener('click',applyLgbtqiaPreview);
+ $('#restoreBeforeLgbtqiaBtn')?.addEventListener('click',restoreBeforeClean);
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
