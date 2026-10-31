@@ -22,6 +22,9 @@
     "search_panel_color": "#000000",
     "rule_bold_color": "#ff8800"
   },
+  "hero_signature_initials": "SC",
+  "hero_signature_prefix": "EST.",
+  "hero_signature_year": "2026",
   "side_footer_top": "CONHEÇA AS REGRAS.",
   "side_footer_highlight": "ESCOLHA SEU CAMINHO.",
   "side_footer_bottom": "SIN CITY · 2026",
@@ -57,7 +60,7 @@
   "favicon": "./assets/uploads/favicon-mvwglquq-u87m9bv.png",
   "discord_url": "",
   "hero_eyebrow": "SIN CITY ROLEPLAY",
-  "hero_title": "QUEM VIVE SIN CITY\nFAZ HISTÓRIA.",
+  "hero_title": "AQUI É ONDE SUA HISTÓRIA COMEÇA...",
   "hero_text": "O Site da Cidade reúne as regras que mantêm Sin City viva. Leia, entenda e faça parte da história.",
   "hero_image": "./assets/uploads/banner-mvwglquq-qx0k2a1.png",
   "notice_title": "ANTES DE ENTRAR NA CIDADE",
