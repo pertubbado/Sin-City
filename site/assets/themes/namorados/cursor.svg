@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cursor cartoon de caneta-tinteiro vermelha com coração">
+<!-- Compact fountain pen; tapered writing tip points to top-left. -->
+<g transform="rotate(-43 31 31)">
+ <path d="M31 2L22 18L31 27L40 18Z" fill="#FFF5E6" stroke="#802B4B" stroke-width="3.5" stroke-linejoin="round"/>
+ <path d="M31 7v18" stroke="#C34B69" stroke-width="2.3" stroke-linecap="round"/>
+ <path d="M24 19h14v7H24Z" fill="#F6D3A8" stroke="#802B4B" stroke-width="3" stroke-linejoin="round"/>
+ <rect x="21" y="25" width="20" height="30" rx="6" fill="#F0587B" stroke="#802B4B" stroke-width="3.5"/>
+ <path d="M26 30v20" stroke="#FFAEC0" stroke-width="4" opacity=".85" stroke-linecap="round"/>
+ <rect x="23" y="50" width="16" height="9" rx="4" fill="#FBC69A" stroke="#802B4B" stroke-width="3"/>
+ <path d="M30.5 40C26 35 21 42 30.5 48C41 41 35 35 30.5 40Z" fill="#FFF6E9" stroke="#A33053" stroke-width="1.7" stroke-linejoin="round"/>
+</g>
+<path d="M52 12v9m-4-4h9" stroke="#F6B9C7" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
