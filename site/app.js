@@ -160,6 +160,7 @@ const detailedColors = {
   '--custom-nav-text': theme.nav_text_color,
   '--custom-action-text': theme.action_text_color,
   '--custom-content-text': theme.content_text_color,
+  '--custom-rule-bold-color': theme.rule_bold_color,
   '--custom-category-panel': theme.category_panel_color,
   '--custom-nav-button': theme.navigation_button_color,
   '--custom-search-panel': theme.search_panel_color,
