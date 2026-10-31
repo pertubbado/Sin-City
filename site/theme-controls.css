@@ -15,7 +15,7 @@
 .topbar {
   background: color-mix(
     in srgb,
-    color-mix(in srgb, var(--custom-header-bg) 55%, #010005) 94%,
+    color-mix(in srgb, var(--custom-header-bg) 55%, color-mix(in srgb,var(--surface) 93%,var(--accent))) 94%,
     transparent
   );
 }
@@ -24,7 +24,7 @@
 .sidebar {
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--custom-sidebar-bg) 60%, #07020f),
+    color-mix(in srgb, var(--custom-sidebar-bg) 60%, color-mix(in srgb,var(--surface) 91%,var(--accent))),
     var(--custom-sidebar-bg)
   );
 }
@@ -249,4 +249,71 @@ body.sin-city-custom-bg {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+}
+
+/* C6.12 — auditoria geral de cores: cor automática herdada do tema. */
+:root {
+  --custom-nav-text: color-mix(in srgb,var(--text) 68%,var(--muted));
+  --custom-action-text:var(--text);
+  --custom-content-text:color-mix(in srgb,var(--text) 78%,var(--muted));
+  --custom-category-panel:color-mix(in srgb,var(--custom-card-bg) 84%,var(--accent));
+  --custom-nav-button:color-mix(in srgb,var(--surface) 84%,var(--accent));
+  --custom-search-panel:color-mix(in srgb,var(--surface) 88%,var(--accent));
+  --custom-nav-highlight:var(--accent);
+  --custom-edge-color:var(--accent-light);
+  --line:color-mix(in srgb,var(--custom-edge-color) 18%,transparent);
+}
+.side-home,.category-nav .nav-category,.category-nav .nav-rule-link {
+  color:var(--custom-nav-text);
+}
+.search-button,.search-button kbd,.back-button,
+.category-navigation button,.category-navigation button span,
+.search-modal-top button,.toc-items button,.toc-items button span,.search-modal-foot {
+  color:var(--custom-action-text);
+}
+.rule-content,.rule-content em,.rule-content pre,.rule-content code,.md-table td,
+.category-hero-text>p:last-child,.search-page-hero>p:not(.eyebrow) {
+  color:var(--custom-content-text);
+}
+.category-hero {
+  background:linear-gradient(105deg,
+    color-mix(in srgb,var(--custom-category-panel) 94%,transparent),
+    color-mix(in srgb,var(--custom-category-panel) 91%,transparent)),
+    url("./assets/cemetery-halloween.svg") center/cover;
+}
+.category-navigation button {background:var(--custom-nav-button);}
+.search-page-hero {
+  background:linear-gradient(110deg,
+    color-mix(in srgb,var(--custom-search-panel) 95%,transparent),
+    color-mix(in srgb,var(--custom-search-panel) 92%,transparent)),
+    url("./assets/cemetery-halloween.svg") center/cover;
+}
+.search-modal {background:var(--custom-search-panel);}
+.big-search-wrap,.overlay-input-wrap {
+  background:color-mix(in srgb,var(--custom-search-panel) 66%,transparent);
+}
+.topbar,.hero,.category-hero,.search-page-hero,.rule-card,
+.category-navigation button,.search-button,.ghost-button,
+.search-modal,.search-result,.big-search-wrap,.overlay-input-wrap {
+  border-color:color-mix(in srgb,var(--custom-edge-color) 24%,transparent);
+}
+.nav-rule-list {border-left-color:color-mix(in srgb,var(--custom-edge-color) 28%,transparent);}
+.side-home:hover,.category-nav .nav-category:hover,.nav-group.expanded .nav-category,
+.category-nav .nav-rule-link:hover,.category-nav .nav-rule-link.active,
+.category-nav .nav-expand:hover,.toc-items button:hover,.toc-items button.active {
+  background:color-mix(in srgb,var(--custom-nav-highlight) 23%,transparent);
+}
+.side-home.active,.category-nav .nav-category.active {
+  background:linear-gradient(90deg,
+    color-mix(in srgb,var(--custom-nav-highlight) 42%,transparent),
+    color-mix(in srgb,var(--custom-nav-highlight) 8%,transparent));
+  border-color:color-mix(in srgb,var(--custom-nav-highlight) 24%,transparent);
+}
+.category-navigation button:hover,.search-button:hover,.ghost-button:hover {
+  background:color-mix(in srgb,var(--custom-nav-button) 80%,var(--custom-nav-highlight));
+  border-color:color-mix(in srgb,var(--custom-nav-highlight) 52%,transparent);
+}
+.primary-button:hover {
+  background:var(--custom-nav-highlight);
+  box-shadow:0 9px 25px color-mix(in srgb,var(--custom-nav-highlight) 36%,transparent);
 }
