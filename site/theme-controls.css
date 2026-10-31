@@ -341,3 +341,14 @@ body.sin-city-clean .ambient-noise{display:none;}
 body.sin-city-clean .hero{box-shadow:none;}
 body.sin-city-clean .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 94%,transparent),color-mix(in srgb,var(--background) 55%,transparent));}
 body.sin-city-clean .notice,body.sin-city-clean .category-card{box-shadow:none;}
+
+/* C7.2 — detalhes cartoon: somente quando Halloween está ativo.
+   As cores continuam vindas do editor visual; nada fica travado. */
+body.sin-city-halloween .hero{border-radius:19px;border-color:color-mix(in srgb,var(--accent-light) 44%,transparent);box-shadow:0 16px 38px color-mix(in srgb,var(--background) 75%,transparent);}
+body.sin-city-halloween .hero-backdrop{background-position:center center;opacity:.98;}
+body.sin-city-halloween .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 94%,transparent) 0%,color-mix(in srgb,var(--background) 85%,transparent) 30%,color-mix(in srgb,var(--background) 38%,transparent) 57%,transparent 82%),linear-gradient(0deg,color-mix(in srgb,var(--background) 38%,transparent),transparent 55%);}
+body.sin-city-halloween .category-card,body.sin-city-halloween .rule-card,body.sin-city-halloween .update-card,body.sin-city-halloween .notice{border-radius:15px;}
+body.sin-city-halloween .category-card::before{opacity:.55;}
+body.sin-city-halloween .category-hero,body.sin-city-halloween .search-page-hero{background:linear-gradient(110deg,color-mix(in srgb,var(--custom-category-panel) 97%,transparent),color-mix(in srgb,var(--custom-category-panel) 89%,transparent)),url("./assets/themes/halloween/background.svg") center/cover;}
+body.sin-city-halloween .category-hero{border-radius:15px;}
+@media(max-width:620px){body.sin-city-halloween .hero{border-radius:14px;}body.sin-city-halloween .hero-backdrop{background-position:58% center;}body.sin-city-halloween .hero-vignette{background:linear-gradient(90deg,color-mix(in srgb,var(--background) 97%,transparent),color-mix(in srgb,var(--background) 70%,transparent) 68%,color-mix(in srgb,var(--background) 20%,transparent));}}
