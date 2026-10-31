@@ -176,6 +176,20 @@ ${optionalColorField('Cor dos Indicadores e Etiquetas',
   </div>
 </details>
 
+<details class="card">
+  <summary>🦇 Partículas de ambiente</summary>
+  <div class="card-body">
+    ${field('Ativar partículas','cursor.falling_particles.enabled','check')}
+    ${field('Tipo','cursor.falling_particles.type','select','letters:Letras|logo:Abóboras|mixed:Misto|spark:Brilhos')}
+    ${field('Cor','cursor.falling_particles.color','color')}
+    ${field('Quantidade','cursor.falling_particles.count')}
+    ${field('Tamanho','cursor.falling_particles.size')}
+  </div>
+</details>`;
+
+renderRules();
+bindEditor();
+
 }
 function renderRules(){
  const panel=$('#panel-rules');
