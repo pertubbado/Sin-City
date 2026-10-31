@@ -2,8 +2,8 @@
   "theme": {
     "accent": "#F06000",
     "accent_light": "#F0B020",
-    "background": "#212121",
-    "surface": "#111111",
+    "background": "#000000",
+    "surface": "#0f0f0f",
     "text": "#FFFFFF",
     "muted": "#e9e1ce",
     "glow_color": "#f08000",
