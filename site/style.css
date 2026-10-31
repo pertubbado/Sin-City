@@ -293,7 +293,7 @@ body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;bac
 .hero-vignette{background:linear-gradient(90deg,rgba(5,4,8,.98) 0%,rgba(9,6,14,.88) 37%,rgba(15,9,24,.38) 70%,rgba(8,6,12,.2) 100%),linear-gradient(0deg,rgba(7,5,10,.75),transparent 42%)}
 .hero-copy{max-width:920px;padding:74px clamp(36px,4.2vw,66px) 88px}
 .hero .eyebrow{font-size:11px;letter-spacing:.24em;margin-bottom:20px}
-.hero h1{max-width:830px;font-size:clamp(54px,5.4vw,88px);line-height:.96;letter-spacing:-.055em;font-weight:950}
+.hero h1{max-width:830px;font-size:clamp(54px,5.4vw,88px);line-height:.96;letter-spacing:-.02em;font-weight:950}
 .hero-text{max-width:660px;margin-top:20px;font-size:16px;line-height:1.7;color:var(--text)}
 .hero-actions{margin-top:31px;gap:12px}
 .primary-button,.ghost-button{min-height:46px;padding:0 20px;font-size:11px;letter-spacing:.09em}
