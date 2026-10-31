@@ -793,3 +793,53 @@ body {
 .category-nav .nav-category.active {
   color: var(--text);
 }
+
+
+
+/* ==========================================
+   C5.2 - TEXTO SECUNDARIO DINAMICO
+   Descricoes e textos auxiliares
+   ========================================== */
+
+/* Descricoes da pagina inicial */
+.category-card p,
+.update-card p,
+.notice-copy p,
+.section-heading > p {
+  color: var(--muted);
+}
+
+/* Descricoes de categorias e pesquisa */
+.category-hero-text > p:last-child,
+.subcategory-heading p,
+.search-page-hero > p:not(.eyebrow),
+.search-result p,
+.search-empty {
+  color: var(--muted);
+}
+
+/* Informacoes auxiliares */
+.search-result-meta,
+.update-meta,
+.side-bottom p,
+.site-footer {
+  color: var(--muted);
+}
+
+/* Texto da capa: um pouco mais claro */
+.hero-text {
+  color: color-mix(
+    in srgb,
+    var(--muted) 38%,
+    var(--text)
+  );
+}
+
+/* Conteudo das regras: legibilidade preservada */
+.rule-content {
+  color: color-mix(
+    in srgb,
+    var(--muted) 40%,
+    var(--text)
+  );
+}
