@@ -13,6 +13,19 @@
 
 .auth-modal[hidden]{display:none!important}.auth-modal{position:fixed;inset:0;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.78);z-index:200}.auth-card{width:min(520px,100%);max-height:90vh;overflow:auto;background:#111114;border:1px solid #38383f;border-radius:16px;padding:22px;box-shadow:0 25px 80px rgba(0,0,0,.65)}.auth-card h2{font-size:18px;margin:0 0 9px}.auth-card p,.auth-card li{font-size:12px;color:#c7c7cf;line-height:1.55}.auth-card ol{padding-left:20px}.auth-card a{color:#d4d8de}.auth-card input{width:100%;border:1px solid #38383f;background:#08080a;color:#fff;border-radius:8px;padding:11px;margin:6px 0 12px}.auth-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.auth-warning{border:1px solid #5c4527;background:#20190f;color:#e5ca9e;padding:10px;border-radius:8px;font-size:11px;line-height:1.45;margin:12px 0}
 @media(max-width:1000px){body{overflow:auto}.shell{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto auto 65vh}.topbar{grid-column:1;position:sticky;top:0;z-index:20;flex-wrap:wrap}.brand{min-width:180px}.sidebar{border-right:0;border-bottom:1px solid var(--line);max-height:62vh}.preview-area{min-height:65vh}.spacer{display:none}}
+
+/* C6.11 - central de imagens, sem alterar a prévia */
+.image-asset{padding:12px;margin:11px 0;border:1px solid var(--line);border-radius:10px;background:#17191b}
+.image-asset label{font-size:12px;font-weight:800;color:var(--text);letter-spacing:0;text-transform:none}
+.image-help{color:#babfc6;font-size:11px;line-height:1.5;margin:5px 0 10px}
+.image-preview{display:flex;align-items:center;justify-content:center;min-height:86px;max-height:145px;margin:9px 0;border:1px dashed #454950;border-radius:8px;background:#0d0e10;overflow:hidden}
+.image-preview img{display:block;width:100%;max-height:142px;object-fit:contain}
+.image-preview img:not([src]),.image-preview img[src=""]{display:none}
+.image-file{margin:8px 0;width:100%;font-size:11px;color:#c6c9cf}
+.image-file::file-selector-button{border:1px solid #4d5259;background:#24272b;color:#f1f2f4;border-radius:7px;padding:7px;margin-right:8px;cursor:pointer}
+.image-alert{font-size:11px;color:#b8bdc4;line-height:1.4;min-height:15px;margin:6px 0}
+.image-alert.warn{color:#e7c38b}
+.image-alert.error{color:#ffabb0}
 </style>
 </head>
 <body>
@@ -128,13 +141,74 @@ function optionalColorField(label, path, fallback) {
   `;
 }
 
+const IMAGE_SPECS = {
+  logo: {label:'Logo da cidade',path:'logo',width:512,height:512,formats:'PNG, WebP ou JPG',defaultUrl:'./assets/logo-sin-city.webp'},
+  favicon: {label:'Favicon (ícone da aba)',path:'favicon',width:64,height:64,formats:'PNG, WebP ou ICO existente por URL',defaultUrl:'./assets/sin-city-mark.svg'},
+  banner: {label:'Banner da capa',path:'hero_image',width:1920,height:800,formats:'WebP, JPG ou PNG',defaultUrl:'./assets/cemetery-night.webp'},
+  background: {label:'Fundo do site',path:'background_image',width:1920,height:1080,formats:'WebP, JPG ou PNG',defaultUrl:''},
+  cursor: {label:'Imagem do cursor',path:'cursor.image',width:64,height:64,formats:'PNG ou WebP com transparência',defaultUrl:'./assets/cursor-esqueleto.png'}
+};
+const pendingImageUploads = new Map();
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+function imageAssetField(key){
+ const spec=IMAGE_SPECS[key],value=getPath(spec.path),pending=pendingImageUploads.get(spec.path);
+ const safeSrc=/^(https:\/\/|\.\/assets\/|data:image\/)/i.test(String(value||''))?value:'';
+ const hint='Tamanho recomendado: '+spec.width+' × '+spec.height+' px · Formato: '+spec.formats+' · Até 3 MB por arquivo.';
+ return '<div class="field image-asset" data-image-asset="'+esc(spec.path)+'">'+
+ '<label>'+esc(spec.label)+'</label><p class="image-help">'+esc(hint)+'<br>Outras dimensões são aceitas, mas podem ser recortadas pelo layout responsivo.</p>'+
+ '<div class="image-preview"><img data-image-preview="'+esc(spec.path)+'" src="'+esc(safeSrc)+'" alt="Prévia de '+esc(spec.label)+'"></div>'+
+ '<input type="text" data-image-url="'+esc(spec.path)+'" value="'+esc(pending?'':(/^data:image\//i.test(value)?'':value))+'" placeholder="https://... ou ./assets/..." aria-label="Endereço de '+esc(spec.label)+'">'+
+ '<input class="image-file" type="file" data-image-file="'+esc(spec.path)+'" accept=".png,.jpg,.jpeg,.webp,.gif,image/png,image/jpeg,image/webp,image/gif" aria-label="Selecionar '+esc(spec.label)+' no computador">'+
+ '<div class="image-alert" data-image-status="'+esc(spec.path)+'">'+(pending?'Arquivo local selecionado; será enviado ao publicar.':'Selecione um arquivo ou informe um endereço de imagem.')+'</div>'+
+ '<button type="button" class="btn mini" data-image-reset="'+esc(spec.path)+'">Restaurar imagem padrão</button></div>';
+}
+function displayImageAsset(path,message='',status=''){
+ const image=document.querySelector('[data-image-preview="'+path+'"]');
+ const value=getPath(path);
+ if(image)image.src=/^(https:\/\/|\.\/assets\/|data:image\/)/i.test(String(value||''))?value:'';
+ const note=document.querySelector('[data-image-status="'+path+'"]');
+ if(note){note.textContent=message||'Imagem atualizada na prévia.';note.className='image-alert '+status;}
+}
+function isValidImageReference(value){
+ return /^(https:\/\/[^\s"<>]+|\.\/assets\/[a-z0-9\/_-]+\.(png|jpe?g|webp|gif|svg))$/i.test(value);
+}
+async function prepareImageFile(file,spec){
+ const extension=({ 'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif' })[file.type];
+ if(!extension)throw new Error('Formato não aceito. Envie PNG, JPG, WebP ou GIF.');
+ if(file.size===0||file.size>MAX_IMAGE_BYTES)throw new Error('O arquivo deve ter entre 1 byte e 3 MB.');
+ const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=()=>reject(new Error('Não foi possível ler o arquivo.'));r.readAsDataURL(file);});
+ const dims=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve({width:img.naturalWidth,height:img.naturalHeight});img.onerror=()=>reject(new Error('O arquivo não é uma imagem válida.'));img.src=dataUrl;});
+ const warning=dims.width===spec.width&&dims.height===spec.height?'Dimensões ideais confirmadas.':'Imagem '+dims.width+' × '+dims.height+' px. Recomendação: '+spec.width+' × '+spec.height+' px; o site poderá recortar ou ajustar.';
+ return {dataUrl,base64:dataUrl.split(',')[1],extension,original: getPath(spec.path),dimensions:dims,warning};
+}
+function bindImageEditor(){
+ document.querySelectorAll('[data-image-url]').forEach(input=>{
+   input.onchange=()=>{const path=input.dataset.imageUrl,val=input.value.trim();
+    if(val&&!isValidImageReference(val)){displayImageAsset(path,'Endereço inválido: use https:// ou ./assets/arquivo.png (JPG, WebP, GIF ou SVG).','error');return;}
+    pendingImageUploads.delete(path);setPath(path,val);displayImageAsset(path,val?'Endereço atualizado na prévia.':'Imagem removida da configuração.');sendPreview();
+   };
+ });
+ document.querySelectorAll('[data-image-file]').forEach(input=>{input.onchange=async()=>{const path=input.dataset.imageFile,spec=Object.values(IMAGE_SPECS).find(x=>x.path===path);const file=input.files?.[0];if(!file)return;try{
+   const item=await prepareImageFile(file,spec);
+   pendingImageUploads.set(path,item);setPath(path,item.dataUrl);
+   const urlInput=document.querySelector('[data-image-url="'+path+'"]');if(urlInput)urlInput.value='';
+   displayImageAsset(path,item.warning+' Arquivo local pendente de publicação.',item.dimensions.width===spec.width&&item.dimensions.height===spec.height?'':'warn');sendPreview();
+  }catch(err){displayImageAsset(path,err.message||'Não foi possível ler a imagem.','error');}finally{input.value='';}
+ };});
+ document.querySelectorAll('[data-image-reset]').forEach(btn=>{btn.onclick=()=>{const path=btn.dataset.imageReset,spec=Object.values(IMAGE_SPECS).find(x=>x.path===path);pendingImageUploads.delete(path);setPath(path,spec.defaultUrl);const input=document.querySelector('[data-image-url="'+path+'"]');if(input)input.value=spec.defaultUrl;displayImageAsset(path,'Restaurado para a imagem padrão.');sendPreview();};});
+}
+function snapshotForStorage(){
+ const copy=structuredClone(site);
+ pendingImageUploads.forEach((item,path)=>{const parts=path.split('.');let target=copy;for(let i=0;i<parts.length-1;i++)target=target?.[parts[i]];if(target)target[parts.at(-1)]=item.original||'';});
+ return copy;
+}
 async function load(forceRemote=false){
  try{
   const [s,r]=await Promise.all([
    fetch(`./content/site.json?v=${Date.now()}`,{cache:'no-store'}).then(x=>{if(!x.ok)throw new Error('content/site.json não encontrado');return x.json()}),
    fetch(`./rules.json?v=${Date.now()}`,{cache:'no-store'}).then(x=>{if(!x.ok)throw new Error('rules.json não encontrado');return x.json()})
   ]);
-  site=mergeSite(s);data=r||{categories:[],updates:[]};
+  pendingImageUploads.clear();site=mergeSite(s);data=r||{categories:[],updates:[]};
   if(!Array.isArray(data.categories))data.categories=[];if(!Array.isArray(data.updates))data.updates=[];
    if (forceRemote) {   localStorage.removeItem('sin-city-editor-draft'); } else {   const saved = localStorage.getItem('sin-city-editor-draft');    if (saved) {     try {       const draft = JSON.parse(saved);        site = draft.site ? mergeSite(draft.site) : site;       data = draft.data || data;        toast('Rascunho local carregado.', 'ok');     } catch (error) {       localStorage.removeItem('sin-city-editor-draft');       toast('Rascunho local inválido foi descartado.', 'error');     }   } }
   render();sendPreview();
@@ -143,7 +217,7 @@ async function load(forceRemote=false){
 function render(){
  $('#panel-site').innerHTML=`
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
- ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Logo','logo')}${field('Favicon','favicon')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}${field('Imagem da capa','hero_image')}${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
+ ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
  <div class="fixed-note">✦ Rodapé do menu lateral — abaixo das categorias</div>
  ${field('Texto superior do menu lateral', 'side_footer_top')}
  ${optionalColorField('Cor do texto superior', 'theme.side_footer_top_color', 'theme.muted')}
@@ -152,6 +226,17 @@ function render(){
  ${field('Texto inferior do menu lateral', 'side_footer_bottom')}
  ${optionalColorField('Cor do texto inferior', 'theme.side_footer_bottom_color', 'theme.label_color|#675672')}
  </div></details>
+ <details class="card" open>
+ <summary>🖼️ Central de Imagens</summary>
+ <div class="card-body">
+ <div class="fixed-note">Escolha arquivos do computador ou cole URLs HTTPS. As medidas abaixo são recomendações exatas; proporções diferentes podem sofrer recorte na prévia. O botão PUBLICAR envia os arquivos selecionados ao GitHub junto dos dados do site.</div>
+ ${imageAssetField('logo')}
+ ${imageAssetField('favicon')}
+ ${imageAssetField('banner')}
+ ${imageAssetField('background')}
+ ${imageAssetField('cursor')}
+ </div>
+ </details>
  <details class="card">
   <summary>🎨 Cores do site</summary>
   <div class="card-body">
@@ -195,7 +280,7 @@ ${optionalColorField('Cor dos Indicadores e Etiquetas',
 
     ${field('Ativar rastro do cursor','cursor.trail_enabled','check')}
 
-    ${field('Imagem do cursor','cursor.image')}
+    
 
     ${field('Tamanho do cursor','cursor.size')}
 
@@ -250,6 +335,7 @@ function renderRules(){
 function subEditor(sub,i,j){sub.rules=Array.isArray(sub.rules)?sub.rules:[];return `<details class="subitem"><summary><b>📂 ${esc(sub.name||'Nova subcategoria')}</b> — ${sub.rules.length} regra(s)</summary><div class="field-row"><div class="field"><label>ID</label><input data-sub="${i}:${j}" data-k="id" value="${esc(sub.id||'')}"></div><div class="field"><label>Ícone</label><input data-sub="${i}:${j}" data-k="icon" value="${esc(sub.icon||'◈')}"></div></div><div class="field"><label>Nome da subcategoria</label><input data-sub="${i}:${j}" data-k="name" value="${esc(sub.name||'')}"></div><div class="inline"><button class="btn mini" data-add-sub-rule="${i}:${j}">+ Regra</button><button class="btn mini danger" data-del-sub="${i}:${j}">Excluir subcategoria</button></div>${sub.rules.map((r,k)=>ruleEditor(r,`data-sub-rule="${i}:${j}:${k}"`,`data-del-sub-rule="${i}:${j}:${k}"`)).join('')}</details>`;}
 function ruleEditor(r,attrs,delAttr){return `<div class="rule"><div class="item-head"><strong>${esc(r.code||'')} • ${esc(r.title||'Sem título')}</strong><button class="btn mini danger" ${delAttr}>Excluir</button></div><div class="field-row"><div class="field"><label>Código</label><input ${attrs} data-k="code" value="${esc(r.code||'')}"></div><div class="field"><label>Tag</label><input ${attrs} data-k="tag" value="${esc(r.tag||'REGRA')}"></div></div><div class="field"><label>Título</label><input ${attrs} data-k="title" value="${esc(r.title||'')}"></div><div class="field"><label>Texto da regra (Markdown permitido)</label><textarea ${attrs} data-k="text">${esc(r.text||'')}</textarea></div><div class="field"><label>Imagem (opcional)</label><input ${attrs} data-k="image" value="${esc(r.image||'')}"></div></div>`;}
 function bindEditor(){
+ bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
  
@@ -288,7 +374,7 @@ if (picker) {
  $$('[data-del-upd]').forEach(b=>b.onclick=()=>{data.updates.splice(+b.dataset.delUpd,1);renderRules();bindEditor();sendPreview();});
 }
 function sendPreview(){const f=$('#preview');if(f?.contentWindow){f.contentWindow.postMessage({type:'sin-city-preview',site,data},location.origin);}}
-function saveDraft(){localStorage.setItem('sin-city-editor-draft',JSON.stringify({site,data,savedAt:new Date().toISOString()}));toast('Rascunho salvo somente neste navegador.','ok');}
+function saveDraft(){localStorage.setItem('sin-city-editor-draft',JSON.stringify({site:snapshotForStorage(),data,savedAt:new Date().toISOString()}));toast(pendingImageUploads.size?'Rascunho salvo. Arquivos locais precisam ser selecionados novamente ao reabrir.':'Rascunho salvo somente neste navegador.','ok');}
 function login(){
  const modal=$('#tokenModal');
  modal.hidden=false;
@@ -326,29 +412,38 @@ function updateAuthUI(){const box=$('#authStatus'),text=$('#authText'),avatar=$(
 function logout(show=true){githubToken='';githubUser=null;sessionStorage.removeItem('sin-city-gh-token');updateAuthUI();if(show)toast('Sessão do editor encerrada.');}
 async function createBlob(content){return gh(`/repos/${REPO}/git/blobs`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,encoding:'utf-8'})});}
 async function publish(){
- if(!githubToken){login();toast('Entre com a conta GitHub que tem acesso de escrita ao repositório.');return;}
- if(!confirm('Publicar as alterações do editor no GitHub? Isso atualiza o site para todos os visitantes.'))return;
+ if(!githubToken){login();toast('Entre com GitHub para publicar.');return;}
+ if(!confirm('Publicar as alterações e imagens no GitHub? Isso atualiza o site para todos os visitantes.'))return;
  const btn=$('#publishBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='PUBLICANDO...';
  try{
-  site=mergeSite(site);
-  const siteText=JSON.stringify(site,null,2)+'\n';const rulesText=JSON.stringify(data,null,2)+'\n';
-  toast('Preparando arquivos para publicação...');
-  const ref=await gh(`/repos/${REPO}/git/ref/heads/${BRANCH}`);
-  const parent=await gh(`/repos/${REPO}/git/commits/${ref.object.sha}`);
+  const publishedSite=mergeSite(structuredClone(site));
+  const images=[];
+  const stampId=Date.now().toString(36);
+  for(const [path,item] of pendingImageUploads){
+    const key=Object.entries(IMAGE_SPECS).find(([,spec])=>spec.path===path)?.[0];
+    if(!key||!item.base64)throw new Error('Arquivo de imagem pendente inválido. Selecione-o novamente.');
+    const remotePath='site/assets/uploads/'+key+'-'+stampId+'-'+Math.random().toString(36).slice(2,9)+'.'+item.extension;
+    const blob=await gh('/repos/'+REPO+'/git/blobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:item.base64,encoding:'base64'})});
+    images.push({path:remotePath,mode:'100644',type:'blob',sha:blob.sha});
+    const parts=path.split('.');let o=publishedSite;for(let i=0;i<parts.length-1;i++)o=o[parts[i]];o[parts.at(-1)]='./assets/uploads/'+remotePath.split('/').pop();
+  }
+  const siteText=JSON.stringify(publishedSite,null,2)+'\n';
+  const rulesText=JSON.stringify(data,null,2)+'\n';
+  toast('Preparando site e '+images.length+' imagem(ns) para publicação...');
+  const ref=await gh('/repos/'+REPO+'/git/ref/heads/'+BRANCH);
+  const parent=await gh('/repos/'+REPO+'/git/commits/'+ref.object.sha);
   const [siteBlob,rulesBlob,contentRulesBlob]=await Promise.all([createBlob(siteText),createBlob(rulesText),createBlob(rulesText)]);
-  const tree=await gh(`/repos/${REPO}/git/trees`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_tree:parent.tree.sha,tree:[
-   {path:SITE_PATH,mode:'100644',type:'blob',sha:siteBlob.sha},
-   {path:RULES_PATH,mode:'100644',type:'blob',sha:rulesBlob.sha},
-   {path:CONTENT_RULES_PATH,mode:'100644',type:'blob',sha:contentRulesBlob.sha}
-  ]})});
+  const entries=[{path:SITE_PATH,mode:'100644',type:'blob',sha:siteBlob.sha},{path:RULES_PATH,mode:'100644',type:'blob',sha:rulesBlob.sha},{path:CONTENT_RULES_PATH,mode:'100644',type:'blob',sha:contentRulesBlob.sha},...images];
+  const tree=await gh('/repos/'+REPO+'/git/trees',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_tree:parent.tree.sha,tree:entries})});
   const stamp=new Date().toLocaleString('pt-BR');
-  const commit=await gh(`/repos/${REPO}/git/commits`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:`Sin City Editor: atualizar site e regras (${stamp})`,tree:tree.sha,parents:[ref.object.sha]})});
-  await gh(`/repos/${REPO}/git/refs/heads/${BRANCH}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({sha:commit.sha,force:false})});
-  localStorage.removeItem('sin-city-editor-draft');toast('Publicado no GitHub! O GitHub Actions vai atualizar o site em instantes.','ok');
- }catch(err){console.error(err);let msg=err.message||'Erro ao publicar.';if(/403|Resource not accessible|permission|Forbidden/i.test(msg))msg='Sua conta não tem permissão de escrita nesse repositório. Confira se entrou no GitHub correto.';if(/409|422|fast.forward|reference update failed/i.test(msg))msg+=' A branch mudou durante a publicação; recarregue os dados e tente novamente.';toast(msg,'error');}
+  const commit=await gh('/repos/'+REPO+'/git/commits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Sin City Editor: atualizar imagens e conteúdo ('+stamp+')',tree:tree.sha,parents:[ref.object.sha]})});
+  await gh('/repos/'+REPO+'/git/refs/heads/'+BRANCH,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({sha:commit.sha,force:false})});
+  site=publishedSite;pendingImageUploads.clear();render();sendPreview();
+  localStorage.removeItem('sin-city-editor-draft');toast('Publicado no GitHub! Imagens enviadas com sucesso.','ok');
+ }catch(err){console.error(err);let msg=err.message||'Erro ao publicar.';if(/403|Resource not accessible|permission|Forbidden/i.test(msg))msg='A conta não tem permissão de escrita nesse repositório.';if(/409|422|fast.forward|reference update failed/i.test(msg))msg+=' A branch mudou durante a publicação; recarregue os dados antes de tentar novamente.';toast(msg,'error');}
  finally{btn.disabled=false;btn.textContent=old;}
 }
-function backup(){const payload={exportedAt:new Date().toISOString(),site,data};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='sin-city-editor-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup baixado.','ok');}
+function backup(){const payload={exportedAt:new Date().toISOString(),site:snapshotForStorage(),data};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='sin-city-editor-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup baixado.','ok');}
 $$('.tab').forEach(b=>b.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));$$('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#panel-'+b.dataset.tab).classList.add('active');});
 $('#preview').addEventListener('load',sendPreview);$('#reloadBtn').onclick=()=>{if(confirm('Recarregar os dados publicados? Um rascunho não salvo pode ser perdido.'))load(true);};$('#draftBtn').onclick=saveDraft;$('#backupBtn').onclick=backup;$('#siteBtn').onclick=()=>window.open('./index.html','_blank','noopener');$('#loginBtn').onclick=login;$('#publishBtn').onclick=publish;$('#cancelTokenBtn').onclick=()=>{$('#tokenModal').hidden=true;$('#tokenInput').value='';};$('#connectTokenBtn').onclick=connectWithToken;$('#tokenInput').addEventListener('keydown',e=>{if(e.key==='Enter')connectWithToken();if(e.key==='Escape')$('#tokenModal').hidden=true;});$('#tokenModal').addEventListener('click',e=>{if(e.target.id==='tokenModal')$('#tokenModal').hidden=true;});
 load();updateAuthUI();if(githubToken)loadGitHubUser();
