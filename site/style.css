@@ -390,3 +390,139 @@ body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;bac
     filter: none;
   }
 }
+
+/* ==================================================
+   C2 - COR PRINCIPAL DINAMICA
+   Destaques controlados pelo editor visual
+   ================================================== */
+
+/* Brilho suave do fundo */
+body {
+  background-image:
+    radial-gradient(
+      ellipse at 72% 22%,
+      color-mix(in srgb, var(--accent) 14%, transparent),
+      transparent 38%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background) 60%, #0d031a) 0%,
+      var(--background) 45%,
+      color-mix(in srgb, var(--background) 60%, #0d0817) 100%
+    );
+}
+
+/* Botoes e efeitos de hover */
+.search-button:hover,
+.discord-btn:hover {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.discord-btn:hover {
+  background: color-mix(in srgb, var(--accent) 80%, var(--accent-light));
+  border-color: color-mix(in srgb, var(--accent) 37%, var(--accent-light));
+}
+
+.primary-button:hover {
+  background: color-mix(in srgb, var(--accent) 80%, var(--accent-light));
+  box-shadow: 0 9px 25px color-mix(in srgb, var(--accent) 36%, transparent);
+}
+
+.ghost-button:hover {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* Menu lateral */
+.side-home:hover,
+.category-nav button:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.side-home.active,
+.category-nav button.active {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 40%, transparent),
+    color-mix(in srgb, var(--accent) 8%, transparent)
+  );
+}
+
+.category-nav .nav-category:hover,
+.nav-group.expanded .nav-category {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.category-nav .nav-category.active {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 42%, transparent),
+    color-mix(in srgb, var(--accent) 8%, transparent)
+  );
+}
+
+.category-nav .nav-expand:hover {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.category-nav .nav-rule-link:hover,
+.category-nav .nav-rule-link.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Avisos e cartoes */
+.notice {
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--accent) 17%, transparent),
+    rgba(17, 17, 17, .92) 55%
+  );
+}
+
+.category-card::before {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 24%, transparent),
+    transparent 68%
+  );
+}
+
+.card-icon {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* Categorias e subcategorias */
+.category-hero::after {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 27%, transparent),
+    transparent 68%
+  );
+}
+
+.category-hero-icon {
+  background: color-mix(in srgb, var(--accent) 17%, transparent);
+  box-shadow: 0 0 45px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.subcategory-code {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* Regras e tabelas */
+.rule-content blockquote,
+.rule-callout {
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+}
+
+.md-table th {
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.toc-items button:hover,
+.toc-items button.active {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.category-navigation button:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
