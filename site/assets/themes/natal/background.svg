@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Fundo natalino aconchegante com estrelinhas, flocos suaves, pinheiros e luzes">
+<defs><radialGradient id="bg"><stop stop-color="#365c52"/><stop offset=".58" stop-color="#1b3938"/><stop offset="1" stop-color="#132b2e"/></radialGradient></defs>
+<rect width="1920" height="1080" fill="url(#bg)"/>
+<g opacity=".33" fill="#f8e9c6"><circle cx="115" cy="96" r="4"/><circle cx="418" cy="245" r="6"/><circle cx="713" cy="125" r="4"/><circle cx="1032" cy="285" r="5"/><circle cx="1330" cy="71" r="6"/><circle cx="1738" cy="154" r="5"/><circle cx="1891" cy="421" r="4"/><circle cx="224" cy="775" r="5"/><circle cx="1512" cy="903" r="6"/><circle cx="901" cy="973" r="4"/></g>
+<g opacity=".30" stroke="#e9f6ea" stroke-width="5" stroke-linecap="round">
+<path d="M280 485v22m-11-11h22M1170 155v22m-11-11h22M1715 604v23m-11-11h22M630 892v25m-13-12h26M1467 403v20m-10-10h20"/>
+<path d="M526 391l22 22m0-22l-22 22M1802 806l22 22m0-22l-22 22M1092 655l16 16m0-16l-16 16"/>
+</g>
+<g fill="none" stroke="#b2dac9" stroke-width="8" stroke-linejoin="round" opacity=".22"><path d="M80 1045l64-115 68 115zM112 989l32-70 38 70"/><path d="M1670 1048l70-124 78 124zM1707 988l33-70 43 70"/><path d="M450 1060l42-88 46 88z"/></g>
+<path d="M0 1039q250-40 495-17t519 0q317-33 503-14t403-7v79H0z" fill="#92b5a7" opacity=".12"/>
+<g opacity=".18"><path d="M1211 197q42-42 84-5t90-5q48-39 99 1" fill="none" stroke="#faf7df" stroke-width="12" stroke-linecap="round"/><path d="M152 607q41-27 82-4t79-1" fill="none" stroke="#faf7df" stroke-width="8" stroke-linecap="round"/></g>
+</svg>
