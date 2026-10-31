@@ -82,6 +82,9 @@ let githubToken = sessionStorage.getItem('sin-city-gh-token') || '';
 let githubUser = null;
 const defaults = {
  theme:{accent:'#542287',accent_light:'#AF7AFF',background:'#212121',surface:'#111111',text:'#FFFFFF',muted:'#B6A9BF'},
+ hero_signature_initials:'SC',
+ hero_signature_prefix:'EST.',
+ hero_signature_year:'2026',
  side_footer_top:'CONHEÇA AS REGRAS.',
  side_footer_highlight:'ESCOLHA SEU CAMINHO.',
  side_footer_bottom:'SIN CITY · 2026',
@@ -220,7 +223,13 @@ async function load(forceRemote=false){
 function render(){
  $('#panel-site').innerHTML=`
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
- ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
+ ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}
+ <div class="fixed-note">✦ Assinatura no canto direito da capa (SC · EST. 2026)</div>
+ ${field('Sigla da assinatura', 'hero_signature_initials')}
+ ${field('Texto antes do ano', 'hero_signature_prefix')}
+ ${field('Ano ou data da assinatura', 'hero_signature_year')}
+ ${optionalColorField('Cor da assinatura', 'theme.hero_signature_color', 'theme.label_color|#AF7AFF')}
+ ${field('Título do aviso','notice_title')}${field('Texto do aviso','notice_text','textarea')}${field('Rodapé','footer_text')}
  <div class="fixed-note">✦ Rodapé do menu lateral — abaixo das categorias</div>
  ${field('Texto superior do menu lateral', 'side_footer_top')}
  ${optionalColorField('Cor do texto superior', 'theme.side_footer_top_color', 'theme.muted')}
