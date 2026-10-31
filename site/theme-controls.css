@@ -93,3 +93,84 @@
   box-shadow: 0 0 45px
     color-mix(in srgb, var(--custom-glow) 16%, transparent);
 }
+
+/* ==========================================
+   C6.3 - INDICADORES E ETIQUETAS
+   Cores independentes com padrao automatico
+   ========================================== */
+
+/* Identidade e titulos pequenos */
+.brand-copy small,
+.side-eyebrow,
+.eyebrow,
+.toc-title {
+  color: var(--custom-label-color, var(--accent-light));
+}
+
+/* Menu lateral */
+.side-label {
+  color: var(--custom-label-color, #89759b);
+}
+
+.category-nav button .nav-number {
+  color: var(--custom-label-color, #806a92);
+}
+
+.category-nav .nav-number {
+  color: var(--custom-label-color, #806a92);
+}
+
+.category-nav button.active .nav-number {
+  color: var(--custom-label-color, var(--accent-light));
+}
+
+.nav-rule-code {
+  color: var(--custom-label-color, #a782c9);
+}
+
+.nav-no-rules {
+  color: var(--custom-label-color, #84778d);
+}
+
+.side-version {
+  color: var(--custom-label-color, #675672);
+}
+
+/* Indicadores da pagina inicial */
+.section-index {
+  color: var(--custom-label-color, #9c7ab8);
+}
+
+.card-index {
+  color: var(--custom-label-color, #9272ae);
+}
+
+.card-bottom {
+  color: var(--custom-label-color, #a78ac2);
+}
+
+.hero-bottom-note {
+  color: var(--custom-label-color, #a995ba);
+}
+
+.hero-signature {
+  color: var(--custom-label-color, rgba(227,203,255,.62));
+}
+
+.notice-mark {
+  color: var(--custom-label-color, #715b82);
+}
+
+/* Etiquetas das regras e atualizacoes */
+.rule-code {
+  color: var(--custom-label-color, var(--accent-light));
+}
+
+.rule-tag {
+  color: var(--custom-label-color, #bda1d9);
+}
+
+.update-meta,
+.search-result-meta {
+  color: var(--custom-label-color, var(--muted));
+}
