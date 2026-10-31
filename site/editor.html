@@ -981,23 +981,23 @@ function updateDashboard(){
  setText('dashboardDraftStatus',hasDraft?'Há um rascunho local salvo neste navegador.':'Nenhum rascunho local salvo no momento.');
 }
 function activateStudioPanel(name){
- $('.panel').forEach(panel=>panel.classList.remove('active'));
- $('.studio-nav-item[data-tab]').forEach(button=>{const active=button.dataset.tab===name;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+ $$('.panel').forEach(panel=>panel.classList.remove('active'));
+ $$('.studio-nav-item[data-tab]').forEach(button=>{const active=button.dataset.tab===name;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
  const target=$('#panel-'+name);if(target)target.classList.add('active');
  const workspace=$('#editorWorkspace');if(workspace)workspace.scrollTop=0;
  if(name==='dashboard')updateDashboard();
 }
 function activateStudioJump(id,key){
  activateStudioPanel('site');
- $('.studio-nav-item').forEach(button=>button.classList.remove('active'));
+ $$('.studio-nav-item').forEach(button=>button.classList.remove('active'));
  const navButton=$('.studio-nav-item[data-nav-key="'+key+'"]');if(navButton){navButton.classList.add('active');navButton.setAttribute('aria-current','location');}
  requestAnimationFrame(()=>{const target=document.getElementById(id);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});
 }
-$('.studio-nav-item[data-tab]').forEach(button=>button.addEventListener('click',()=>activateStudioPanel(button.dataset.tab)));
-$('.studio-nav-item[data-jump]').forEach(button=>button.addEventListener('click',()=>activateStudioJump(button.dataset.jump,button.dataset.navKey)));
-$('[data-dashboard-tab]').forEach(button=>button.addEventListener('click',()=>activateStudioPanel(button.dataset.dashboardTab)));
-$('[data-dashboard-jump]').forEach(button=>button.addEventListener('click',()=>activateStudioJump(button.dataset.dashboardJump,button.dataset.dashboardJump==='cleanThemeCard'?'themes':'media')));
-$('[data-dashboard-action]').forEach(button=>button.addEventListener('click',()=>{
+$$('.studio-nav-item[data-tab]').forEach(button=>button.addEventListener('click',()=>activateStudioPanel(button.dataset.tab)));
+$$('.studio-nav-item[data-jump]').forEach(button=>button.addEventListener('click',()=>activateStudioJump(button.dataset.jump,button.dataset.navKey)));
+$$('[data-dashboard-tab]').forEach(button=>button.addEventListener('click',()=>activateStudioPanel(button.dataset.dashboardTab)));
+$$('[data-dashboard-jump]').forEach(button=>button.addEventListener('click',()=>activateStudioJump(button.dataset.dashboardJump,button.dataset.dashboardJump==='cleanThemeCard'?'themes':'media')));
+$$('[data-dashboard-action]').forEach(button=>button.addEventListener('click',()=>{
  const action=button.dataset.dashboardAction;
  if(action==='draft')saveDraft();
  if(action==='backup')backup();

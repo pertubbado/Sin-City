@@ -89,3 +89,49 @@ html,body{width:100%;min-width:0;height:100%}body{overflow:hidden}
 @media(max-width:1000px){body{overflow:auto}.shell{height:auto;min-height:100dvh;grid-template-columns:68px minmax(0,1fr);grid-template-rows:auto minmax(680px,auto) minmax(620px,72vh);overflow:visible}.topbar{grid-column:1/-1;grid-row:1;position:sticky;top:0;flex-wrap:wrap;min-height:72px}.studio-nav{grid-column:1;grid-row:2;position:sticky;top:72px;height:calc(100vh - 72px);align-self:start}.editor-workspace{grid-column:2;grid-row:2;min-height:680px;border-right:0}.preview-area{grid-column:1/-1;grid-row:3;min-height:620px}}
 @media(max-width:680px){.shell{display:flex;flex-direction:column;height:auto;min-height:100dvh;overflow:visible}.topbar{position:sticky;top:0;flex-wrap:wrap;gap:6px;padding:8px}.brand{min-width:0;flex:1 1 100%}.topbar .spacer{display:none}.topbar .btn{flex:1 1 auto;padding:8px 7px;font-size:10px}.studio-nav{position:sticky;top:112px;z-index:25;width:100%;height:auto;min-height:0;flex-direction:row;align-items:center;overflow-x:auto;overflow-y:hidden;padding:7px;border-right:0;border-bottom:1px solid var(--studio-border)}.studio-nav-heading,.studio-nav-caption,.studio-nav-divider,.studio-nav-bottom{display:none!important}.studio-nav-item{width:auto;min-width:52px;min-height:44px;flex:0 0 auto;padding:8px 12px}.shell.nav-expanded .studio-nav-item{justify-content:center}.studio-nav-item .nav-label{display:none!important}.editor-workspace{width:100%;min-height:70vh;overflow:visible;padding:15px 12px 28px;border-right:0}.editor-workspace .panel{max-width:none}.dashboard-hero{min-height:160px;padding:20px}.dashboard-hero-mark{flex-basis:76px;width:76px;height:76px;border-radius:18px}.dashboard-hero-mark span{font-size:26px}.dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-shortcuts,.dashboard-bottom-grid{grid-template-columns:1fr}.dashboard-roadmap{align-items:flex-start;flex-direction:column}.dashboard-roadmap-tags{justify-content:flex-start}.preview-area{width:100%;height:68vh;min-height:520px;padding:10px}.preview-bar{padding:0 8px;gap:6px}.preview-label{display:none}.preview-actions{gap:5px}.preview-device{padding:6px 5px;font-size:8px}.preview-fullscreen-btn{padding:6px 7px!important;font-size:9px!important}}
 @media(prefers-reduced-motion:reduce){.studio-nav-item,.dashboard-shortcut{transition:none}}
+
+/* C7.9.1 — tipografia ampliada para leitura confortável e melhor hierarquia. */
+.brand h1{font-size:14px}
+.brand p{font-size:11px}
+.topbar .btn{font-size:13px}
+.studio-nav-caption{font-size:10px}
+.nav-label{font-size:13px}
+.studio-nav-note{font-size:10px}
+.editor-workspace .card>summary{font-size:14px}
+.editor-workspace .field label{font-size:12px;letter-spacing:.045em}
+.editor-workspace .field input,.editor-workspace .field textarea,.editor-workspace .field select{font-size:14px}
+.editor-workspace .fixed-note,.editor-workspace .hint,.editor-workspace .small-note{font-size:12px;line-height:1.55}
+.editor-workspace .item-head strong{font-size:13px}
+.editor-workspace .btn{font-size:13px}
+.dashboard-eyebrow{font-size:10px}
+.dashboard-hero h2{font-size:clamp(27px,2.5vw,36px)}
+.dashboard-hero p:not(.dashboard-eyebrow){font-size:13px}
+.dashboard-city-name{font-size:13px}
+.dashboard-stat span{font-size:10px}
+.dashboard-stat strong{font-size:28px}
+.dashboard-stat small{font-size:11px}
+.dashboard-section-heading h3,.dashboard-info-card h3{font-size:18px}
+.dashboard-section-heading>span{font-size:11px}
+.shortcut-copy strong{font-size:14px}
+.shortcut-copy small{font-size:11px}
+.dashboard-card-heading h3{font-size:14px}
+.dashboard-card-heading p,.dashboard-footnote{font-size:11px;line-height:1.55}
+.dashboard-quick-actions .btn{font-size:11px}
+.dashboard-status-row{font-size:11px;line-height:1.5}
+.dashboard-roadmap h3{font-size:15px}
+.dashboard-roadmap p:not(.dashboard-eyebrow){font-size:11px}
+.dashboard-roadmap-tags span{font-size:10px}
+.preview-label{font-size:10px}
+.preview-device{font-size:10px}
+.preview-fullscreen-btn{font-size:11px!important}
+@media(max-width:680px){
+ .brand h1{font-size:13px}
+ .topbar .btn{font-size:12px}
+ .editor-workspace .card>summary{font-size:14px}
+ .editor-workspace .field label{font-size:12px}
+ .editor-workspace .field input,.editor-workspace .field textarea,.editor-workspace .field select{font-size:14px}
+ .dashboard-hero h2{font-size:27px}
+ .shortcut-copy strong{font-size:13px}
+ .preview-device{font-size:9px}
+ .preview-fullscreen-btn{font-size:10px!important}
+}
