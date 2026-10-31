@@ -179,3 +179,36 @@
 .category-nav .nav-expand {
   color: var(--custom-label-color, #a58cbb);
 }
+
+/* ==========================================
+   C6.4 - BRILHO DO CURSOR E DO RASTRO
+   ========================================== */
+
+/* Brilho do cursor ao passar sobre elementos */
+html.sin-city-cursor-enabled .custom-cursor.hovering {
+  filter: drop-shadow(
+    0 0 10px
+    color-mix(
+      in srgb,
+      var(--cursor-glow-color, #AF7AFF) 95%,
+      transparent
+    )
+  );
+}
+
+/* Brilho do rastro acompanha sua própria cor */
+.cursor-trail {
+  box-shadow:
+    0 0 7px
+    color-mix(
+      in srgb,
+      var(--trail-color, #2D1243) 72%,
+      transparent
+    ),
+    0 0 15px
+    color-mix(
+      in srgb,
+      var(--trail-color, #2D1243) 42%,
+      transparent
+    );
+}
