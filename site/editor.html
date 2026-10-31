@@ -26,6 +26,16 @@
 .image-alert{font-size:11px;color:#b8bdc4;line-height:1.4;min-height:15px;margin:6px 0}
 .image-alert.warn{color:#e7c38b}
 .image-alert.error{color:#ffabb0}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.gallery-tile{min-width:0;border-radius:11px;border:1px solid #3d4146;background:#181a1c;padding:10px}
+.gallery-tile strong{font-size:11px;line-height:1.35;display:block}
+.gallery-tile p{font-size:10px;color:#c4c7cb;line-height:1.4;min-height:43px;margin:7px 0}
+.gallery-tile .btn{width:100%;white-space:normal}
+.theme-swatches{display:flex;gap:4px;height:19px;margin-top:7px}
+.theme-swatches i{flex:1;border:1px solid #ffffff25;border-radius:5px}
+.gallery-saved{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid #3e4248;font-size:11px}
+.gallery-saved>span{overflow-wrap:anywhere}
+@media(max-width:440px){.gallery-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -220,8 +230,111 @@ async function load(forceRemote=false){
   render();sendPreview();
  }catch(err){console.error(err);toast('Erro ao carregar os arquivos do site: '+err.message,'error');}
 }
+
+// C7.0 - Galeria opcional. Apenas a aparencia; nunca edita categorias e regras.
+const THEME_LIBRARY_KEY='sin-city-gallery-custom-v1';
+const THEME_PREVIOUS_KEY='sin-city-gallery-previous-v1';
+const SEASON_PRESETS=[
+ ['carnaval','🎭 Carnaval','Festa colorida e confetes','#bf65f2','#ffd65c','#39d7b0','#191329','#291c3a'],
+ ['pascoa','🐰 Páscoa','Docinhos, flores e tons pastel','#a98be9','#ffd0df','#a0dfbb','#201a2a','#302639'],
+ ['namorados','💗 Dia dos Namorados','Corações, carinho e tons rosados','#e36f9f','#ffb8d1','#ffc9dd','#2a1723','#3b2330'],
+ ['halloween','🎃 Halloween','Magia, abóboras e fantasminhas','#eb872e','#ffd477','#ad92ed','#211828','#302239'],
+ ['natal','🎄 Natal','Luzinhas e noite aconchegante','#48a27b','#ffcf82','#e98191','#14251f','#21362e'],
+ ['lgbtqia','🌈 LGBTQIA+','Alegria, inclusão e arco-íris','#e675a9','#ffd576','#9ca2fa','#1e1a31','#2e2442']
+];
+function galleryRead(){
+ try{const saved=JSON.parse(localStorage.getItem(THEME_LIBRARY_KEY)||'[]');
+ return Array.isArray(saved)?saved.filter(x=>x&&typeof x.name==='string'&&x.site&&typeof x.site==='object').slice(0,12):[];}
+ catch{return [];}
+}
+function galleryStore(key,val){
+ try{localStorage.setItem(key,JSON.stringify(val));return true;}
+ catch{toast('Sem espaço no armazenamento local. Faça um backup antes.','error');return false;}
+}
+function galleryPreviewSwatches(colors){
+ return '<div class="theme-swatches">'+colors.map(c=>'<i style="background:'+esc(c)+'"></i>').join('')+'</div>';
+}
+function galleryMarkup(){
+ const choices=[
+  ['clean','🫧 Tema Padrão Clean','Tela limpa e neutra. Nenhuma cor bloqueada.','#181a1d','#eceff2','#aeb4b9'],
+  ...SEASON_PRESETS.map(p=>[p[0],p[1],p[2],p[3],p[4],p[5]])
+ ];
+ return '<details class="card" open><summary>🎭 Galeria de Temas (C7.0)</summary><div class="card-body">'+
+ '<div class="fixed-note">Cada tema é <b>opcional</b> e serve como ponto de partida. O <b>Padrão Clean</b> não copia o tema laranja, não fixa cores e deixa todos os campos abaixo editáveis. Experimente na prévia antes de publicar.</div>'+
+ '<div class="gallery-grid">'+choices.map(p=>'<article class="gallery-tile"><strong>'+esc(p[1])+'</strong>'+galleryPreviewSwatches(p.slice(3))+'<p>'+esc(p[2])+'</p><button class="btn mini" type="button" data-gallery-preset="'+p[0]+'">Testar tema</button></article>').join('')+'</div>'+
+ '<div class="fixed-note">O primeiro teste guarda a configuração anterior neste navegador. Cores, textos e imagens ficam editáveis. O tema Clean desliga efeitos e imagens decorativas; os outros oferecem paletas e brilho suave. Artes cartoon exclusivas: próxima etapa C7.1.</div>'+
+ '<div class="inline"><button class="btn mini" type="button" id="galleryRestore">↩ Recuperar visual anterior</button><button class="btn mini" type="button" id="gallerySave">💾 Salvar meu tema</button></div>'+
+ galleryRead().map((t,i)=>'<div class="gallery-saved"><span>'+esc(t.name)+'</span><div class="inline"><button class="btn mini" type="button" data-gallery-load="'+i+'">Aplicar</button><button class="btn mini danger" type="button" data-gallery-delete="'+i+'">Excluir</button></div></div>').join('')+
+ '<p class="small-note">Temas pessoais ficam salvos somente neste navegador (máximo 12). Use Backup para guardar os dados completos. Alterações não são publicadas até clicar em PUBLICAR.</p></div></details>';
+}
+function canSwitchTheme(){
+ if(pendingImageUploads.size){toast('Você tem imagens locais ainda não publicadas. Publique ou remova-as antes de trocar de tema.','error');return false;}
+ if(!localStorage.getItem(THEME_PREVIOUS_KEY)){
+  if(!galleryStore(THEME_PREVIOUS_KEY,snapshotForStorage()))return false;
+ }
+ return true;
+}
+function applyThemePreset(id){
+ if(!canSwitchTheme())return;
+ if(id==='clean'){
+  // Base neutra, nao importa nenhuma das cores antigas. Todos os campos continuam livres.
+  const overrideKeys=Object.keys(site.theme||{});
+  site.theme={...Object.fromEntries(overrideKeys.map(k=>[k,''])),
+   accent:'#adb4bc',accent_light:'#e5e8eb',background:'#121416',
+   surface:'#1d2024',text:'#f7f8f9',muted:'#c4c7cb'};
+  site.layout={...site.layout,clean_mode:true,show_hero_image:false};
+  site.background_image='';site.hero_image='';
+  site.cursor={...site.cursor,enabled:false,trail_enabled:false,
+    falling_particles:{...(site.cursor?.falling_particles||{}),enabled:false}};
+ }else{
+  const p=SEASON_PRESETS.find(x=>x[0]===id);if(!p)return;
+  const oldKeys=Object.keys(site.theme||{});
+  // Remove overrides da paleta anterior, sem travar controles manuais.
+  site.theme={...Object.fromEntries(oldKeys.map(k=>[k,''])),
+   accent:p[3],accent_light:p[4],label_color:p[5],background:p[6],
+   surface:p[7],text:'#fffaff',muted:'#e2d8eb'};
+  site.layout={...site.layout,clean_mode:false,show_hero_image:false};
+  site.background_image='';
+  site.cursor={...site.cursor,enabled:false,trail_enabled:false,
+   falling_particles:{...(site.cursor?.falling_particles||{}),enabled:true,type:'spark',color:p[4],count:8,size:12}};
+ }
+ render();sendPreview();
+ toast('Tema aplicado na prévia. Ajuste livremente qualquer cor antes de publicar.','ok');
+}
+function bindGallery(){
+ $('[data-gallery-preset]').forEach(b=>b.onclick=()=>applyThemePreset(b.dataset.galleryPreset));
+ $('#galleryRestore')?.addEventListener('click',()=>{
+  if(pendingImageUploads.size){toast('Há imagens locais pendentes.','error');return;}
+  let previous=null;try{previous=JSON.parse(localStorage.getItem(THEME_PREVIOUS_KEY)||'null');}catch{}
+  if(!previous){toast('Nenhum visual anterior salvo.','error');return;}
+  site=mergeSite(previous);localStorage.removeItem(THEME_PREVIOUS_KEY);
+  render();sendPreview();toast('Visual anterior recuperado na prévia.','ok');
+ });
+ $('#gallerySave')?.addEventListener('click',()=>{
+  if(pendingImageUploads.size){toast('Publique ou remova imagens locais antes de salvar um tema.','error');return;}
+  const input=prompt('Nome do tema personalizado:','Meu tema');
+  if(input===null)return;
+  const name=input.trim().slice(0,45);
+  if(!name){toast('Digite um nome para o tema.','error');return;}
+  const items=galleryRead();
+  if(items.length>=12){toast('Limite de 12 temas. Remova um para continuar.','error');return;}
+  items.push({name,site:snapshotForStorage()});
+  if(galleryStore(THEME_LIBRARY_KEY,items)){render();toast('Tema salvo neste navegador.','ok');}
+ });
+ $('[data-gallery-load]').forEach(b=>b.onclick=()=>{
+  const s=galleryRead()[Number(b.dataset.galleryLoad)];if(!s||!canSwitchTheme())return;
+  site=mergeSite(structuredClone(s.site));render();sendPreview();toast('Tema pessoal aplicado na prévia.','ok');
+ });
+ $('[data-gallery-delete]').forEach(b=>b.onclick=()=>{
+  const i=Number(b.dataset.galleryDelete),items=galleryRead();
+  if(!items[i]||!confirm('Excluir este tema do navegador?'))return;
+  items.splice(i,1);if(galleryStore(THEME_LIBRARY_KEY,items)){render();toast('Tema excluído.','ok');}
+ });
+}
+
 function render(){
  $('#panel-site').innerHTML=`
+ ${galleryMarkup()}
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
  ${field('Nome da cidade','site_name')}${field('Título principal','site_title')}${field('Bordão','tagline')}${field('Descrição','description','textarea')}${field('Convite do Discord','discord_url')}${field('Texto pequeno da capa','hero_eyebrow')}${field('Título da capa','hero_title')}${field('Texto da capa','hero_text','textarea')}
  <div class="fixed-note">✦ Assinatura no canto direito da capa (SC · EST. 2026)</div>
@@ -298,7 +411,7 @@ ${optionalColorField('Cor dos Indicadores e Etiquetas',
   </div>
 </details>
 
- <details class="card"><summary>👁️ Elementos visíveis</summary><div class="card-body">${field('Mostrar pesquisa','layout.show_search','check')}${field('Mostrar últimas alterações','layout.show_updates','check')}${field('Mostrar aviso','layout.show_notice','check')}${field('Mostrar imagem da capa','layout.show_hero_image','check')}</div></details>
+ <details class="card"><summary>👁️ Elementos visíveis</summary><div class="card-body">${field('Visual Clean (menos decorações)','layout.clean_mode','check')}${field('Mostrar pesquisa','layout.show_search','check')}${field('Mostrar últimas alterações','layout.show_updates','check')}${field('Mostrar aviso','layout.show_notice','check')}${field('Mostrar imagem da capa','layout.show_hero_image','check')}</div></details>
 
 <details class="card">
   <summary>🐀 Cursor e Efeitos</summary>
@@ -362,6 +475,7 @@ function renderRules(){
 function subEditor(sub,i,j){sub.rules=Array.isArray(sub.rules)?sub.rules:[];return `<details class="subitem"><summary><b>📂 ${esc(sub.name||'Nova subcategoria')}</b> — ${sub.rules.length} regra(s)</summary><div class="field-row"><div class="field"><label>ID</label><input data-sub="${i}:${j}" data-k="id" value="${esc(sub.id||'')}"></div><div class="field"><label>Ícone</label><input data-sub="${i}:${j}" data-k="icon" value="${esc(sub.icon||'◈')}"></div></div><div class="field"><label>Nome da subcategoria</label><input data-sub="${i}:${j}" data-k="name" value="${esc(sub.name||'')}"></div><div class="inline"><button class="btn mini" data-add-sub-rule="${i}:${j}">+ Regra</button><button class="btn mini danger" data-del-sub="${i}:${j}">Excluir subcategoria</button></div>${sub.rules.map((r,k)=>ruleEditor(r,`data-sub-rule="${i}:${j}:${k}"`,`data-del-sub-rule="${i}:${j}:${k}"`)).join('')}</details>`;}
 function ruleEditor(r,attrs,delAttr){return `<div class="rule"><div class="item-head"><strong>${esc(r.code||'')} • ${esc(r.title||'Sem título')}</strong><button class="btn mini danger" ${delAttr}>Excluir</button></div><div class="field-row"><div class="field"><label>Código</label><input ${attrs} data-k="code" value="${esc(r.code||'')}"></div><div class="field"><label>Tag</label><input ${attrs} data-k="tag" value="${esc(r.tag||'REGRA')}"></div></div><div class="field"><label>Título</label><input ${attrs} data-k="title" value="${esc(r.title||'')}"></div><div class="field"><label>Texto da regra (Markdown permitido)</label><textarea ${attrs} data-k="text">${esc(r.text||'')}</textarea></div><div class="field"><label>Imagem (opcional)</label><input ${attrs} data-k="image" value="${esc(r.image||'')}"></div></div>`;}
 function bindEditor(){
+ bindGallery();
  bindImageEditor();
  $$('[data-path]').forEach(el=>el.oninput=()=>{let v=el.type==='checkbox'?el.checked:el.value;if(['cursor.size','cursor.trail_count','cursor.falling_particles.count','cursor.falling_particles.size'].includes(el.dataset.path)){const n=Number(v);if(Number.isFinite(n))v=n;}setPath(el.dataset.path,v);const color=$(`[data-color-path="${el.dataset.path}"]`);if(color&&/^#[0-9a-f]{6}$/i.test(String(v)))color.value=v;sendPreview();});
  $$('[data-color-path]').forEach(el=>el.oninput=()=>{setPath(el.dataset.colorPath,el.value);const text=$(`[data-path="${el.dataset.colorPath}"]`);if(text)text.value=el.value;sendPreview();});
