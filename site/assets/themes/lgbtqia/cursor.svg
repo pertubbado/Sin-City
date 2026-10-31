@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cursor coração arco-íris em estilo cartoon">
+<defs><clipPath id="h"><path d="M32 55C17 43 7 34 7 22c0-8 6-14 14-14 5 0 9 2 11 7 2-5 6-7 11-7 8 0 14 6 14 14 0 12-10 22-25 33Z"/></clipPath></defs>
+<path d="M32 55C17 43 7 34 7 22c0-8 6-14 14-14 5 0 9 2 11 7 2-5 6-7 11-7 8 0 14 6 14 14 0 12-10 22-25 33Z" fill="#FFF" stroke="#493E68" stroke-width="3.6" stroke-linejoin="round"/>
+<g clip-path="url(#h)"><rect x="7" y="8" width="50" height="8" fill="#FF526B"/><rect x="7" y="16" width="50" height="8" fill="#FF9A32"/><rect x="7" y="24" width="50" height="8" fill="#FFD346"/><rect x="7" y="32" width="50" height="8" fill="#43C96F"/><rect x="7" y="40" width="50" height="8" fill="#3C9EFF"/><rect x="7" y="48" width="50" height="8" fill="#9257E8"/></g>
+<path d="M32 55C17 43 7 34 7 22c0-8 6-14 14-14 5 0 9 2 11 7 2-5 6-7 11-7 8 0 14 6 14 14 0 12-10 22-25 33Z" fill="none" stroke="#493E68" stroke-width="3.6" stroke-linejoin="round"/>
+<path d="M16 20q4-9 12-9" fill="none" stroke="#FFF" stroke-width="3" opacity=".75" stroke-linecap="round"/>
+</svg>
