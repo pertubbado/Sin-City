@@ -266,18 +266,21 @@ function restoreBeforeClean(){
 }
 function cleanGalleryMarkup(){
  return `<details class="card" id="cleanThemeCard">
-  <summary>🫧 C7.1 — Tema Padrão Clean</summary>
+  <summary>🎨 Temas</summary>
   <div class="card-body">
-   <div class="fixed-note">Esta opção é uma base visual <b>neutra e sem efeitos</b>, não uma cópia do tema laranja. Todas as cores continuam disponíveis para edição acima. Não altera as regras, os textos ou o logo.</div>
-   <div class="inline">
-    <button class="btn" type="button" id="applyCleanPreviewBtn">🫧 Testar Clean na prévia</button>
-    <button class="btn" type="button" id="restoreBeforeCleanBtn">↩ Restaurar visual anterior</button>
+   <div class="fixed-note">Escolha o visual que combina com sua cidade. Os temas são opcionais e todas as cores, imagens e configurações continuam editáveis no editor.</div>
+   <div class="item" role="group" aria-label="Tema Clean">
+    <div class="item-head"><strong>🫧 Tema Clean</strong></div>
+    <p class="small-note">Visual leve, neutro e sem efeitos extras. Personalize as cores como quiser, sem alterar textos, regras ou logo.</p>
+    <div class="inline">
+     <button class="btn" type="button" id="applyCleanPreviewBtn">👁️ Testar na prévia</button>
+     <button class="btn" type="button" id="restoreBeforeCleanBtn">↩ Restaurar visual anterior</button>
+    </div>
    </div>
-   <p class="small-note">A mudança aparece somente na prévia até você usar PUBLICAR. O visual anterior fica guardado neste navegador para recuperação.</p>
+   <p class="small-note">A prévia não publica alterações. Os próximos temas serão adicionados aqui, um por etapa, depois dos testes.</p>
   </div>
  </details>`;
 }
-
 function render(){
  $('#panel-site').innerHTML=`
  <details class="card" open><summary>🏠 Capa e identidade</summary><div class="card-body">
