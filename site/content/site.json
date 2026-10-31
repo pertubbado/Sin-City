@@ -19,7 +19,8 @@
     "content_text_color": "#ffffff",
     "category_panel_color": "#000000",
     "navigation_button_color": "#000000",
-    "search_panel_color": "#000000"
+    "search_panel_color": "#000000",
+    "rule_bold_color": "#ff8800"
   },
   "side_footer_top": "CONHEÇA AS REGRAS.",
   "side_footer_highlight": "ESCOLHA SEU CAMINHO.",
