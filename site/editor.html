@@ -149,8 +149,33 @@ ${optionalColorField('Cor dos Indicadores e Etiquetas',
 </details>
 
  <details class="card"><summary>👁️ Elementos visíveis</summary><div class="card-body">${field('Mostrar pesquisa','layout.show_search','check')}${field('Mostrar últimas alterações','layout.show_updates','check')}${field('Mostrar aviso','layout.show_notice','check')}${field('Mostrar imagem da capa','layout.show_hero_image','check')}</div></details>
- <details class="card"><summary>🎃 Cursor e efeitos Halloween</summary><div class="card-body">${field('Ativar cursor de abóbora','cursor.enabled','check')}${field('Ativar rastro roxo','cursor.trail_enabled','check')}${field('Imagem do cursor','cursor.image')}${field('Tamanho do cursor','cursor.size')}${field('Cor do rastro','cursor.trail_color','color')}${field('Quantidade máxima do rastro','cursor.trail_count')}<div class="fixed-note">O cursor especial e o rastro são aplicados somente em dispositivos com mouse ou trackpad. Em telas de toque e com movimento reduzido, o cursor normal é preservado.</div></div></details><details class="card"><summary>🦇 Partículas de ambiente</summary><div class="card-body">${field('Ativar partículas','cursor.falling_particles.enabled','check')}${field('Tipo','cursor.falling_particles.type','select','letters:Letras|logo:Abóboras|mixed:Misto|spark:Brilhos')}${field('Cor','cursor.falling_particles.color','color')}${field('Quantidade','cursor.falling_particles.count')}${field('Tamanho','cursor.falling_particles.size')}</div></details>`;
- renderRules();bindEditor();
+
+<details class="card">
+  <summary>🐀 Cursor e Efeitos</summary>
+  <div class="card-body">
+    ${field('Ativar cursor personalizado','cursor.enabled','check')}
+
+    ${field('Ativar rastro do cursor','cursor.trail_enabled','check')}
+
+    ${field('Imagem do cursor','cursor.image')}
+
+    ${field('Tamanho do cursor','cursor.size')}
+
+    ${field('Cor do rastro','cursor.trail_color','color')}
+
+    ${optionalColorField('Cor do Brilho do Cursor',
+      'cursor.glow_color', 'theme.accent_light')}
+
+    ${field('Quantidade máxima do rastro','cursor.trail_count')}
+
+    <div class="fixed-note">
+      O cursor especial e o rastro são aplicados somente em dispositivos
+      com mouse ou trackpad. Em telas de toque e com movimento reduzido,
+      o cursor normal é preservado.
+    </div>
+  </div>
+</details>
+
 }
 function renderRules(){
  const panel=$('#panel-rules');
