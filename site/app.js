@@ -155,6 +155,25 @@ if (/^#[0-9a-f]{6}$/i.test(String(labelColor || ''))) {
   root.style.removeProperty('--custom-label-color');
 }
 
+// C6.12: controles detalhados; valores vazios restauram o tema.
+const detailedColors = {
+  '--custom-nav-text': theme.nav_text_color,
+  '--custom-action-text': theme.action_text_color,
+  '--custom-content-text': theme.content_text_color,
+  '--custom-category-panel': theme.category_panel_color,
+  '--custom-nav-button': theme.navigation_button_color,
+  '--custom-search-panel': theme.search_panel_color,
+  '--custom-nav-highlight': theme.nav_highlight_color,
+  '--custom-edge-color': theme.border_color
+};
+Object.entries(detailedColors).forEach(([property, value]) => {
+  if (/^#[0-9a-f]{6}$/i.test(String(value || ''))) {
+    root.style.setProperty(property, value);
+  } else {
+    root.style.removeProperty(property);
+  }
+});
+
 const scrollbarColor = theme.scrollbar_color;
 if (/^#[0-9a-f]{6}$/i.test(String(scrollbarColor || ''))) {
   root.style.setProperty('--custom-scrollbar-color', scrollbarColor);
