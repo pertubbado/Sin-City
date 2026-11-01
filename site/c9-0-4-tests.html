@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.4 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(360px,.8fr) minmax(620px,1.6fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}iframe{width:100%;height:790px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="grid">
+  <section class="card">
+   <h1>C9.0.4 — Movimentação de categorias</h1>
+   <p class="muted">Runner seguro. Não conecta GitHub e não publica. Os testes de movimentação usam somente a API pública da C9.0.4 e o DOM do Studio, restaurando a ordem original ao final.</p>
+   <button id="run">Executar novamente</button>
+   <div id="summary" class="status">Aguardando o Studio…</div>
+   <div id="results"></div>
+  </section>
+  <section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.4"></iframe></section>
+ </div>
+</div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function categoryCards(d){return [...d.querySelectorAll('#cats > details.item')];}
+function getCategoryIds(d){return categoryCards(d).map(card=>String(card.dataset.categoryId||''));}
+function domIndexById(d,id){return categoryCards(d).findIndex(card=>String(card.dataset.categoryId||'')===String(id||''));}
+function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(Boolean(w.SinCityOrdering)&&w.SinCityOrdering.version==='C9.0.4','Módulo C9.0.4 carregado',w.SinCityOrdering?.version||'ausente');
+  let cards=categoryCards(d);
+  add(cards.length>1,'Categorias disponíveis para movimentação',`${cards.length} categoria(s)`);
+  let numbers=cards.map(card=>card.dataset.categoryNumber||'');
+  let expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
+  add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração sequencial preservada',numbers.join(', '));
+  const controls=cards.map(card=>[...card.querySelectorAll('[data-c9-move-category]')]);
+  add(controls.every(group=>group.length===2),'Controles ↑/↓ em todas as categorias',controls.map(x=>x.length).join(', '));
+  const firstUp=controls[0]?.find(b=>b.dataset.c9MoveCategory==='up');
+  const lastDown=controls.at(-1)?.find(b=>b.dataset.c9MoveCategory==='down');
+  add(Boolean(firstUp?.disabled),'Limite superior protegido','↑ da primeira categoria desabilitado');
+  add(Boolean(lastDown?.disabled),'Limite inferior protegido','↓ da última categoria desabilitado');
+  const middleOk=controls.slice(1,-1).every(group=>group.every(btn=>!btn.disabled));
+  add(cards.length<=2||middleOk,'Categorias intermediárias podem subir e descer',cards.length<=2?'Não aplicável com até 2 categorias':'controles habilitados');
+  const names=[...d.querySelectorAll('[data-c9-move-category]')].map(btn=>btn.getAttribute('aria-label')||'');
+  add(names.length>0&&names.every(Boolean),'Controles possuem nomes acessíveis',`${names.length} controle(s)`);
+  const ids=cards.map(card=>card.dataset.categoryId||'').filter(Boolean);
+  add(ids.length===cards.length&&new Set(ids).size===ids.length,'IDs das categorias únicos e preserváveis',`${ids.length}/${cards.length}`);
+  add(typeof w.SinCityOrdering?.moveCategory==='function','API de movimentação disponível','moveCategory disponível');
+  const idInputs=[...d.querySelectorAll('#cats > details.item input[data-cat][data-k="id"]')];
+  add(idInputs.length===cards.length&&idInputs.every(input=>!input.readOnly),'IDs internos editáveis com validação',`${idInputs.length}/${cards.length}`);
+  const codeInputs=[...d.querySelectorAll('#cats > details.item input[data-cat][data-k="code"]')];
+  add(codeInputs.length===cards.length&&codeInputs.every(input=>input.readOnly),'Código continua automático/somente leitura',`${codeInputs.length}/${cards.length}`);
+
+  if(cards.length>=3){
+   const original=getCategoryIds(d);
+   let from=-1;
+   for(let i=cards.length-1;i>=2;i--){
+    if(cards[i].querySelectorAll(':scope > .sub-list > details.subitem').length){from=i;break;}
+   }
+   if(from<2)from=cards.length-1;
+   const movingCardBefore=cards[from];
+   const movingId=String(movingCardBefore.dataset.categoryId||'');
+   const hadSubs=movingCardBefore.querySelectorAll(':scope > .sub-list > details.subitem').length>0;
+
+   const firstMove=w.SinCityOrdering.moveCategory(from,-1,{notify:false});
+   const afterFirstIndex=domIndexById(d,movingId);
+   const secondMove=w.SinCityOrdering.moveCategory(afterFirstIndex,-1,{notify:false});
+   const afterTwo=getCategoryIds(d);
+   const movedDomIndex=domIndexById(d,movingId);
+   add(firstMove?.moved&&secondMove?.moved&&firstMove.id===movingId&&secondMove.id===movingId&&movedDomIndex===from-2&&afterTwo[from-2]===movingId,'Movimentos repetidos funcionam',`categoria ${movingId} subiu duas posições seguidas`);
+
+   cards=categoryCards(d);
+   numbers=cards.map(card=>card.dataset.categoryNumber||'');
+   expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
+   add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração continua correta após múltiplos movimentos',numbers.join(', '));
+
+   const movedCard=cards.find(card=>card.dataset.categoryId===movingId);
+   const controlsAligned=Boolean(movedCard)&&[...movedCard.querySelectorAll('[data-c9-move-category]')].every(btn=>Number(btn.dataset.categoryIndex)===movedDomIndex);
+   add(controlsAligned&&secondMove?.to===movedDomIndex,'DOM e motor permanecem alinhados após movimentos',`posição atual=${movedDomIndex+1}`);
+
+   const subNums=movedCard?[...movedCard.querySelectorAll(':scope > .sub-list > details.subitem')].map(sub=>sub.dataset.subcategoryNumber||''):[];
+   const subExpected=subNums.map((_,si)=>`${String(movedDomIndex+1).padStart(2,'0')}.${String(si+1).padStart(2,'0')}`);
+   add(!hadSubs||subNums.length>0&&JSON.stringify(subNums)===JSON.stringify(subExpected),'Subcategorias renumeram junto com a categoria',hadSubs?(subNums.slice(0,8).join(', ')||'falha: subcategorias não encontradas'):'categoria escolhida sem subcategorias');
+
+   const backOneIndex=domIndexById(d,movingId);
+   const backOne=w.SinCityOrdering.moveCategory(backOneIndex,1,{notify:false});
+   const backTwoIndex=domIndexById(d,movingId);
+   const backTwo=w.SinCityOrdering.moveCategory(backTwoIndex,1,{notify:false});
+   const restored=getCategoryIds(d);
+   const restoredIndex=domIndexById(d,movingId);
+   const restoredOk=JSON.stringify(restored)===JSON.stringify(original);
+   add(backOne?.moved&&backTwo?.moved&&backOne.id===movingId&&backTwo.id===movingId&&restoredIndex===from&&restoredOk,'Movimento inverso restaura a ordem original',`posição restaurada=${restoredIndex+1}; ordem=${restoredOk?'ok':'diferente'}`);
+  }else{
+   add(true,'Movimentos repetidos funcionam','não aplicável com menos de 3 categorias');
+   add(true,'Numeração continua correta após múltiplos movimentos','não aplicável');
+   add(true,'DOM e motor permanecem alinhados após movimentos','não aplicável');
+   add(true,'Subcategorias renumeram junto com a categoria','não aplicável');
+   add(true,'Movimento inverso restaura a ordem original','não aplicável');
+  }
+
+  const subs=[...d.querySelectorAll('#cats > details.item .subitem[data-subcategory-number]')];
+  add(subs.every(sub=>/^\d{2}\.\d{2}$/.test(sub.dataset.subcategoryNumber||'')),'Numeração de subcategorias preservada',`${subs.length} subcategoria(s)`);
+  add(typeof w.sendPreview==='function'&&typeof w.publish==='function','Prévia e publicação preservadas','funções existentes; publicação não executada');
+ }catch(error){add(false,'Runner executado sem exceções',error.message||String(error));}
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1400));document.getElementById('run').addEventListener('click',run);
+</script>
+</body>
+</html>
