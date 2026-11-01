@@ -410,7 +410,7 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
       const id = route.slice('categoria:'.length);
       const category = state.data.categories.find((item, index) => categoryId(item, index) === id);
       if (!category) return;
-      state.categoryId = id; renderCategory(category); showPage('#categoryPage'); setActiveNavigation('category');
+      state.categoryId = id; renderCategory(category); showPage('#categoryPage', !targetRule); setActiveNavigation('category');
       if (!replace) history.pushState({route}, '', `#categoria/${encodeURIComponent(id)}`);
       if (targetRule) {
         setActiveRule(targetRule);
@@ -419,6 +419,7 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
           if (target) {
             target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
             setActiveRule(targetRule);
+            scheduleActiveRuleSync();
           } else {
             scheduleActiveRuleSync();
           }
@@ -430,9 +431,11 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
     closeMobileNav();
   }
 
-  function showPage(selector) {
-    $$('.page').forEach(page => page.classList.toggle('active', `#${page.id}` === selector));
-    window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
+  function showPage(selector, scrollToTop = true) {
+    $('.page').forEach(page => page.classList.toggle('active', `#${page.id}` === selector));
+    if (scrollToTop) {
+      window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
+    }
   }
 
   function handleHash() {
