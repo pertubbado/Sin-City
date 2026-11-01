@@ -114,7 +114,8 @@ async function run(){
   add(w.SinCityPersistence.equivalent(backupPayload,JSON.parse(JSON.stringify(backupPayload))),'Backup suporta round-trip JSON sem perda','stringify → parse');
   const publishSource=String(w.publish||'');
   add(typeof w.publish==='function','Função PUBLICAR preservada','publish disponível');
-  add(/JSON\.stringify\(data/.test(publishSource),'PUBLICAR serializa o data atual','JSON.stringify(data)');
+  const serializesCurrentData=/JSON\.stringify\((?:data|publishedData)/.test(publishSource);
+  add(serializesCurrentData,'PUBLICAR serializa os dados atuais','JSON.stringify(data/publishedData)');
   add((publishSource.match(/createBlob\(rulesText\)/g)||[]).length>=2,'PUBLICAR usa o mesmo rulesText nos dois arquivos de regras','2 blobs');
   add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não conecta GitHub','nenhum token criado');
 
