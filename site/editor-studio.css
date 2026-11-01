@@ -184,6 +184,7 @@ html,body{width:100%;min-width:0;height:100%}body{overflow:hidden}
 .diagnostic-check-list{display:grid;gap:7px;margin-top:12px}.diagnostic-result{padding:9px 10px;border:1px solid #3b4046;border-left-width:3px;border-radius:8px;background:#191b1e;min-width:0}
 .diagnostic-result-ok{border-left-color:#4eaa7c}.diagnostic-result-attention{border-left-color:#bd9148}.diagnostic-result-error{border-left-color:#bf626c}.diagnostic-result-unavailable{border-left-color:#747c88}
 .diagnostic-result-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.diagnostic-result-head strong{color:#e6e7e9;font-size:10px;line-height:1.45;overflow-wrap:anywhere}
+.diagnostic-result-link{color:#e4c58d;font-size:10px;font-weight:800;line-height:1.45;text-decoration:none;overflow-wrap:anywhere}.diagnostic-result-link:hover{text-decoration:underline;color:#fff0cf}
 .diagnostic-result-badge{flex:0 0 auto;padding:3px 6px;border:1px solid;border-radius:999px;font-size:8px;font-weight:900;letter-spacing:.04em}
 .diagnostic-result-badge-ok{border-color:#39775a;color:#9ee0bd}.diagnostic-result-badge-attention{border-color:#8a6b37;color:#f0ce8d}.diagnostic-result-badge-error{border-color:#92515b;color:#ffb0b7}.diagnostic-result-badge-unavailable{border-color:#555b65;color:#c1c6cf}
 .diagnostic-result p{margin:5px 0;color:#b4b9c1;font-size:10px;line-height:1.5;overflow-wrap:anywhere}.diagnostic-result small{display:block;color:#8f969f;font-size:9px;line-height:1.45;overflow-wrap:anywhere}
