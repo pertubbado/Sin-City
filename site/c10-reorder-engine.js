@@ -167,6 +167,7 @@ window.SinCityReorderEngine = (function () {
 
   return {
     version: VERSION,
+    getData,
     reorderArray,
     moveCategoryTo,
     moveSubcategoryTo,
