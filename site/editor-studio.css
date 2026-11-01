@@ -6,7 +6,6 @@ html,body{width:100%;min-width:0;height:100%}body{overflow:hidden}
 .topbar{grid-column:1/-1;grid-row:1;min-width:0;min-height:72px;padding:10px 16px;gap:9px;z-index:30}
 .brand{flex:0 0 auto;min-width:220px}.brand-mark{border:1px solid #666b72;color:#f5f5f5;box-shadow:inset 0 1px 0 #ffffff20,0 5px 16px #0005}
 .topbar .btn{min-height:38px}
-.preview-publish-blocked{opacity:.72;cursor:not-allowed;border-color:#66533a;background:#29231a;color:#e5c68e;font-size:10px}
 .studio-nav{grid-column:1;grid-row:2;min-width:0;min-height:0;display:flex;flex-direction:column;gap:7px;overflow-x:hidden;overflow-y:auto;padding:13px 8px 12px;background:#151619;border-right:1px solid var(--studio-border);scrollbar-width:thin;scrollbar-color:#454951 transparent}
 .studio-nav-heading{min-height:42px;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;color:#aeb2b8;font-size:10px;font-weight:900;letter-spacing:.14em}
 .studio-nav-mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid #565b63;border-radius:10px;background:linear-gradient(145deg,#353941,#202328);color:#f3f3f4;font-size:12px;letter-spacing:0}

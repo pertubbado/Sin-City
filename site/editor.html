@@ -56,7 +56,7 @@
   <button class="btn" id="backupBtn">⬇ Backup</button>
   <button class="btn" id="siteBtn">SITE ↗</button>
   <button class="btn" id="loginBtn">Conectar GitHub</button>
-  <button class="btn primary preview-publish-blocked" id="publishBtn" type="button" disabled title="Publicação bloqueada nesta versão de avaliação">PUBLICAÇÃO DESATIVADA</button>
+  <button class="btn primary" id="publishBtn" type="button">PUBLICAR</button>
 </header>
 <aside class="studio-nav" id="studioNav" aria-label="Navegação do editor">
   <div class="studio-nav-heading"><span class="studio-nav-mark">SC</span><span class="studio-nav-heading-label">WORKSPACE</span></div>
@@ -68,7 +68,7 @@
   <button class="studio-nav-item" type="button" data-jump="cleanThemeCard" data-nav-key="themes" title="Biblioteca de temas" aria-label="Biblioteca de temas"><span class="nav-icon" aria-hidden="true">✧</span><span class="nav-label">Temas</span></button>
   <button class="studio-nav-item" type="button" data-jump="mediaSection" data-nav-key="media" title="Central de imagens" aria-label="Central de imagens"><span class="nav-icon" aria-hidden="true">▧</span><span class="nav-label">Mídias</span></button>
   <div class="studio-nav-bottom">
-    <div class="studio-nav-note">C7.9 · VERSÃO DE AVALIAÇÃO</div>
+    <div class="studio-nav-note">C7.9 · SIN CITY STUDIO</div>
     <button class="studio-nav-toggle" id="toggleNavBtn" type="button" aria-expanded="false" aria-label="Expandir navegação" title="Expandir navegação"><span class="nav-icon" aria-hidden="true">⇥</span><span class="nav-label">Expandir navegação</span></button>
   </div>
 </aside>
@@ -100,7 +100,7 @@
     </section>
     <div class="dashboard-bottom-grid">
       <section class="dashboard-info-card">
-        <div class="dashboard-card-heading"><span class="dashboard-card-icon">⚙</span><div><h3>Ferramentas rápidas</h3><p>Ações locais disponíveis nesta versão.</p></div></div>
+        <div class="dashboard-card-heading"><span class="dashboard-card-icon">⚙</span><div><h3>Ferramentas rápidas</h3><p>Ações rápidas do editor.</p></div></div>
         <div class="dashboard-quick-actions">
           <button class="btn" type="button" data-dashboard-action="draft">💾 Salvar rascunho</button>
           <button class="btn" type="button" data-dashboard-action="backup">⬇ Baixar backup</button>
@@ -109,10 +109,10 @@
         <p class="dashboard-footnote" id="dashboardDraftStatus">Rascunho local: verificando...</p>
       </section>
       <section class="dashboard-info-card">
-        <div class="dashboard-card-heading"><span class="dashboard-card-icon">◉</span><div><h3>Estado da sessão</h3><p>Informações desta versão de avaliação.</p></div></div>
+        <div class="dashboard-card-heading"><span class="dashboard-card-icon">◉</span><div><h3>Estado da sessão</h3><p>Informações da sessão do editor.</p></div></div>
         <div class="dashboard-status-row"><span>GitHub</span><strong id="dashboardGithubStatus">Não conectado nesta sessão</strong></div>
         <div class="dashboard-status-row"><span>Prévia</span><strong class="status-live-text">Atualização automática</strong></div>
-        <div class="dashboard-status-row"><span>Publicação</span><strong class="status-preview-text">Bloqueada nesta versão de teste</strong></div>
+        <div class="dashboard-status-row"><span>Publicação</span><strong id="dashboardPublishStatus" class="status-preview-text">Conecte o GitHub para publicar</strong></div>
       </section>
     </div>
     <section class="dashboard-roadmap">
@@ -163,8 +163,6 @@
 // Configuração do novo repositório da Sin City.
 const REPO = 'pertubbado/Sin-City';
 const BRANCH = 'main';
-// C7.9 preview safety: publishing stays disabled until the approved PR is prepared for merge.
-const PREVIEW_BUILD = true;
 const SITE_PATH = 'site/content/site.json';
 const RULES_PATH = 'site/rules.json';
 const CONTENT_RULES_PATH = 'site/content/rules.json';
@@ -935,7 +933,6 @@ function updateAuthUI(){const box=$('#authStatus'),text=$('#authText'),avatar=$(
 function logout(show=true){githubToken='';githubUser=null;sessionStorage.removeItem('sin-city-gh-token');updateAuthUI();if(show)toast('Sessão do editor encerrada.');}
 async function createBlob(content){return gh(`/repos/${REPO}/git/blobs`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,encoding:'utf-8'})});}
 async function publish(){
- if(PREVIEW_BUILD){toast('A publicação está bloqueada nesta versão de avaliação. Nenhum arquivo será enviado ao GitHub.','error');return;}
  if(!githubToken){login();toast('Entre com GitHub para publicar.');return;}
  if(!confirm('Publicar as alterações e imagens no GitHub? Isso atualiza o site para todos os visitantes.'))return;
  const btn=$('#publishBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='PUBLICANDO...';
@@ -977,6 +974,8 @@ function updateDashboard(){
  setText('dashboardRuleCount',totalRules);
  setText('dashboardUpdateCount',Array.isArray(data.updates)?data.updates.length:0);
  setText('dashboardGithubStatus',githubUser?'Conectado como @'+githubUser.login:'Não conectado nesta sessão');
+ setText('dashboardPublishStatus',githubUser?'Disponível para publicar':'Conecte o GitHub para publicar');
+ const publishStatus=document.getElementById('dashboardPublishStatus');if(publishStatus)publishStatus.className=githubUser?'status-live-text':'status-preview-text';
  let hasDraft=false;try{hasDraft=!!localStorage.getItem('sin-city-editor-draft');}catch{}
  setText('dashboardDraftStatus',hasDraft?'Há um rascunho local salvo neste navegador.':'Nenhum rascunho local salvo no momento.');
 }
