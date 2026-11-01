@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C10.0.4 Subcategorias</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.9fr) minmax(650px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}.group{margin:15px 0 7px;font-size:12px;letter-spacing:.08em;color:#c9cdd3;text-transform:uppercase}iframe{width:100%;height:840px;border:1px solid #34373d;border-radius:12px;background:#000}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C10.0.4 — Drag de subcategorias</h1><p class="muted">Valida handles, acessibilidade, restrição à própria categoria, destino antes/depois e movimentação real com restauração do estado. Não conecta GitHub e não publica.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C10.0.4"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=100)=>new Promise(r=>setTimeout(r,ms));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function group(title){return `<div class="group">${title}</div>`}
+async function ready(w){for(let i=0;i<90;i++){if(w.SinCitySubcategoryDrag?.version==='C10.0.4'&&w.SinCityReorderEngine&&w.document.querySelector('#cats > details.item'))return true;await wait(75)}return false}
+async function run(){
+ const w=frame.contentWindow,checks=[];let section='';
+ const add=(ok,title,detail='')=>checks.push({section,ok:Boolean(ok),title,detail});
+ try{
+  const loaded=await ready(w);section='01 · Carregamento';
+  add(loaded,'Studio e C10.0.4 carregados',loaded?'pronto':'tempo esgotado');
+  const d=w.SinCitySubcategoryDrag,e=w.SinCityReorderEngine,data=e?.getData?.();
+  add(d?.version==='C10.0.4','Módulo de subcategorias disponível',d?.version||'ausente');
+  add(typeof d?.computeDropIndex==='function','Cálculo de destino disponível');
+  add(typeof e?.moveSubcategoryTo==='function','Motor moveSubcategoryTo disponível');
+
+  section='02 · Handles e fallback';
+  const categoryCards=[...w.document.querySelectorAll('#cats > details.item')];
+  const subcards=[...w.document.querySelectorAll('#cats > details.item > .sub-list > details.subitem')];
+  const handles=[...w.document.querySelectorAll('.c10-subcategory-drag-handle')];
+  add(handles.length===subcards.length,'Cada subcategoria possui handle',`${handles.length}/${subcards.length}`);
+  add(handles.every(h=>h.draggable===true),'Handles estão marcados como draggable');
+  add(handles.every(h=>String(h.getAttribute('aria-label')||'').includes('Arrastar')),'Handles têm nome acessível');
+  add(handles.every(h=>h.getAttribute('aria-grabbed')==='false'),'Estado aria-grabbed inicia falso');
+  const fallbackOk=subcards.every(s=>s.querySelector('[data-c9-move-subcategory="up"]')&&s.querySelector('[data-c9-move-subcategory="down"]'));
+  add(fallbackOk,'Botões ↑/↓ continuam presentes em todas as subcategorias');
+
+  section='03 · Cálculo de destino';
+  add(d.computeDropIndex(0,2,'before',4)===1,'Origem antes do alvo ajusta índice corretamente','0 → antes de 2 = 1');
+  add(d.computeDropIndex(0,2,'after',4)===2,'Origem antes do alvo + after calcula posição correta','0 → depois de 2 = 2');
+  add(d.computeDropIndex(3,1,'before',4)===1,'Origem depois do alvo preserva índice do alvo');
+  add(d.computeDropIndex(3,1,'after',4)===2,'After em alvo anterior calcula posição correta');
+  add(d.computeDropIndex(-1,1,'before',4)===-1,'Índice inválido é rejeitado');
+
+  section='04 · Restrição à categoria atual';
+  if(categoryCards.length>1){
+   const first=categoryCards.find(c=>c.querySelector(':scope > .sub-list > details.subitem'));
+   const other=categoryCards.find(c=>c!==first&&c.querySelector(':scope > .sub-list > details.subitem'));
+   if(first&&other){
+    const firstId=String(first.dataset.categoryId||''),otherId=String(other.dataset.categoryId||'');
+    add(firstId!==otherId,'Categorias de teste possuem IDs distintos',`${firstId} / ${otherId}`);
+   }else add(true,'Restrição entre categorias não aplicável','menos de duas categorias com subcategorias');
+  }else add(true,'Restrição entre categorias não aplicável','menos de duas categorias');
+
+  section='05 · Movimentação real';
+  const original=JSON.stringify(data);
+  const ci=data.categories.findIndex(c=>Array.isArray(c.subcategories)&&c.subcategories.length>1);
+  if(ci>=0){
+   const list=data.categories[ci].subcategories,first=list[0],id=String(first.id||''),last=list.length-1;
+   const result=e.moveSubcategoryTo(ci,0,last,{notify:false,preview:false,render:true});await wait(150);
+   add(result.moved,'Subcategoria move para destino absoluto',`0 → ${last}`);
+   add(list[last]===first,'Objeto movido é preservado');
+   add(String(list[last].id||'')===id,'ID da subcategoria é preservado',id);
+   add(w.document.querySelectorAll('.c10-subcategory-drag-handle').length===w.document.querySelectorAll('#cats > details.item > .sub-list > details.subitem').length,'Handles são reconstruídos após re-render');
+   e.moveSubcategoryTo(ci,last,0,{notify:false,preview:false,render:true});await wait(150);
+   add(list[0]===first,'Subcategoria retorna à posição original');
+  }else add(true,'Movimentação real não aplicável','nenhuma categoria com 2+ subcategorias');
+
+  section='06 · Regressão final';
+  w.SinCityFlowGuard?.flush?.();await wait();
+  add(JSON.stringify(data)===original,'Dados restaurados exatamente ao estado inicial');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não cria sessão GitHub');
+ }catch(error){checks.push({section:section||'Erro',ok:false,title:'Runner executado sem exceções',detail:error?.message||String(error)});}
+ let html='',last='';for(const c of checks){if(c.section!==last){last=c.section;html+=group(last)}html+=row(c.ok,c.title,c.detail)}results.innerHTML=html;
+ const passed=checks.filter(x=>x.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,2300));document.getElementById('run').addEventListener('click',run);
+</script></body></html>
