@@ -156,10 +156,11 @@
 
     <div class="diagnostics-grid">
       <article class="diagnostic-module">
-        <div class="diagnostic-module-top"><span class="diagnostic-icon">▦</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▦</span><span class="diagnostic-planned" id="diagnosticHealthStatus">AGUARDANDO</span></div>
         <p class="diagnostic-kicker">01 · ESTRUTURA</p><h3>Saúde do projeto</h3><p class="diagnostic-description">Confere se os arquivos essenciais e os dados que alimentam o site estão íntegros.</p>
         <ul><li>Arquivos principais presentes</li><li>JSON válido e campos obrigatórios</li><li>Cópias das regras sincronizadas</li><li>Estrutura de categorias e atualizações</li></ul>
         <div class="diagnostic-module-foot"><span>Verificações locais</span><span>Somente leitura</span></div>
+        <div class="diagnostic-check-list" id="diagnosticHealthResults"><p class="diagnostic-empty">Aguardando a execução do diagnóstico.</p></div>
       </article>
 
       <article class="diagnostic-module">
@@ -171,18 +172,18 @@
       </article>
 
       <article class="diagnostic-module">
-        <div class="diagnostic-module-top"><span class="diagnostic-icon">▧</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▧</span><span class="diagnostic-planned" id="diagnosticMediaStatus">AGUARDANDO</span></div>
         <p class="diagnostic-kicker">03 · RECURSOS</p><h3>Imagens e mídias</h3><p class="diagnostic-description">Localiza referências quebradas e recursos visuais que não podem ser carregados.</p>
         <ul><li>Imagens referenciadas no conteúdo</li><li>Arquivos ausentes ou inacessíveis</li><li>Formato e extensão dos recursos</li><li>Referências dos temas oficiais</li></ul>
         <div class="diagnostic-module-foot"><span>Arquivos e caminhos</span><span>Sem excluir mídias</span></div>
+        <div class="diagnostic-check-list" id="diagnosticMediaResults"><p class="diagnostic-empty">Aguardando a execução do diagnóstico.</p></div>
       </article>
 
       <article class="diagnostic-module">
-        <div class="diagnostic-module-top"><span class="diagnostic-icon">▤</span><span class="diagnostic-planned" id="diagnosticMediaStatus">AGUARDANDO</span></div>
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▤</span><span class="diagnostic-planned">PLANEJADO</span></div>
         <p class="diagnostic-kicker">04 · RECUPERAÇÃO</p><h3>Rascunhos e backups</h3><p class="diagnostic-description">Ajuda a identificar dados salvos localmente e entender o que cada backup contém.</p>
         <ul><li>Disponibilidade e leitura do rascunho</li><li>Validade da estrutura salva</li><li>Biblioteca de temas pessoais</li><li>Conteúdo e limites do backup geral</li></ul>
         <div class="diagnostic-module-foot"><span>Armazenamento local</span><span>Sem sobrescrever dados</span></div>
-        <div class="diagnostic-check-list" id="diagnosticMediaResults"><p class="diagnostic-empty">Aguardando a execução do diagnóstico.</p></div>
       </article>
 
       <article class="diagnostic-module">
