@@ -335,7 +335,7 @@ function create(options){
   summary(health,media,access,deploy,new Date().toLocaleString('pt-BR'));
   if(runButton){runButton.disabled=false;runButton.textContent='↻ EXECUTAR NOVAMENTE';}
   running=false;toast('Diagnóstico C8.0.4 concluído. Nenhum dado foi alterado ou publicado.','ok');
-  return {health:health,media:media,report:lastReport};
+  return {health:health,media:media,access:access,deploy:deploy,report:lastReport};
  }
  function bind(){
   const runButton=el('runLocalDiagnosticsBtn'),copyButton=el('copyDiagnosticsReportBtn');
