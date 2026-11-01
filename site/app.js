@@ -651,7 +651,7 @@ function setupAmbientParticles(config = {}) {
 
     // A mesma linha visual determina o item ativo, sem depender da ordem dos eventos do observer.
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 800;
-    const activationLine = Math.min(Math.max(viewportHeight * 0.24, 96), 220);
+    const activationLine = Math.min(Math.max(viewportHeight * 0.30, 128), 280);
     let activeCard = cards[0];
 
     for (const card of cards) {
