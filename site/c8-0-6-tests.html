@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City · C8.0.6 Test Runner</title>
+<style>
+:root{color-scheme:dark;--bg:#111316;--panel:#1b1e22;--line:#3a3f46;--text:#f2f3f5;--muted:#aeb4bd;--ok:#78d8aa;--warn:#e8c27d;--error:#ff8e97}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.shell{min-height:100vh;display:grid;grid-template-columns:minmax(340px,520px) minmax(0,1fr)}.panel{padding:24px;overflow:auto;border-right:1px solid var(--line)}h1{margin:0 0 8px;font-size:25px}p{color:var(--muted);line-height:1.55}.meta{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}.pill{padding:6px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.btn{border:1px solid var(--line);background:#252a30;color:#fff;border-radius:8px;padding:10px 12px;font-weight:700;cursor:pointer}.btn:focus-visible{outline:2px solid #e5bd70;outline-offset:2px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary article{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel)}.summary span{display:block;color:var(--muted);font-size:11px}.summary strong{display:block;margin-top:4px;font-size:24px}.results{display:grid;gap:9px}.test{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px}.test-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.test h2{font-size:14px;margin:0}.badge{font-size:10px;font-weight:900;padding:5px 7px;border-radius:999px;border:1px solid}.badge.ok{color:var(--ok)}.badge.warn{color:var(--warn)}.badge.error{color:var(--error)}.test p{font-size:12px;margin:7px 0 0}.test small{display:block;color:#9097a1;margin-top:6px;line-height:1.45}.viewer{min-width:0;min-height:100vh;background:#090a0c}.viewer iframe{display:block;width:100%;height:100vh;border:0;background:#000}.notice{border:1px solid #6f5a36;background:#211c14;color:#dfc391;padding:10px 12px;border-radius:9px;font-size:12px;line-height:1.5}.foot{margin-top:16px;font-size:11px;color:#848b94}@media(max-width:1000px){.shell{grid-template-columns:1fr}.panel{border-right:0;border-bottom:1px solid var(--line)}.viewer iframe{height:75vh}.summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<section class="panel" aria-labelledby="title">
+  <p style="margin:0 0 5px;color:#d6a34a;font-size:11px;font-weight:900;letter-spacing:.12em">C8.0.6 · INTEGRAÇÃO / ACESSIBILIDADE / REGRESSÃO</p>
+  <h1 id="title">Sin City Quality Test Runner</h1>
+  <p>Executa verificações somente de leitura sobre o Studio e a prévia pública carregados na mesma origem. Este runner não salva rascunhos, não altera temas, não conecta GitHub e não chama PUBLICAR.</p>
+  <div class="meta"><span class="pill" id="state">Carregando Studio…</span><span class="pill">Base esperada: C8.0.5</span><span class="pill">Somente leitura</span></div>
+  <div class="notice">O objetivo da C8.0.6 é revelar regressões e lacunas reais. Um resultado de atenção/erro aqui não modifica o projeto automaticamente e não deve ser “mascarado” pelo runner.</div>
+  <div class="actions"><button class="btn" id="runBtn" type="button">▶ Executar testes</button><button class="btn" id="copyBtn" type="button" disabled>Copiar relatório</button></div>
+  <div class="summary" aria-label="Resumo dos testes"><article><span>APROVADOS</span><strong id="okCount">—</strong></article><article><span>ATENÇÃO</span><strong id="warnCount">—</strong></article><article><span>ERROS</span><strong id="errorCount">—</strong></article></div>
+  <div class="results" id="results" aria-live="polite"><p>Aguardando o carregamento do Studio.</p></div>
+  <div class="foot">C8.0.6 não substitui teste manual de teclado, leitor de tela ou navegador real. Os resultados automatizados são evidência complementar.</div>
+</section>
+<section class="viewer" aria-label="Studio em avaliação"><iframe id="studio" src="./editor.html" title="Sin City Studio em avaliação"></iframe></section>
+</div>
+<script>
+'use strict';
+const frame=document.getElementById('studio');
+const runBtn=document.getElementById('runBtn');
+const copyBtn=document.getElementById('copyBtn');
+const results=document.getElementById('results');
+const state=document.getElementById('state');
+let lastReport='';
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const row=(status,title,detail,next='Nenhuma ação necessária.')=>({status,title,detail,next});
+const text=node=>String(node?.textContent||'').replace(/\s+/g,' ').trim();
+
+function accessibleName(doc,control){
+ const aria=String(control.getAttribute('aria-label')||'').trim();if(aria)return aria;
+ const by=String(control.getAttribute('aria-labelledby')||'').trim();if(by){const v=by.split(/\s+/).map(id=>text(doc.getElementById(id))).filter(Boolean).join(' ');if(v)return v;}
+ if(control.labels?.length){const v=[...control.labels].map(text).filter(Boolean).join(' ');if(v)return v;}
+ if(control.tagName==='BUTTON'||control.tagName==='A'){const v=text(control);if(v)return v;}
+ const title=String(control.getAttribute('title')||'').trim();return title;
+}
+
+function uniqueIds(doc,label){
+ const counts=new Map();doc.querySelectorAll('[id]').forEach(n=>counts.set(n.id,(counts.get(n.id)||0)+1));
+ const dup=[...counts.entries()].filter(([,c])=>c>1).map(([id])=>id);
+ return dup.length?row('error','IDs únicos — '+label,'IDs duplicados: '+dup.slice(0,8).join(', ')+(dup.length>8?' e outros.':'.'),'Corrija IDs duplicados antes da integração final.'):row('ok','IDs únicos — '+label,'Nenhum ID duplicado encontrado.');
+}
+
+async function fetchText(path){const response=await fetch(path+'?c806='+Date.now(),{cache:'no-store'});if(!response.ok)throw new Error(path+' respondeu HTTP '+response.status);return response.text();}
+
+async function runTests(){
+ runBtn.disabled=true;runBtn.textContent='TESTANDO…';copyBtn.disabled=true;results.innerHTML='<p>Executando testes de integração, acessibilidade e regressão…</p>';
+ const out=[];
+ try{
+  const win=frame.contentWindow,doc=frame.contentDocument||win?.document;
+  if(!win||!doc)throw new Error('O Studio não está acessível na mesma origem.');
+  out.push(row(doc.readyState==='complete'||doc.readyState==='interactive'?'ok':'warn','Carregamento do Studio','editor.html está em estado '+doc.readyState+'.',doc.readyState==='loading'?'Aguarde e execute novamente.':'Nenhuma ação necessária.'));
+  out.push(uniqueIds(doc,'Studio'));
+
+  const modules=[...doc.querySelectorAll('.diagnostics-grid .diagnostic-module')];
+  const moduleStates=['diagnosticHealthStatus','diagnosticAccessStatus','diagnosticMediaStatus','diagnosticStorageStatus','diagnosticPreviewStatus','diagnosticDeployStatus'];
+  const missingStates=moduleStates.filter(id=>!doc.getElementById(id));
+  out.push(modules.length===6&&!missingStates.length?row('ok','Integração dos seis módulos','Foram encontrados os seis cartões e os seis estados da Central C8.0.'):row('error','Integração dos seis módulos','Cartões encontrados: '+modules.length+'. Estados ausentes: '+(missingStates.join(', ')||'nenhum')+'.','Revise a estrutura da Central antes de avançar.'));
+
+  const required=['reloadBtn','draftBtn','backupBtn','siteBtn','loginBtn','publishBtn','runLocalDiagnosticsBtn','copyDiagnosticsReportBtn','preview','previewFullscreenBtn','toggleNavBtn'];
+  const missing=required.filter(id=>!doc.getElementById(id));
+  out.push(!missing.length?row('ok','Fluxos principais do Studio','Rascunho, backup, sessão, publicação, diagnóstico, navegação e prévia continuam presentes.'):row('error','Fluxos principais do Studio','Controles ausentes: '+missing.join(', ')+'.','Restaure os controles antes da integração final.'));
+
+  const activePanels=doc.querySelectorAll('.editor-workspace .panel.active').length;
+  out.push(activePanels===1?row('ok','Estado da navegação do Studio','Existe exatamente um painel ativo.'):row('error','Estado da navegação do Studio','Foram encontrados '+activePanels+' painéis ativos.','Revise activateStudioPanel e as classes active.'));
+
+  const controls=[...doc.querySelectorAll('button,input,select,textarea')].filter(c=>c.type!=='hidden'&&!c.hidden&&c.getAttribute('aria-hidden')!=='true');
+  const unnamed=controls.filter(c=>!accessibleName(doc,c));
+  out.push(!unnamed.length?row('ok','Nomes acessíveis dos controles do Studio',controls.length+' controles possuem nome acessível.'):row('warn','Nomes acessíveis dos controles do Studio',unnamed.length+' de '+controls.length+' controles não possuem associação programática de nome. Exemplos: '+unnamed.slice(0,6).map(c=>c.id||c.dataset.path||c.tagName.toLowerCase()).join(', ')+'.','Associar label/for ou aria-label nos campos dinâmicos na etapa de correção.'));
+
+  const modal=doc.getElementById('tokenModal');
+  const modalSemantic=modal&&modal.getAttribute('role')==='dialog'&&modal.getAttribute('aria-modal')==='true'&&Boolean(doc.getElementById(modal.getAttribute('aria-labelledby')));
+  out.push(modalSemantic?row('ok','Semântica do diálogo GitHub','O modal possui role=dialog, aria-modal e título associado.'):row('error','Semântica do diálogo GitHub','A semântica do diálogo está incompleta.','Corrija role/aria-modal/aria-labelledby.'));
+  const modalFocusHints=modal&&/focus\(\)/.test(doc.documentElement.innerHTML)?true:false;
+  out.push(row(modalFocusHints?'warn':'warn','Ciclo de foco do diálogo GitHub','O código move foco para o campo ao abrir, mas este runner não confirma sozinho trapping de Tab e restauração do foco ao fechar.','Teste manualmente Tab, Shift+Tab e Escape no modal; registrar o resultado no aceite da C8.0.6.'));
+
+  const toast=doc.getElementById('toast');
+  out.push(toast?.getAttribute('aria-live')?row('ok','Mensagens dinâmicas do Studio','O toast possui região viva configurada.'):row('warn','Mensagens dinâmicas do Studio','O toast visual não possui aria-live no HTML atual.','Adicionar role=status/aria-live em correção futura para leitores de tela.'));
+
+  const preview=doc.getElementById('preview');
+  let pdoc=null;
+  try{pdoc=preview?.contentDocument||preview?.contentWindow?.document;}catch{}
+  if(!pdoc)out.push(row('warn','Acesso à prévia pública','A prévia não pôde ser inspecionada na mesma origem.','Execute este runner pelo mesmo servidor/origem de editor.html.'));
+  else{
+   out.push(uniqueIds(pdoc,'prévia pública'));
+   const search=pdoc.getElementById('searchInput'),overlay=pdoc.getElementById('overlaySearch');
+   const missingNames=[];
+   if(search&&!accessibleName(pdoc,search))missingNames.push('pesquisa global');
+   if(overlay&&!accessibleName(pdoc,overlay))missingNames.push('pesquisa rápida');
+   out.push(!missingNames.length?row('ok','Pesquisas da prévia com nome acessível','Campos de pesquisa possuem nome acessível.'):row('warn','Pesquisas da prévia com nome acessível','Sem nome programático: '+missingNames.join(', ')+'. O placeholder sozinho não substitui label.','Adicionar label visual/oculto ou aria-label sem mudar o layout.'));
+   const dialog=pdoc.querySelector('.search-modal[role="dialog"][aria-modal="true"]');
+   out.push(dialog?row('ok','Semântica da pesquisa rápida','A janela de pesquisa é exposta como diálogo modal.'):row('error','Semântica da pesquisa rápida','O diálogo de pesquisa não foi encontrado com role/aria-modal.','Revise a marcação da busca rápida.'));
+   const loadError=pdoc.getElementById('loadError');
+   out.push(loadError?.getAttribute('role')==='alert'?row('ok','Erros de carregamento anunciáveis','loadError usa role=alert.'):row('warn','Erros de carregamento anunciáveis','loadError não está configurado como alert.','Use role=alert para falhas críticas de carregamento.'));
+  }
+
+  const [appSource,editorSource,diagSource,savedSource]=await Promise.all([fetchText('./app.js'),fetchText('./editor.html'),fetchText('./diagnostics.js'),fetchText('./saved-themes.js')]);
+  const helperOk=/const \$ = \(selector, scope = document\) => scope\.querySelector\(selector\)/.test(appSource)&&/const \$\$ = \(selector, scope = document\) => \[\.\.\.scope\.querySelectorAll\(selector\)\]/.test(appSource)&&/const \$ = s => document\.querySelector\(s\)/.test(editorSource)&&/const \$\$ = s => \[\.\.\.document\.querySelectorAll\(s\)\]/.test(editorSource);
+  out.push(helperOk?row('ok','Contrato $ / $$','Helpers de elemento único e coleção continuam definidos corretamente no portal e no Studio.'):row('error','Contrato $ / $$','As definições esperadas de $ e $$ não foram confirmadas.','Não integrar antes de revisar os helpers de seletor.'));
+  const safePagesCollection=/(^|[^$])\$\$\('\.page'\)\.forEach/.test(appSource);
+  const unsafeSinglePage=/(^|[^$])\$\('\.page'\)\.forEach/.test(appSource);
+  out.push(safePagesCollection&&!unsafeSinglePage?row('ok','Regressão crítica de coleções','A navegação usa $$(\'.page\').forEach e não reapresenta o bug histórico de $ único.'):row('error','Regressão crítica de coleções','Não foi possível confirmar o padrão seguro para .page.','Revisar seletores antes da integração.'));
+
+  const reduced=/prefers-reduced-motion:\s*reduce/.test(appSource)&&/reduceMotion/.test(appSource)&&/config\.enabled === false \|\| reduceMotion/.test(appSource);
+  out.push(reduced?row('ok','Movimento reduzido','app.js continua respeitando prefers-reduced-motion para cursor/partículas e scroll.'):row('error','Movimento reduzido','A proteção de movimento reduzido não foi confirmada.','Não remover o tratamento de prefers-reduced-motion.'));
+
+  const diagnosticWrites=/localStorage\.(setItem|removeItem|clear)\s*\(/.test(diagSource)||/method\s*:\s*['"](?:POST|PUT|PATCH|DELETE)['"]/.test(diagSource);
+  out.push(!diagnosticWrites?row('ok','Diagnóstico somente leitura','diagnostics.js não contém escrita em localStorage nem métodos HTTP mutáveis.'):row('error','Diagnóstico somente leitura','Foi detectado possível caminho de escrita em diagnostics.js.','Revisar imediatamente antes da integração.'));
+
+  const tokenLeak=/github_pat_[A-Za-z0-9_]{10,}/.test(diagSource)||/lastReport[^\n]{0,200}(token|Authorization)/i.test(diagSource);
+  out.push(!tokenLeak?row('ok','Proteção de credenciais no diagnóstico','Não foi detectado token literal nem inclusão óbvia de Authorization no relatório.'):row('error','Proteção de credenciais no diagnóstico','Foi encontrado padrão suspeito de credencial/relatório.','Não integrar até eliminar a exposição.'));
+
+  out.push(/sin-city-saved-visual-themes-v1/.test(savedSource)&&/MAX=12/.test(savedSource)?row('ok','Biblioteca de temas preservada','C7.8 mantém chave e limite esperados da biblioteca de temas.'):row('error','Biblioteca de temas preservada','Contrato da biblioteca de temas não foi confirmado.','Revisar saved-themes.js antes de integrar.'));
+
+  const responsive=/@media\(max-width:1000px\)/.test(editorSource)&&/data-preview-device="mobile"/.test(editorSource)&&/data-preview-device="tablet"/.test(editorSource);
+  out.push(responsive?row('ok','Estrutura responsiva do Studio','Breakpoints e controles Desktop/Tablet/Mobile continuam presentes.'):row('warn','Estrutura responsiva do Studio','Não foi possível confirmar todos os marcadores responsivos esperados.','Testar manualmente larguras desktop, tablet e mobile.'));
+
+  out.push(row('ok','Segurança do test runner','Nenhuma rotina deste arquivo chama PUBLICAR, saveDraft, temas, token ou APIs de escrita. Ele apenas lê DOM/arquivos públicos da mesma origem.'));
+ }catch(error){out.push(row('error','Execução do runner','Falha ao executar os testes: '+error.message+'.','Abra o runner por HTTP/Live Server e mantenha editor.html na mesma origem.'));}
+ render(out);
+ runBtn.disabled=false;runBtn.textContent='↻ Executar novamente';
+}
+
+function render(list){
+ const counts={ok:0,warn:0,error:0};list.forEach(x=>counts[x.status]++);
+ document.getElementById('okCount').textContent=counts.ok;document.getElementById('warnCount').textContent=counts.warn;document.getElementById('errorCount').textContent=counts.error;
+ results.innerHTML=list.map(x=>'<article class="test"><div class="test-head"><h2>'+esc(x.title)+'</h2><span class="badge '+x.status+'">'+(x.status==='ok'?'APROVADO':x.status==='warn'?'ATENÇÃO':'ERRO')+'</span></div><p>'+esc(x.detail)+'</p><small>Próximo passo: '+esc(x.next)+'</small></article>').join('');
+ const lines=['SIN CITY — C8.0.6 · TESTE DE INTEGRAÇÃO / ACESSIBILIDADE / REGRESSÃO','Data: '+new Date().toLocaleString('pt-BR'),'Resumo: '+counts.ok+' aprovado(s), '+counts.warn+' atenção, '+counts.error+' erro(s).',''];
+ list.forEach(x=>lines.push('['+(x.status==='ok'?'APROVADO':x.status==='warn'?'ATENÇÃO':'ERRO')+'] '+x.title+'\n'+x.detail+'\nPróximo passo: '+x.next+'\n'));
+ lines.push('Somente leitura: este runner não publicou, não salvou rascunhos e não alterou temas ou credenciais.');lastReport=lines.join('\n');copyBtn.disabled=false;
+ state.textContent=counts.error?'Teste concluído com erros':counts.warn?'Teste concluído com pontos de atenção':'Teste concluído sem ressalvas';
+}
+
+copyBtn.addEventListener('click',async()=>{if(!lastReport)return;try{await navigator.clipboard.writeText(lastReport);copyBtn.textContent='Relatório copiado ✓';setTimeout(()=>copyBtn.textContent='Copiar relatório',1600);}catch{const ta=document.createElement('textarea');ta.value=lastReport;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}});
+runBtn.addEventListener('click',runTests);
+frame.addEventListener('load',()=>{state.textContent='Studio carregado';setTimeout(runTests,700);});
+</script>
+</body>
+</html>
