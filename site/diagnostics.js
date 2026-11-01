@@ -8,7 +8,8 @@ const el=id=>document.getElementById(id);
 const isObject=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 
 function create(options){
- const repo=options.repo,branch=options.branch||'main',toast=options.toast||function(){};
+ const repo=options.repo,branch=options.branch||'main',toast=options.toast||function(){},getSession=typeof options.getSession==='function'?options.getSession:function(){return null;};
+ const workflowPath='.github/workflows/deploy.yml';
  let running=false,lastReport='';
 
  const item=(status,title,detail,recommendation)=>({status,title,detail,recommendation});
@@ -86,6 +87,109 @@ function create(options){
   });
   return refs;
  }
+ async function githubGet(path,token){
+  const headers={Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+  if(token)headers.Authorization='Bearer '+token;
+  try{
+   const response=await fetch(path.startsWith('https://')?path:'https://api.github.com'+path,{method:'GET',headers,cache:'no-store'});
+   let body=null;try{body=await response.json();}catch{}
+   return {response,body,error:null};
+  }catch(error){return {response:null,body:null,error:error};}
+ }
+ function githubFailure(result,label){
+  if(result.error)return item('unavailable',label,'Não foi possível concluir a consulta ao GitHub. A rede, o navegador ou a API pode estar indisponível.','Confira a conexão e tente executar o diagnóstico novamente.');
+  const response=result.response,body=result.body||{},message=String(body.message||'');
+  const limited=response.status===429||response.headers.get('x-ratelimit-remaining')==='0'||/rate limit/i.test(message);
+  if(response.status===401)return item('error',label,'O GitHub recusou a sessão (HTTP 401). O token pode estar inválido, expirado ou revogado.','Conecte novamente o GitHub no editor; não cole o token em relatórios ou mensagens.');
+  if(limited)return item('unavailable',label,'O limite de consultas do GitHub foi atingido temporariamente.','Aguarde a renovação do limite e execute novamente.');
+  if(response.status===403)return item('error',label,'O GitHub recusou o acesso necessário (HTTP 403). A sessão pode não possuir a permissão solicitada.','Revise as permissões do token e o acesso ao repositório.');
+  if(response.status===404)return item('error',label,'O GitHub não localizou o recurso solicitado (HTTP 404).','Confira o nome do repositório, a branch e o caminho do arquivo.');
+  if(response.status>=500)return item('unavailable',label,'O GitHub respondeu com erro temporário (HTTP '+response.status+').','Tente novamente quando a API estiver disponível.');
+  return item('error',label,'A consulta foi recusada pelo GitHub (HTTP '+response.status+').','Revise o recurso solicitado e tente novamente.');
+ }
+ async function checkAccess(){
+  const out=[];let session=null,token='';
+  try{session=getSession();}catch(error){
+   out.push(item('unavailable','Leitura da sessão do editor','O navegador não permitiu consultar o estado da sessão. Nenhuma credencial foi exibida.','Reabra o editor em uma janela normal do navegador e tente novamente.'));
+  }
+  if(session&&typeof session.token==='string')token=session.token;
+  if(!token){
+   out.push(item('attention','Sessão GitHub','Não existe uma sessão GitHub conectada neste navegador. As consultas públicas continuam disponíveis.','Use “Conectar GitHub” no editor para validar a sessão autenticada.'));
+  }else{
+   const user=await githubGet('/user',token);
+   if(user.response&&user.response.ok&&isObject(user.body)&&typeof user.body.login==='string'){
+    out.push(item('ok','Sessão GitHub','Sessão autenticada válida para @'+user.body.login+'. O token não foi exibido nem incluído no relatório.','Nenhuma ação necessária.'));
+   }else out.push(githubFailure(user,'Validação da sessão GitHub'));
+  }
+  const repoResult=await githubGet('/repos/'+repo,token);
+  if(repoResult.response&&repoResult.response.ok){
+   const privateRepo=repoResult.body?.private===true;
+   out.push(item('ok','Acesso ao repositório','O repositório '+repo+' está acessível por leitura'+(privateRepo?' autenticada.':' pública.'),'Nenhuma ação necessária.'));
+  }else out.push(githubFailure(repoResult,'Acesso ao repositório'));
+  const branchResult=await githubGet('/repos/'+repo+'/branches/'+encodeURIComponent(branch),token);
+  if(branchResult.response&&branchResult.response.ok){
+   const commit=branchResult.body?.commit?.sha||'';
+   out.push(item('ok','Branch principal','A branch '+branch+' está acessível. Commit atual: '+(commit?commit.slice(0,7):'não informado')+'.','Nenhuma ação necessária.'));
+  }else out.push(githubFailure(branchResult,'Disponibilidade da branch principal'));
+  const contentResult=await githubGet('/repos/'+repo+'/contents/site/content/site.json?ref='+encodeURIComponent(branch),token);
+  if(contentResult.response&&contentResult.response.ok&&contentResult.body?.type==='file'){
+   out.push(item('ok','Leitura de conteúdo','A API permitiu ler site/content/site.json na branch '+branch+'. Nenhum arquivo foi alterado.','Nenhuma ação necessária.'));
+  }else out.push(githubFailure(contentResult,'Permissão de leitura do conteúdo'));
+  return out;
+ }
+ function formatDate(value){
+  const date=value?new Date(value):null;
+  return date&&!Number.isNaN(date.getTime())?date.toLocaleString('pt-BR'):'data não informada';
+ }
+ async function checkDeployment(){
+  const out=[];
+  const runs=await githubGet('https://api.github.com/repos/'+repo+'/actions/runs?branch='+encodeURIComponent(branch)+'&per_page=30','');
+  if(!runs.response||!runs.response.ok)out.push(githubFailure(runs,'Histórico do GitHub Actions'));
+  else{
+   const all=Array.isArray(runs.body?.workflow_runs)?runs.body.workflow_runs:[];
+   const candidates=all.filter(run=>run&&run.head_branch===branch&&(run.path===workflowPath||run.name==='Deploy Sin City Roleplay'));
+   candidates.sort((a,b)=>Date.parse(b.created_at||0)-Date.parse(a.created_at||0));
+   const latest=candidates[0];
+   if(!latest)out.push(item('attention','Última execução do deploy','Não foi encontrada execução do workflow de publicação na branch '+branch+' entre as execuções recentes consultadas.','Abra GitHub Actions e confira se o workflow Deploy Sin City Roleplay já foi executado.'));
+   else{
+    const runStatus=String(latest.status||'').toLowerCase(),conclusion=String(latest.conclusion||'').toLowerCase();
+    let status='attention',recommendation='Acompanhe a execução no GitHub Actions até a conclusão.';
+    if(runStatus==='completed'&&conclusion==='success'){status='ok';recommendation='Nenhuma ação necessária.';}
+    else if(runStatus==='completed'&&['failure','timed_out','action_required'].includes(conclusion)){status='error';recommendation='Abra os detalhes da execução e corrija a etapa indicada antes de considerar o site atualizado.';}
+    else if(runStatus==='completed'&&['cancelled','skipped','stale'].includes(conclusion)){status='attention';recommendation='Confira por que a implantação foi cancelada ou ignorada e execute o fluxo correto quando necessário.';}
+    const runNo=latest.run_number?'#'+latest.run_number:'sem número';
+    const shortSha=typeof latest.head_sha==='string'?latest.head_sha.slice(0,7):'commit não informado';
+    const detail='Execução '+runNo+' · '+runStatus+(conclusion?' / '+conclusion:'')+' · branch '+latest.head_branch+' · commit '+shortSha+' · '+formatDate(latest.updated_at||latest.created_at)+'.';
+    const entry=item(status,'Última execução do GitHub Actions',detail,recommendation);
+    if(typeof latest.html_url==='string'&&/^https:\/\/github\.com\//.test(latest.html_url))entry.url=latest.html_url;
+    out.push(entry);
+   }
+  }
+  const pages=await githubGet('/repos/'+repo+'/pages','');
+  if(pages.response&&pages.response.ok){
+   const pagesUrl=typeof pages.body?.html_url==='string'?pages.body.html_url:'';
+   const pagesStatus=String(pages.body?.status||'').toLowerCase();
+   let status='attention',recommendation='Confira o estado do GitHub Pages no repositório.';
+   if(pagesStatus==='built'){status='ok';recommendation='Nenhuma ação necessária.';}
+   else if(pagesStatus==='errored'){status='error';recommendation='Confira a configuração e os detalhes da implantação do GitHub Pages.';}
+   else if(pagesStatus==='building'){status='attention';recommendation='Aguarde a conclusão da construção do GitHub Pages.';}
+   const detail='GitHub Pages respondeu pela API'+(pagesStatus?': '+pagesStatus:'; estado não informado')+'.'+(pagesUrl?' Endereço: '+pagesUrl:'');
+   const entry=item(status,'Estado do GitHub Pages',detail,recommendation);
+   if(pagesUrl&&/^https:\/\//.test(pagesUrl))entry.url=pagesUrl;
+   out.push(entry);
+   if(pagesUrl){
+    try{
+     const response=await fetch(pagesUrl,{method:'HEAD',cache:'no-store'});
+     if(response.ok)out.push(item('ok','Disponibilidade do endereço publicado','O endereço informado pelo GitHub Pages respondeu HTTP '+response.status+'.','Nenhuma ação necessária.'));
+     else if(response.status===404)out.push(item('error','Disponibilidade do endereço publicado','O endereço informado pelo GitHub Pages respondeu HTTP 404.','Confira se o último deploy foi concluído e se o caminho publicado está correto.'));
+     else out.push(item('attention','Disponibilidade do endereço publicado','O endereço informado pelo GitHub Pages respondeu HTTP '+response.status+'.','Confira a página no navegador; o servidor pode limitar requisições HEAD.'));
+    }catch(error){out.push(item('unavailable','Disponibilidade do endereço publicado','Não foi possível confirmar o endereço por uma requisição HEAD no navegador. Isso pode ser uma limitação de rede ou do próprio navegador.','Abra o link do GitHub Pages e confira a página manualmente.'));}
+   }
+  }else if(pages.response&&pages.response.status===404){
+   out.push(item('attention','Estado do GitHub Pages','A API não retornou uma configuração de Pages (HTTP 404). Isso não prova sozinho que o site esteja fora do ar.','Confira Settings → Pages e o endereço publicado no repositório.'));
+  }else out.push(githubFailure(pages,'Estado do GitHub Pages'));
+  return out;
+ }
  function aggregate(list){
   if(list.some(x=>x.status==='error'))return {status:'error',label:'ERRO'};
   if(list.some(x=>x.status==='attention'))return {status:'attention',label:'ATENÇÃO'};
@@ -96,9 +200,12 @@ function create(options){
  function appendRow(host,entry){
   const row=document.createElement('article');row.className='diagnostic-result diagnostic-result-'+entry.status;
   const head=document.createElement('div');head.className='diagnostic-result-head';
-  const title=document.createElement('strong');title.textContent=entry.title;
+  let titleNode;
+  if(typeof entry.url==='string'&&/^https:\/\/github\.com\//.test(entry.url)){
+   titleNode=document.createElement('a');titleNode.className='diagnostic-result-link';titleNode.href=entry.url;titleNode.target='_blank';titleNode.rel='noopener noreferrer';titleNode.textContent=entry.title;
+  }else{titleNode=document.createElement('strong');titleNode.textContent=entry.title;}
   const state=document.createElement('span');state.className='diagnostic-result-badge diagnostic-result-badge-'+entry.status;state.textContent=STATUS[entry.status].label;
-  head.append(title,state);const detail=document.createElement('p');detail.textContent=entry.detail;
+  head.append(titleNode,state);const detail=document.createElement('p');detail.textContent=entry.detail;
   const next=document.createElement('small');next.textContent='Próximo passo: '+entry.recommendation;row.append(head,detail,next);host.appendChild(row);
  }
  function renderList(id,list){
@@ -107,25 +214,29 @@ function create(options){
   list.slice(0,6).forEach(entry=>appendRow(host,entry));
   if(list.length>6){const more=document.createElement('details');more.className='diagnostic-more';const summary=document.createElement('summary');summary.textContent='Ver mais '+(list.length-6)+' verificações';const rest=document.createElement('div');rest.className='diagnostic-more-list';list.slice(6).forEach(entry=>appendRow(rest,entry));more.append(summary,rest);host.appendChild(more);}
  }
- function summary(health,media,when){
-  const all=health.concat(media),count={ok:0,attention:0,error:0,unavailable:0};all.forEach(x=>count[x.status]++);
+ function summary(health,media,access,deploy,when){
+  const all=health.concat(media,access,deploy),count={ok:0,attention:0,error:0,unavailable:0};all.forEach(x=>count[x.status]++);
   if(el('diagnosticsPassCount'))el('diagnosticsPassCount').textContent=String(count.ok);
   if(el('diagnosticsAttentionCount'))el('diagnosticsAttentionCount').textContent=String(count.attention+count.unavailable);
   if(el('diagnosticsErrorCount'))el('diagnosticsErrorCount').textContent=String(count.error);
   if(el('diagnosticsRunMeta'))el('diagnosticsRunMeta').textContent='Última execução: '+when+' · somente leitura';
   if(el('diagnosticsSummaryText')){
-   let message='Foram executadas '+all.length+' verificações nos módulos Saúde do projeto e Imagens e mídias.';
+   let message='Foram executadas '+all.length+' verificações nos módulos Saúde do projeto, Imagens e mídias, Conexão e segurança e Publicação e implantação.';
    if(count.error)message+=' Existem '+count.error+' erro(s) que merecem revisão.';
    else if(count.attention||count.unavailable)message+=' Existem pontos de atenção ou verificações indisponíveis.';
    else message+=' Todos os itens executados foram aprovados.';
-   message+=' Os outros quatro módulos continuam planejados para as próximas etapas.';
+   message+=' Nenhuma alteração ou publicação foi realizada pelo diagnóstico.';
    el('diagnosticsSummaryText').textContent=message;
   }
-  const lines=['SIN CITY STUDIO — DIAGNÓSTICO LOCAL C8.0.3','Data: '+when,'Resumo: '+count.ok+' aprovado(s), '+count.attention+' atenção, '+count.error+' erro(s), '+count.unavailable+' indisponível(is).','','01 — SAÚDE DO PROJETO'];
+  const lines=['SIN CITY STUDIO — DIAGNÓSTICO LOCAL C8.0.4','Data: '+when,'Resumo: '+count.ok+' aprovado(s), '+count.attention+' atenção, '+count.error+' erro(s), '+count.unavailable+' indisponível(is).','','01 — SAÚDE DO PROJETO'];
   health.forEach(x=>lines.push('['+STATUS[x.status].label+'] '+x.title+'\n'+x.detail+'\nPróximo passo: '+x.recommendation));
+  lines.push('','02 — CONEXÃO E SEGURANÇA');
+  access.forEach(x=>lines.push('['+STATUS[x.status].label+'] '+x.title+'\n'+x.detail+'\nPróximo passo: '+x.recommendation));
   lines.push('','03 — IMAGENS E MÍDIAS');
   media.forEach(x=>lines.push('['+STATUS[x.status].label+'] '+x.title+'\n'+x.detail+'\nPróximo passo: '+x.recommendation));
-  lines.push('','Somente leitura: nenhum arquivo, tema, regra ou publicação foi alterado.');
+  lines.push('','06 — PUBLICAÇÃO E IMPLANTAÇÃO');
+  deploy.forEach(x=>lines.push('['+STATUS[x.status].label+'] '+x.title+'\n'+x.detail+'\nPróximo passo: '+x.recommendation));
+  lines.push('','Somente leitura: nenhuma credencial foi incluída; nenhum arquivo, tema, regra ou publicação foi alterado.');
   lastReport=lines.join('\n');if(el('copyDiagnosticsReportBtn'))el('copyDiagnosticsReportBtn').disabled=false;
  }
  async function copyReport(){
@@ -144,6 +255,9 @@ function create(options){
   if(el('diagnosticsSummaryText'))el('diagnosticsSummaryText').textContent='Consultando arquivos publicados e validando os dados. Nenhuma alteração será realizada.';
   if(el('diagnosticHealthStatus'))el('diagnosticHealthStatus').textContent='ANALISANDO';
   if(el('diagnosticMediaStatus'))el('diagnosticMediaStatus').textContent='ANALISANDO';
+  if(el('diagnosticAccessStatus'))el('diagnosticAccessStatus').textContent='ANALISANDO';
+  if(el('diagnosticDeployStatus'))el('diagnosticDeployStatus').textContent='ANALISANDO';
+  const externalChecksPromise=Promise.all([checkAccess(),checkDeployment()]);
   const health=[],media=[];let tree=null,fileMap=new Map(),siteData=null,rulesData=null;
   const settled=await Promise.allSettled([treeData(),textFile('./content/site.json'),textFile('./rules.json')]);
   if(settled[0].status==='fulfilled'){
@@ -209,11 +323,18 @@ function create(options){
     else{row.status='attention';row.detail=path+' existe no repositório, mas a verificação HTTP respondeu '+response.status+'.';row.recommendation='Confirme o carregamento no navegador; o servidor pode limitar requisições HEAD.';}
    }catch(error){row.status='attention';row.detail=path+' existe no repositório, mas o carregamento não pôde ser confirmado: '+error.message;row.recommendation='Abra a imagem no site; a falha pode ser uma limitação do navegador.';}
   }));
+  let access=[],deploy=[];
+  try{[access,deploy]=await externalChecksPromise;}catch(error){
+   access=[item('unavailable','Diagnóstico de conexão','Não foi possível concluir as verificações de conexão.','Confira a rede e tente novamente.')];
+   deploy=[item('unavailable','Diagnóstico de implantação','Não foi possível concluir as verificações de implantação.','Confira a rede e tente novamente.')];
+  }
   renderList('diagnosticHealthResults',health);renderList('diagnosticMediaResults',media);
+  renderList('diagnosticAccessResults',access);renderList('diagnosticDeployResults',deploy);
   badge('diagnosticHealthStatus',health);badge('diagnosticMediaStatus',media);
-  summary(health,media,new Date().toLocaleString('pt-BR'));
+  badge('diagnosticAccessStatus',access);badge('diagnosticDeployStatus',deploy);
+  summary(health,media,access,deploy,new Date().toLocaleString('pt-BR'));
   if(runButton){runButton.disabled=false;runButton.textContent='↻ EXECUTAR NOVAMENTE';}
-  running=false;toast('Diagnóstico local concluído. Nenhum dado foi alterado.','ok');
+  running=false;toast('Diagnóstico C8.0.4 concluído. Nenhum dado foi alterado ou publicado.','ok');
   return {health:health,media:media,report:lastReport};
  }
  function bind(){
