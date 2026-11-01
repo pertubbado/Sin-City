@@ -12,7 +12,7 @@ body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-syst
 <div class="wrap"><div class="grid">
 <section class="card">
 <h1>C9.0.7 — Fluxos combinados</h1>
-<p class="muted">Cria uma categoria temporária e subcategorias na memória do Studio, move, exclui, recria e remove tudo ao final. Não conecta GitHub e não publica.</p>
+<p class="muted">Cria categoria, subcategorias e regra temporárias na memória do Studio, testa código estrutural automático, move, exclui, recria e remove tudo ao final. Não conecta GitHub e não publica.</p>
 <button id="run">Executar novamente</button>
 <div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div>
 </section>
@@ -21,13 +21,28 @@ body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-syst
 <script>
 'use strict';
 const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
-const wait=(ms=60)=>new Promise(resolve=>setTimeout(resolve,ms));
+const wait=(ms=70)=>new Promise(resolve=>setTimeout(resolve,ms));
 const cards=d=>[...d.querySelectorAll('#cats > details.item')];
 const subs=card=>card?[...card.querySelectorAll(':scope > .sub-list > details.subitem')]:[];
 const ids=d=>cards(d).map(card=>String(card.dataset.categoryId||''));
 const findCard=(d,id)=>cards(d).find(card=>String(card.dataset.categoryId||'')===String(id||''));
 const findIndex=(d,id)=>cards(d).findIndex(card=>String(card.dataset.categoryId||'')===String(id||''));
+const firstRule=sub=>sub?.querySelector(':scope > .rule')||null;
+const ruleCodeInput=rule=>rule?.querySelector('input[data-sub-rule][data-k="code"]')||null;
 function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function previewDoc(d){try{return d.getElementById('preview')?.contentDocument||null;}catch{return null;}}
+async function openPreviewCategory(d,id){
+ const pd=previewDoc(d);if(!pd)return false;
+ const button=pd.querySelector(`[data-category-nav="${id}"]`);
+ if(!button)return false;
+ button.click();await wait(140);return true;
+}
+function previewRuleCode(d,title='Nova regra'){
+ const pd=previewDoc(d);if(!pd)return '';
+ const cards=[...pd.querySelectorAll('.rule-card')];
+ const card=cards.find(el=>(el.querySelector('h3')?.textContent||'').trim()===title)||cards[0];
+ return String(card?.querySelector('.rule-code')?.textContent||'').trim();
+}
 async function run(){
  const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
  const originalConfirm=w.confirm;
@@ -38,6 +53,7 @@ async function run(){
   add(w.SinCityFlowGuard?.version==='C9.0.7','Guarda C9.0.7 carregada',w.SinCityFlowGuard?.version||'ausente');
   add(Boolean(w.SinCityFlowGuard?.isInstalled?.()),'Guarda instalada no sendPreview',String(w.SinCityFlowGuard?.isInstalled?.()));
   add(w.sendPreview?.__sinCityFlowGuard==='C9.0.7','sendPreview protegido antes do envio',w.sendPreview?.__sinCityFlowGuard||'sem guarda');
+  add(typeof w.SinCityFlowGuard?.syncNestedRuleCodes==='function','Sincronização automática de códigos disponível','syncNestedRuleCodes disponível');
 
   const originalIds=ids(d),originalCount=originalIds.length;
   add(originalCount>2,'Categorias base disponíveis',`${originalCount} categoria(s)`);
@@ -64,19 +80,41 @@ async function run(){
   const prefix=String(temp?.dataset.categoryNumber||'');
   add(tempSubs.map(x=>x.dataset.subcategoryNumber).join(',')===`${prefix}.01,${prefix}.02`,'Numeração inicial das subcategorias correta',tempSubs.map(x=>x.dataset.subcategoryNumber).join(', '));
 
-  let up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait();
-  up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait();
+  tempSubs[0]?.querySelector('[data-add-sub-rule]')?.click();await wait(160);
+  temp=findCard(d,tempId);tempSubs=subs(temp);
+  let createdRule=firstRule(tempSubs[0]);
+  let createdCode=ruleCodeInput(createdRule);
+  const initialRuleCode=`${prefix}.01`;
+  add(Boolean(createdRule),'Criar regra dentro da subcategoria funciona','regra temporária criada');
+  add(createdCode?.value===initialRuleCode,'Regra nova recebe código estrutural automaticamente',createdCode?.value||'ausente');
+  add(Boolean(createdCode?.readOnly)&&createdCode?.dataset.autoRuleCode==='true','Código da regra de subcategoria é automático/somente leitura',createdCode?.readOnly?'somente leitura':'editável');
+  add((createdRule?.querySelector('.item-head strong')?.textContent||'').startsWith(`${initialRuleCode} •`),'Cabeçalho da regra no Studio usa o código automático',createdRule?.querySelector('.item-head strong')?.textContent||'ausente');
+  const openedInitial=await openPreviewCategory(d,tempId);
+  add(openedInitial,'Categoria temporária abre no preview','navegação local');
+  add(previewRuleCode(d)===initialRuleCode,'Cartão da regra no preview nasce com código estrutural',previewRuleCode(d)||'ausente');
+
+  let up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(130);
+  up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(160);
   const movedIndex=findIndex(d,tempId),movedCard=findCard(d,tempId);
   add(movedIndex===originalCount-2,'Categoria recém-criada pode mover repetidamente',`posição=${movedIndex+1}`);
   add(String(movedCard?.dataset.categoryId||'')===tempId,'ID da categoria preservado após mover',tempId);
   const movedPrefix=String(movedCard?.dataset.categoryNumber||'');
   add(subs(movedCard).every((sub,i)=>sub.dataset.subcategoryNumber===`${movedPrefix}.${String(i+1).padStart(2,'0')}`),'Subcategorias acompanham categoria movida',subs(movedCard).map(x=>x.dataset.subcategoryNumber).join(', '));
+  createdRule=firstRule(subs(movedCard)[0]);createdCode=ruleCodeInput(createdRule);
+  add(createdCode?.value===`${movedPrefix}.01`,'Código da regra acompanha mudança da categoria',createdCode?.value||'ausente');
+  await openPreviewCategory(d,tempId);
+  add(previewRuleCode(d)===`${movedPrefix}.01`,'Cartão da regra no preview acompanha mudança da categoria',previewRuleCode(d)||'ausente');
 
   let currentSubs=subs(movedCard);
-  currentSubs[1]?.querySelector('[data-c9-move-subcategory="up"]')?.click();await wait();
+  currentSubs[1]?.querySelector('[data-c9-move-subcategory="up"]')?.click();await wait(170);
   currentSubs=subs(findCard(d,tempId));
   add(String(currentSubs[0]?.dataset.subcategoryId||'')===secondSubId,'Subcategoria recém-criada pode subir',`primeira=${currentSubs[0]?.dataset.subcategoryId||''}`);
   add(currentSubs[0]?.dataset.subcategoryNumber===`${movedPrefix}.01`&&currentSubs[1]?.dataset.subcategoryNumber===`${movedPrefix}.02`,'Numeração reorganiza após mover subcategoria',currentSubs.map(x=>x.dataset.subcategoryNumber).join(', '));
+  const ruleAfterSubMove=firstRule(currentSubs[1]);
+  const codeAfterSubMove=ruleCodeInput(ruleAfterSubMove);
+  add(codeAfterSubMove?.value===`${movedPrefix}.02`,'Código da regra acompanha mudança da própria subcategoria',codeAfterSubMove?.value||'ausente');
+  await openPreviewCategory(d,tempId);
+  add(previewRuleCode(d)===`${movedPrefix}.02`,'Cartão da regra no preview acompanha mudança da subcategoria',previewRuleCode(d)||'ausente');
 
   w.confirm=()=>true;
   const deleteTarget=currentSubs[1];
@@ -94,7 +132,7 @@ async function run(){
   add(currentSubs[1]?.dataset.subcategoryNumber===`${movedPrefix}.02`,'Nova subcategoria recebe próxima numeração correta',currentSubs[1]?.dataset.subcategoryNumber||'ausente');
 
   const tempCard=findCard(d,tempId);
-  tempCard?.querySelector('[data-del-cat]')?.click();await wait(100);
+  tempCard?.querySelector('[data-del-cat]')?.click();await wait(120);
   const restored=ids(d);
   add(restored.length===originalCount,'Excluir categoria temporária restaura quantidade original',`${restored.length}/${originalCount}`);
   add(JSON.stringify(restored)===JSON.stringify(originalIds),'Categorias originais mantêm ordem e IDs após fluxo combinado','ordem original restaurada');
@@ -116,7 +154,7 @@ async function run(){
  }
  const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
 }
-frame.addEventListener('load',()=>setTimeout(run,1700));document.getElementById('run').addEventListener('click',run);
+frame.addEventListener('load',()=>setTimeout(run,1900));document.getElementById('run').addEventListener('click',run);
 </script>
 </body>
 </html>
