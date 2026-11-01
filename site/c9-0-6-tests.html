@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.6 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(380px,.85fr) minmax(650px,1.6fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}iframe{width:100%;height:810px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="grid">
+<section class="card">
+<h1>C9.0.6 — Espelhamento público</h1>
+<p class="muted">Runner seguro. Não conecta GitHub e não publica. Move temporariamente uma subcategoria, valida o preview e restaura a ordem original.</p>
+<button id="run">Executar novamente</button>
+<div id="summary" class="status">Aguardando o Studio…</div>
+<div id="results"></div>
+</section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.6"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function cards(d){return [...d.querySelectorAll('#cats > details.item')];}
+function subcards(card){return [...card.querySelectorAll(':scope > .sub-list > details.subitem')];}
+function findPreviewGroup(pd,categoryId){return pd.querySelector(`.nav-group[data-nav-group="${CSS.escape(String(categoryId||''))}"]`);}
+function structuralLinks(group){return [...(group?.querySelectorAll('.nav-rule-link[data-structural-subcategory-number]')||[])];}
+function expectedForLink(link,categoryIndex){
+ const target=String(link.dataset.navRule||'');
+ const categoryId=String(link.dataset.navCategory||'');
+ const safe=categoryId.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,72)||'item';
+ const prefixes=[`rule-${safe}-`,`sub-${safe}-`];
+ let rest='';for(const prefix of prefixes){if(target.startsWith(prefix)){rest=target.slice(prefix.length);break;}}
+ const token=rest.split('-')[0];if(token==='direct'||!/^\d+$/.test(token))return null;
+ return `${String(categoryIndex+1).padStart(2,'0')}.${String(Number(token)+1).padStart(2,'0')}`;
+}
+async function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(w.SinCityOrdering?.version==='C9.0.5','Motor do Studio preservado',w.SinCityOrdering?.version||'ausente');
+  const preview=d.getElementById('preview');
+  add(Boolean(preview?.contentWindow),'Prévia disponível','iframe encontrado');
+  await sleep(700);
+  const pw=preview.contentWindow,pd=preview.contentDocument;
+  add(pw.SinCityPublicOrdering?.version==='C9.0.6','Módulo público C9.0.6 carregado',pw.SinCityPublicOrdering?.version||'ausente');
+  const groups=[...pd.querySelectorAll('#nav > .nav-group')];
+  add(groups.length>0,'Categorias renderizadas no portal',`${groups.length} categoria(s)`);
+  const categoryNumbers=groups.map((group,i)=>group.querySelector('.nav-number')?.textContent?.trim()===String(i+1).padStart(2,'0'));
+  add(categoryNumbers.every(Boolean),'Numeração das categorias segue a ordem estrutural',`${categoryNumbers.filter(Boolean).length}/${groups.length}`);
+
+  let publicLinks=[];groups.forEach((group,ci)=>structuralLinks(group).forEach(link=>publicLinks.push({link,ci})));
+  add(publicLinks.length>0,'Links de subcategorias espelhados',`${publicLinks.length} link(s)`);
+  const structuralOk=publicLinks.every(({link,ci})=>link.dataset.structuralSubcategoryNumber===expectedForLink(link,ci)&&link.querySelector('.nav-rule-code')?.textContent?.trim()===expectedForLink(link,ci));
+  add(structuralOk,'Números amarelos usam posição estrutural',structuralOk?'todos alinhados':'há divergência');
+  const originalsPreserved=publicLinks.every(({link})=>link.querySelector('.nav-rule-code')?.dataset.ruleCodeOriginal!==undefined);
+  add(originalsPreserved,'Código original da regra preservado em memória',`${publicLinks.filter(({link})=>link.querySelector('.nav-rule-code')?.dataset.ruleCodeOriginal!==undefined).length}/${publicLinks.length}`);
+
+  const editorCards=cards(d);
+  let ci=-1,si=-1;
+  for(let i=0;i<editorCards.length;i++){
+   const subs=subcards(editorCards[i]);
+   if(subs.length>=2){ci=i;si=1;break;}
+  }
+  add(ci>=0,'Categoria com subcategorias disponível para teste',ci>=0?`categoria ${String(ci+1).padStart(2,'0')}`:'nenhuma');
+
+  if(ci>=0){
+   const categoryCard=editorCards[ci];
+   const categoryId=String(categoryCard.dataset.categoryId||'');
+   const beforeSubs=subcards(categoryCard).map(sub=>String(sub.dataset.subcategoryId||''));
+   const movingId=beforeSubs[si];
+   const beforeGroup=findPreviewGroup(pd,categoryId);
+   const beforeCodes=structuralLinks(beforeGroup).map(link=>({target:link.dataset.navRule,visual:link.querySelector('.nav-rule-code')?.textContent?.trim(),original:link.querySelector('.nav-rule-code')?.dataset.ruleCodeOriginal||''}));
+
+   const moved=w.SinCityOrdering.moveSubcategory(ci,si,-1,{notify:false});
+   await sleep(500);
+   const afterEditorCard=cards(d)[ci];
+   const afterSubs=subcards(afterEditorCard).map(sub=>String(sub.dataset.subcategoryId||''));
+   add(moved?.moved&&afterSubs[si-1]===movingId,'Studio move subcategoria mantendo ID',`${movingId} → ${String(ci+1).padStart(2,'0')}.${String(si).padStart(2,'0')}`);
+
+   const afterGroup=findPreviewGroup(pd,categoryId);
+   const afterLinks=structuralLinks(afterGroup);
+   const afterStructuralOk=afterLinks.every(link=>{
+    const expected=expectedForLink(link,ci);return link.dataset.structuralSubcategoryNumber===expected&&link.querySelector('.nav-rule-code')?.textContent?.trim()===expected;
+   });
+   add(afterStructuralOk,'Preview renumera imediatamente após movimento','postMessage + render + espelhamento');
+
+   const movedTargets=afterLinks.filter(link=>String(link.dataset.navRule||'').includes(`-${si-1}-`));
+   add(movedTargets.length>0,'Subcategoria movida aparece na nova posição do preview',`${movedTargets.length} item(ns) na posição nova`);
+
+   const originalCodesStillKnown=afterLinks.every(link=>link.querySelector('.nav-rule-code')?.dataset.ruleCodeOriginal!==undefined);
+   add(originalCodesStillKnown,'Movimento não apaga códigos originais das regras','data-rule-code-original preservado');
+
+   const currentIndex=subcards(cards(d)[ci]).findIndex(sub=>String(sub.dataset.subcategoryId||'')===movingId);
+   const back=w.SinCityOrdering.moveSubcategory(ci,currentIndex,1,{notify:false});
+   await sleep(500);
+   const restored=subcards(cards(d)[ci]).map(sub=>String(sub.dataset.subcategoryId||''));
+   add(back?.moved&&JSON.stringify(restored)===JSON.stringify(beforeSubs),'Ordem original restaurada no Studio','restaurada');
+
+   const restoredGroup=findPreviewGroup(pd,categoryId);
+   const restoredOk=structuralLinks(restoredGroup).every(link=>link.querySelector('.nav-rule-code')?.textContent?.trim()===expectedForLink(link,ci));
+   add(restoredOk,'Preview restaurado e sincronizado','numeração estrutural correta após ida e volta');
+  }
+
+  const direct=[...pd.querySelectorAll('.nav-rule-link')].filter(link=>!link.hasAttribute('data-structural-subcategory-number'));
+  const directPreserved=direct.every(link=>{const code=link.querySelector('.nav-rule-code');return !code||code.textContent===code.dataset.ruleCodeOriginal||code.dataset.ruleCodeOriginal===undefined;});
+  add(directPreserved,'Regras diretas preservam código próprio',`${direct.length} link(s) direto(s)`);
+  add(typeof w.sendPreview==='function'&&typeof w.publish==='function','Prévia e publicação preservadas','publicação não executada');
+ }catch(error){add(false,'Runner executado sem exceções',error.message||String(error));}
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1600));document.getElementById('run').addEventListener('click',run);
+</script>
+</body>
+</html>
