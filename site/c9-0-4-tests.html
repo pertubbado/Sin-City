@@ -26,6 +26,8 @@ body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-syst
 const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
 function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
 function getCategoryIds(w){try{return w.data.categories.map(c=>String(c.id||''));}catch{return []}}
+function dataIndexById(w,id){try{return w.data.categories.findIndex(c=>String(c.id||'')===String(id||''));}catch{return -1}}
+function domIndexById(d,id){return [...d.querySelectorAll('#cats > details.item')].findIndex(card=>String(card.dataset.categoryId||'')===String(id||''));}
 function run(){
  const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
  try{
@@ -56,12 +58,22 @@ function run(){
 
   if(cards.length>=3){
    const original=getCategoryIds(w);
-   const from=cards.length-1;
+   let from=-1;
+   try{
+    for(let i=w.data.categories.length-1;i>=2;i--){
+     if(Array.isArray(w.data.categories[i]?.subcategories)&&w.data.categories[i].subcategories.length){from=i;break;}
+    }
+   }catch{}
+   if(from<2)from=cards.length-1;
    const movingId=original[from];
+   const hadSubs=Boolean(w.data.categories[from]?.subcategories?.length);
+
    const firstMove=w.SinCityOrdering.moveCategory(from,-1,{notify:false});
-   const secondMove=w.SinCityOrdering.moveCategory(from-1,-1,{notify:false});
+   const afterFirstIndex=dataIndexById(w,movingId);
+   const secondMove=w.SinCityOrdering.moveCategory(afterFirstIndex,-1,{notify:false});
    const afterTwo=getCategoryIds(w);
-   add(firstMove?.moved&&secondMove?.moved&&afterTwo[from-2]===movingId,'Movimentos repetidos funcionam','última categoria subiu duas posições seguidas');
+   const movedDataIndex=dataIndexById(w,movingId);
+   add(firstMove?.moved&&secondMove?.moved&&movedDataIndex===from-2&&afterTwo[from-2]===movingId,'Movimentos repetidos funcionam',`categoria ${movingId} subiu duas posições seguidas`);
 
    cards=[...d.querySelectorAll('#cats > details.item')];
    numbers=cards.map(card=>card.dataset.categoryNumber||'');
@@ -69,18 +81,27 @@ function run(){
    add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração continua correta após múltiplos movimentos',numbers.join(', '));
 
    const movedCard=cards.find(card=>card.dataset.categoryId===movingId);
-   const movedIndex=cards.indexOf(movedCard);
-   const subNums=movedCard?[...movedCard.querySelectorAll(':scope > .sub-list > details.subitem')].map(sub=>sub.dataset.subcategoryNumber||''):[];
-   const subExpected=subNums.map((_,si)=>`${String(movedIndex+1).padStart(2,'0')}.${String(si+1).padStart(2,'0')}`);
-   add(JSON.stringify(subNums)===JSON.stringify(subExpected),'Subcategorias renumeram junto com a categoria',subNums.slice(0,8).join(', ')||'sem subcategorias');
+   const movedDomIndex=domIndexById(d,movingId);
+   const domDataAligned=movedDomIndex===movedDataIndex;
+   add(domDataAligned,'DOM e dados permanecem alinhados após movimentos',`dados=${movedDataIndex+1}, DOM=${movedDomIndex+1}`);
 
-   const backOne=w.SinCityOrdering.moveCategory(movedIndex,1,{notify:false});
-   const backTwo=w.SinCityOrdering.moveCategory(movedIndex+1,1,{notify:false});
+   const subNums=movedCard?[...movedCard.querySelectorAll(':scope > .sub-list > details.subitem')].map(sub=>sub.dataset.subcategoryNumber||''):[];
+   const subExpected=subNums.map((_,si)=>`${String(movedDataIndex+1).padStart(2,'0')}.${String(si+1).padStart(2,'0')}`);
+   add(!hadSubs||subNums.length>0&&JSON.stringify(subNums)===JSON.stringify(subExpected),'Subcategorias renumeram junto com a categoria',hadSubs?(subNums.slice(0,8).join(', ')||'falha: subcategorias não encontradas'):'categoria escolhida sem subcategorias');
+
+   const backOneIndex=dataIndexById(w,movingId);
+   const backOne=w.SinCityOrdering.moveCategory(backOneIndex,1,{notify:false});
+   const backTwoIndex=dataIndexById(w,movingId);
+   const backTwo=w.SinCityOrdering.moveCategory(backTwoIndex,1,{notify:false});
    const restored=getCategoryIds(w);
-   add(backOne?.moved&&backTwo?.moved&&JSON.stringify(restored)===JSON.stringify(original),'Movimento inverso restaura a ordem original','subiu e desceu sem travar');
+   const restoredDom=[...d.querySelectorAll('#cats > details.item')].map(card=>String(card.dataset.categoryId||''));
+   const dataRestored=JSON.stringify(restored)===JSON.stringify(original);
+   const domRestored=JSON.stringify(restoredDom)===JSON.stringify(original);
+   add(backOne?.moved&&backTwo?.moved&&dataRestored&&domRestored,'Movimento inverso restaura a ordem original',`dados=${dataRestored?'ok':'diferentes'}; DOM=${domRestored?'ok':'diferente'}`);
   }else{
    add(true,'Movimentos repetidos funcionam','não aplicável com menos de 3 categorias');
    add(true,'Numeração continua correta após múltiplos movimentos','não aplicável');
+   add(true,'DOM e dados permanecem alinhados após movimentos','não aplicável');
    add(true,'Subcategorias renumeram junto com a categoria','não aplicável');
    add(true,'Movimento inverso restaura a ordem original','não aplicável');
   }
