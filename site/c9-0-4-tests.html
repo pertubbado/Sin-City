@@ -13,7 +13,7 @@ body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-syst
  <div class="grid">
   <section class="card">
    <h1>C9.0.4 — Movimentação de categorias</h1>
-   <p class="muted">Runner somente leitura estrutural. Não conecta GitHub, não publica e não chama a função de mover automaticamente. O teste real de ↑/↓ deve ser feito manualmente no Studio ao lado.</p>
+   <p class="muted">Runner seguro. Não conecta GitHub e não publica. Os testes de movimentação usam a API local e restauram a ordem original ao final.</p>
    <button id="run">Executar novamente</button>
    <div id="summary" class="status">Aguardando o Studio…</div>
    <div id="results"></div>
@@ -25,15 +25,16 @@ body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-syst
 'use strict';
 const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
 function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function getCategoryIds(w){try{return w.data.categories.map(c=>String(c.id||''));}catch{return []}}
 function run(){
  const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
  try{
   add(d.readyState==='complete','Studio carregado',d.readyState);
   add(Boolean(w.SinCityOrdering)&&w.SinCityOrdering.version==='C9.0.4','Módulo C9.0.4 carregado',w.SinCityOrdering?.version||'ausente');
-  const cards=[...d.querySelectorAll('#cats > details.item')];
+  let cards=[...d.querySelectorAll('#cats > details.item')];
   add(cards.length>1,'Categorias disponíveis para movimentação',`${cards.length} categoria(s)`);
-  const numbers=cards.map(card=>card.dataset.categoryNumber||'');
-  const expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
+  let numbers=cards.map(card=>card.dataset.categoryNumber||'');
+  let expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
   add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração sequencial preservada',numbers.join(', '));
   const controls=cards.map(card=>[...card.querySelectorAll('[data-c9-move-category]')]);
   add(controls.every(group=>group.length===2),'Controles ↑/↓ em todas as categorias',controls.map(x=>x.length).join(', '));
@@ -48,6 +49,42 @@ function run(){
   const ids=cards.map(card=>card.dataset.categoryId||'').filter(Boolean);
   add(ids.length===cards.length&&new Set(ids).size===ids.length,'IDs das categorias únicos e preserváveis',`${ids.length}/${cards.length}`);
   add(typeof w.SinCityOrdering?.moveCategory==='function','API de movimentação disponível','moveCategory disponível');
+  const idInputs=[...d.querySelectorAll('#cats > details.item input[data-cat][data-k="id"]')];
+  add(idInputs.length===cards.length&&idInputs.every(input=>!input.readOnly),'IDs internos editáveis com validação',`${idInputs.length}/${cards.length}`);
+  const codeInputs=[...d.querySelectorAll('#cats > details.item input[data-cat][data-k="code"]')];
+  add(codeInputs.length===cards.length&&codeInputs.every(input=>input.readOnly),'Código continua automático/somente leitura',`${codeInputs.length}/${cards.length}`);
+
+  if(cards.length>=3){
+   const original=getCategoryIds(w);
+   const from=cards.length-1;
+   const movingId=original[from];
+   const firstMove=w.SinCityOrdering.moveCategory(from,-1,{notify:false});
+   const secondMove=w.SinCityOrdering.moveCategory(from-1,-1,{notify:false});
+   const afterTwo=getCategoryIds(w);
+   add(firstMove?.moved&&secondMove?.moved&&afterTwo[from-2]===movingId,'Movimentos repetidos funcionam','última categoria subiu duas posições seguidas');
+
+   cards=[...d.querySelectorAll('#cats > details.item')];
+   numbers=cards.map(card=>card.dataset.categoryNumber||'');
+   expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
+   add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração continua correta após múltiplos movimentos',numbers.join(', '));
+
+   const movedCard=cards.find(card=>card.dataset.categoryId===movingId);
+   const movedIndex=cards.indexOf(movedCard);
+   const subNums=movedCard?[...movedCard.querySelectorAll(':scope > .sub-list > details.subitem')].map(sub=>sub.dataset.subcategoryNumber||''):[];
+   const subExpected=subNums.map((_,si)=>`${String(movedIndex+1).padStart(2,'0')}.${String(si+1).padStart(2,'0')}`);
+   add(JSON.stringify(subNums)===JSON.stringify(subExpected),'Subcategorias renumeram junto com a categoria',subNums.slice(0,8).join(', ')||'sem subcategorias');
+
+   const backOne=w.SinCityOrdering.moveCategory(movedIndex,1,{notify:false});
+   const backTwo=w.SinCityOrdering.moveCategory(movedIndex+1,1,{notify:false});
+   const restored=getCategoryIds(w);
+   add(backOne?.moved&&backTwo?.moved&&JSON.stringify(restored)===JSON.stringify(original),'Movimento inverso restaura a ordem original','subiu e desceu sem travar');
+  }else{
+   add(true,'Movimentos repetidos funcionam','não aplicável com menos de 3 categorias');
+   add(true,'Numeração continua correta após múltiplos movimentos','não aplicável');
+   add(true,'Subcategorias renumeram junto com a categoria','não aplicável');
+   add(true,'Movimento inverso restaura a ordem original','não aplicável');
+  }
+
   const subs=[...d.querySelectorAll('#cats > details.item .subitem[data-subcategory-number]')];
   add(subs.every(sub=>/^\d{2}\.\d{2}$/.test(sub.dataset.subcategoryNumber||'')),'Numeração de subcategorias preservada',`${subs.length} subcategoria(s)`);
   add(typeof w.sendPreview==='function'&&typeof w.publish==='function','Prévia e publicação preservadas','funções existentes; publicação não executada');
