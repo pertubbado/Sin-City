@@ -26,6 +26,7 @@ async function run(){
   add(loaded,'Studio e camadas carregadas',loaded?'pronto':'tempo esgotado');
   const e=w.SinCityReorderEngine;
   add(e?.version==='C10.0.2','Motor C10.0.2 disponível',e?.version||'ausente');
+  add(typeof e?.getData==='function','Acesso isolado aos dados disponível');
   add(typeof e?.reorderArray==='function','Helper reorderArray disponível');
   add(typeof e?.moveCategoryTo==='function'&&typeof e?.moveSubcategoryTo==='function','APIs estruturais disponíveis');
   add(typeof e?.moveDirectRuleTo==='function'&&typeof e?.moveNestedRuleTo==='function','APIs de regras disponíveis');
@@ -40,7 +41,9 @@ async function run(){
   add(!e.reorderArray(a,0,99).moved,'Rejeita destino fora do limite');
   add(!e.reorderArray(a,1,1).moved,'Mesmo índice não cria movimento');
 
-  const data=w.data;const original=JSON.stringify(data);
+  const data=e.getData();
+  add(Boolean(data?.categories),'Dados atuais acessíveis pelo motor');
+  const original=JSON.stringify(data);
   section='03 · Categoria';
   if(data.categories.length>1){
    const first=data.categories[0],id=first.id;const result=e.moveCategoryTo(0,data.categories.length-1,{notify:false,preview:false});await wait();
