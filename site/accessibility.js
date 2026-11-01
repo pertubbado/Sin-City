@@ -116,6 +116,14 @@ window.SinCityAccessibility=(function(){
   return true;
  }
 
+ function loadOrderingLayer(){
+  if(!document.getElementById('panel-rules')||window.SinCityOrdering||document.querySelector('script[data-sin-city-ordering]'))return;
+  const script=document.createElement('script');
+  script.src='./c9-ordering.js';
+  script.dataset.sinCityOrdering='C9.0.2';
+  document.head.appendChild(script);
+ }
+
  function refresh(){
   ensureStudioControlNames();
   setupToast();
@@ -131,6 +139,7 @@ window.SinCityAccessibility=(function(){
 
  function boot(){
   refresh();
+  loadOrderingLayer();
   const observer=new MutationObserver(scheduleRefresh);
   observer.observe(document.documentElement,{childList:true,subtree:true});
  }
