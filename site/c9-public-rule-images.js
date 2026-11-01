@@ -22,7 +22,6 @@
       .rule-image-figure{margin:0;min-width:0;overflow:hidden;border:1px solid color-mix(in srgb,var(--custom-edge-color,var(--accent-light)) 42%,transparent);border-radius:14px;background:color-mix(in srgb,var(--surface) 86%,#000);box-shadow:0 10px 28px #0002}
       .rule-image-figure img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#09090b;cursor:zoom-in}
       .rule-image-gallery[data-count="1"] .rule-image-figure img{max-height:560px}
-      .rule-image-caption{display:block;padding:8px 10px;color:var(--muted);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase}
       .rule-image-lightbox[hidden]{display:none!important}
       .rule-image-lightbox{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:rgba(0,0,0,.88);backdrop-filter:blur(8px)}
       .rule-image-lightbox img{display:block;max-width:min(1400px,94vw);max-height:88vh;object-fit:contain;border-radius:14px;box-shadow:0 25px 90px #000}
@@ -63,7 +62,7 @@
   function galleryMarkup(images, rule) {
     if (!images.length) return '';
     const title = String(rule?.title || 'Regra');
-    return `<div class="rule-image-gallery" data-count="${images.length}" aria-label="Imagens da regra ${escapeHtml(title)}">${images.map((src, index) => `<figure class="rule-image-figure"><img src="${escapeHtml(src)}" alt="Imagem ${index + 1} da regra ${escapeHtml(title)}" loading="lazy" data-rule-lightbox-src="${escapeHtml(src)}"><figcaption class="rule-image-caption">Imagem ${index + 1} de ${images.length}</figcaption></figure>`).join('')}</div>`;
+    return `<div class="rule-image-gallery" data-count="${images.length}" aria-label="Imagens da regra ${escapeHtml(title)}">${images.map((src, index) => `<figure class="rule-image-figure"><img src="${escapeHtml(src)}" alt="Imagem ${index + 1} da regra ${escapeHtml(title)}" loading="lazy" data-rule-lightbox-src="${escapeHtml(src)}"></figure>`).join('')}</div>`;
   }
 
   function escapeHtml(value) {
