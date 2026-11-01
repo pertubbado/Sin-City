@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.3 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.8fr) minmax(620px,1.4fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px}button{padding:7px 10px}iframe{width:100%;height:850px;border:1px solid #34373d;border-radius:12px;background:#000}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:760px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="grid">
+  <section class="card">
+   <h1>C9.0.3 — IDs únicos e permanentes</h1>
+   <p class="muted">Runner somente leitura. Não conecta GitHub, não publica e não executa API de escrita.</p>
+   <button id="run">Executar novamente</button>
+   <div id="summary" class="status">Aguardando o Studio…</div>
+   <div id="results"></div>
+  </section>
+  <section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.3"></iframe></section>
+ </div>
+</div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function values(nodes){return nodes.map(node=>String(node.value||''));}
+function unique(items){return new Set(items).size===items.length;}
+function run(){
+ const w=frame.contentWindow,d=frame.contentDocument;const checks=[];
+ const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(w.SinCityOrdering?.version==='C9.0.3','Módulo C9.0.3 carregado',w.SinCityOrdering?.version||'ausente');
+
+  const cards=[...d.querySelectorAll('#cats > details.item')];
+  const categoryIds=values(cards.map(card=>card.querySelector(':scope input[data-cat][data-k="id"]')).filter(Boolean));
+  add(cards.length>0&&categoryIds.length===cards.length,'IDs de categoria encontrados',`${categoryIds.length}/${cards.length}`);
+  add(categoryIds.every(id=>id&&!/^nova-categoria$/i.test(id))&&unique(categoryIds),'IDs de categoria válidos e únicos',categoryIds.slice(-4).join(' · '));
+
+  const catIdInputs=cards.map(card=>card.querySelector(':scope input[data-cat][data-k="id"]')).filter(Boolean);
+  add(catIdInputs.every(input=>input.readOnly&&input.getAttribute('aria-readonly')==='true'&&input.dataset.internalId==='true'),'IDs de categoria somente leitura','identidade interna protegida');
+
+  const subInputs=[...d.querySelectorAll('#cats > details.item .sub-list details.subitem input[data-sub][data-k="id"]')];
+  const subIds=values(subInputs);
+  add(subIds.every(id=>id&&!/^nova-subcategoria$/i.test(id))&&unique(subIds),'IDs de subcategoria válidos e únicos',`${subIds.length} subcategoria(s)`);
+  add(subInputs.every(input=>input.readOnly&&input.getAttribute('aria-readonly')==='true'&&input.dataset.internalId==='true'),'IDs de subcategoria somente leitura','identidade interna protegida');
+
+  const beforeCat=[...categoryIds],beforeSub=[...subIds];
+  w.SinCityOrdering?.refresh?.({preview:false});
+  w.SinCityOrdering?.refresh?.({preview:false});
+  const afterCat=values(cards.map(card=>card.querySelector(':scope input[data-cat][data-k="id"]')).filter(Boolean));
+  const afterSub=values(subInputs);
+  add(JSON.stringify(beforeCat)===JSON.stringify(afterCat)&&JSON.stringify(beforeSub)===JSON.stringify(afterSub),'IDs permanecem estáveis após refresh','nenhum ID regenerado');
+
+  const catNumbers=cards.map(card=>card.dataset.categoryNumber||'');
+  const expectedCats=cards.map((_,i)=>String(i+1).padStart(2,'0'));
+  add(JSON.stringify(catNumbers)===JSON.stringify(expectedCats),'C9.0.2 preservada: categorias sequenciais',catNumbers.join(', '));
+
+  let subNumberOk=true;
+  cards.forEach((card,ci)=>[...card.querySelectorAll(':scope > .sub-list > details.subitem')].forEach((sub,si)=>{
+   const expected=`${String(ci+1).padStart(2,'0')}.${String(si+1).padStart(2,'0')}`;
+   if(sub.dataset.subcategoryNumber!==expected)subNumberOk=false;
+  }));
+  add(subNumberOk,'C9.0.2 preservada: subcategorias sequenciais','formato XX.XX');
+
+  add(typeof w.sendPreview==='function'&&typeof w.publish==='function','Preview e publicação preservados','funções existentes; publicação não executada');
+ }catch(error){add(false,'Runner executado sem exceções',error.message||String(error));}
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1400));document.getElementById('run').addEventListener('click',run);
+</script>
+</body>
+</html>
