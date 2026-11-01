@@ -432,7 +432,7 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
   }
 
   function showPage(selector, scrollToTop = true) {
-    $('.page').forEach(page => page.classList.toggle('active', `#${page.id}` === selector));
+    $$('.page').forEach(page => page.classList.toggle('active', `#${page.id}` === selector));
     if (scrollToTop) {
       window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
     }
