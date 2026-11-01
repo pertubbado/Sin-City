@@ -7,6 +7,7 @@
   let cursorConfig = { enabled:false, trailEnabled:false, color:'#2D1243', count:16 };
   let cursorListenersAttached = false;
   let categoryObserver = null;
+  let activeRuleSyncFrame = 0;
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   const touchPointer = window.matchMedia?.('(hover: none), (pointer: coarse)').matches ?? false;
 
@@ -375,11 +376,12 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
   }
 
   function setActiveNavigation(route) {
-    $$('.nav-category').forEach(button => {
+    setActiveRule('');
+    $('.nav-category').forEach(button => {
       const active = button.dataset.categoryNav === state.categoryId && route === 'category';
       button.classList.toggle('active', active);
     });
-    $$('.nav-group').forEach(group => {
+    $('.nav-group').forEach(group => {
       const isCurrent = group.dataset.navGroup === state.categoryId && route === 'category';
       if (isCurrent) setCategoryExpanded(group, true);
     });
@@ -410,7 +412,20 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
       if (!category) return;
       state.categoryId = id; renderCategory(category); showPage('#categoryPage'); setActiveNavigation('category');
       if (!replace) history.pushState({route}, '', `#categoria/${encodeURIComponent(id)}`);
-      if (targetRule) requestAnimationFrame(() => document.getElementById(targetRule)?.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'}));
+      if (targetRule) {
+        setActiveRule(targetRule);
+        requestAnimationFrame(() => {
+          const target = document.getElementById(targetRule);
+          if (target) {
+            target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
+            setActiveRule(targetRule);
+          } else {
+            scheduleActiveRuleSync();
+          }
+        });
+      } else {
+        scheduleActiveRuleSync();
+      }
     }
     closeMobileNav();
   }
@@ -614,18 +629,61 @@ function setupAmbientParticles(config = {}) {
     host.appendChild(particle);
   }
 }
+  function setActiveRule(ruleId) {
+    $('.nav-rule-link').forEach(button => {
+      const active = Boolean(ruleId)
+        && button.dataset.navCategory === state.categoryId
+        && button.dataset.navRule === ruleId;
+      button.classList.toggle('active', active);
+    });
+  }
+
+  function syncActiveRule() {
+    if (!state.categoryId || !$('#categoryPage')?.classList.contains('active')) return;
+    const cards = $('.rule-card');
+    if (!cards.length) {
+      setActiveRule('');
+      return;
+    }
+
+    // A mesma linha visual determina o item ativo, sem depender da ordem dos eventos do observer.
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+    const activationLine = Math.min(Math.max(viewportHeight * 0.24, 96), 220);
+    let activeCard = cards[0];
+
+    for (const card of cards) {
+      if (card.getBoundingClientRect().top <= activationLine) activeCard = card;
+      else break;
+    }
+
+    setActiveRule(activeCard.id);
+  }
+
+  function scheduleActiveRuleSync() {
+    if (activeRuleSyncFrame) return;
+    activeRuleSyncFrame = window.requestAnimationFrame(() => {
+      activeRuleSyncFrame = 0;
+      syncActiveRule();
+    });
+  }
+
   function observeRules() {
     categoryObserver?.disconnect();
     categoryObserver = null;
-    const cards = $$('.rule-card');
-    if (!cards.length || !('IntersectionObserver' in window)) return;
-    categoryObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        $$('.nav-rule-link').forEach(button => button.classList.toggle('active', button.dataset.navRule === entry.target.id));
-      });
-    }, {rootMargin:'-16% 0px -70% 0px'});
-    cards.forEach(card => categoryObserver.observe(card));
+    const cards = $('.rule-card');
+    if (!cards.length) {
+      setActiveRule('');
+      return;
+    }
+
+    if ('IntersectionObserver' in window) {
+      categoryObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) scheduleActiveRuleSync();
+      }, {rootMargin:'-16% 0px -70% 0px'});
+      cards.forEach(card => categoryObserver.observe(card));
+    }
+
+    scheduleActiveRuleSync();
   }
 
   function closeMobileNav() {
@@ -714,6 +772,8 @@ $('#searchInput')?.addEventListener('keydown', event => {
   });
   window.addEventListener('popstate', handleHash);
   window.addEventListener('hashchange', handleHash);
+  window.addEventListener('scroll', scheduleActiveRuleSync, {passive:true});
+  window.addEventListener('resize', scheduleActiveRuleSync, {passive:true});
 
   // O editor visual envia dados temporários para a prévia do iframe, sem gravar nada no visitante.
   window.addEventListener('message', event => {
