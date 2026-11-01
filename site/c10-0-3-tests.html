@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C10.0.3 Drag de Categorias</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.9fr) minmax(650px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}.group{margin:15px 0 7px;font-size:12px;letter-spacing:.08em;color:#c9cdd3;text-transform:uppercase}iframe{width:100%;height:840px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C10.0.3 — Drag de categorias</h1><p class="muted">Valida a camada visual de arraste de categorias sem publicar. Testa handles, cálculo de destino, fallback ↑/↓ e movimentação pelo motor C10.0.2, restaurando a ordem no final.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C10.0.3"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=110)=>new Promise(r=>setTimeout(r,ms));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function group(title){return `<div class="group">${title}</div>`}
+async function ready(w){for(let i=0;i<100;i++){if(w.SinCityCategoryDrag?.version==='C10.0.3'&&w.SinCityReorderEngine?.version==='C10.0.2'&&w.SinCityOrdering&&w.document.querySelectorAll('#cats > details.item').length)return true;await wait(75)}return false}
+async function run(){
+ const w=frame.contentWindow,checks=[];let section='';
+ const add=(ok,title,detail='')=>checks.push({section,ok:Boolean(ok),title,detail});
+ try{
+  const loaded=await ready(w);section='01 · Carregamento';
+  add(loaded,'Studio e camadas C10 carregadas',loaded?'pronto':'tempo esgotado');
+  const drag=w.SinCityCategoryDrag,engine=w.SinCityReorderEngine;
+  add(drag?.version==='C10.0.3','Módulo de drag de categorias disponível',drag?.version||'ausente');
+  add(typeof drag?.computeDropIndex==='function','Helper de posição de drop disponível');
+  add(typeof engine?.moveCategoryTo==='function','Motor absoluto de categorias disponível');
+
+  section='02 · Handles e acessibilidade';
+  drag.refresh();await wait();
+  const cards=[...w.document.querySelectorAll('#cats > details.item')];
+  const handles=[...w.document.querySelectorAll('.c10-category-drag-handle')];
+  add(cards.length>0,'Há categorias para testar',String(cards.length));
+  add(handles.length===cards.length,'Cada categoria recebeu um handle',`${handles.length}/${cards.length}`);
+  add(handles.every(h=>h.draggable===true),'Todos os handles são arrastáveis');
+  add(handles.every(h=>String(h.getAttribute('aria-label')||'').includes('Arrastar')),'Handles possuem nome acessível');
+  add(handles.every(h=>h.getAttribute('aria-grabbed')==='false'),'Estado aria-grabbed inicial correto');
+
+  section='03 · Fallback preservado';
+  const up=[...w.document.querySelectorAll('[data-c9-move-category="up"]')],down=[...w.document.querySelectorAll('[data-c9-move-category="down"]')];
+  add(up.length===cards.length&&down.length===cards.length,'Botões Subir/Descer continuam presentes',`${up.length}/${down.length}`);
+  add(up[0]?.disabled===true,'Primeiro botão Subir permanece desabilitado');
+  add(down.at(-1)?.disabled===true,'Último botão Descer permanece desabilitado');
+
+  section='04 · Cálculo do drop';
+  const n=4;
+  add(drag.computeDropIndex(0,2,'before',n)===1,'Mover 0 antes do alvo 2 resolve para 1');
+  add(drag.computeDropIndex(0,2,'after',n)===2,'Mover 0 depois do alvo 2 resolve para 2');
+  add(drag.computeDropIndex(3,1,'before',n)===1,'Mover 3 antes do alvo 1 resolve para 1');
+  add(drag.computeDropIndex(3,1,'after',n)===2,'Mover 3 depois do alvo 1 resolve para 2');
+  add(drag.computeDropIndex(0,0,'before',n)===0,'Drop sobre a própria posição não desloca');
+  add(drag.computeDropIndex(-1,1,'before',n)===-1,'Índice de origem inválido é rejeitado');
+
+  section='05 · Integração com motor';
+  const data=engine.getData();const original=JSON.stringify(data);
+  if(data.categories.length>2){
+   const first=data.categories[0],id=String(first.id||''),target=Math.min(2,data.categories.length-1);
+   const result=engine.moveCategoryTo(0,target,{notify:false,preview:false});await wait(180);
+   add(result.moved,'Motor move categoria para posição absoluta',`0 → ${target}`);
+   add(data.categories[target]===first,'Objeto da categoria permanece o mesmo');
+   add(String(data.categories[target].id||'')===id,'ID da categoria permanece intacto',id);
+   drag.refresh();await wait();
+   add(w.document.querySelectorAll('.c10-category-drag-handle').length===data.categories.length,'Handles foram reconstruídos após re-render');
+   const back=engine.moveCategoryTo(target,0,{notify:false,preview:false});await wait(180);
+   add(back.moved&&data.categories[0]===first,'Categoria retorna à posição original');
+  }else add(false,'Há categorias suficientes para teste de movimento');
+
+  section='06 · Regressão final';
+  w.SinCityFlowGuard.flush();drag.refresh();await wait();
+  add(JSON.stringify(data)===original,'Estado de dados restaurado exatamente');
+  const finalCards=[...w.document.querySelectorAll('#cats > details.item')];
+  add(w.document.querySelectorAll('.c10-category-drag-handle').length===finalCards.length,'Handles continuam sincronizados no final');
+  add(w.document.querySelectorAll('[data-c9-move-category="up"]').length===finalCards.length,'Fallback ↑ continua sincronizado');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não cria sessão GitHub');
+ }catch(error){checks.push({section:section||'Erro',ok:false,title:'Runner executado sem exceções',detail:error?.message||String(error)});}
+ let html='',last='';for(const c of checks){if(c.section!==last){last=c.section;html+=group(last)}html+=row(c.ok,c.title,c.detail)}results.innerHTML=html;
+ const passed=checks.filter(x=>x.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,2400));document.getElementById('run').addEventListener('click',run);
+</script></body></html>
