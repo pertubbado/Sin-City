@@ -114,8 +114,16 @@ window.SinCityFlowGuard=(function(){
   }
  }
 
+ function loadPersistenceLayer(){
+  if(window.SinCityPersistence||document.querySelector('script[data-sin-city-persistence]'))return;
+  const script=document.createElement('script');
+  script.src='./c9-persistence.js';
+  script.dataset.sinCityPersistence='C9.0.9';
+  document.head.appendChild(script);
+ }
+
  function install(){
-  if(installed)return true;
+  if(installed){loadPersistenceLayer();return true;}
   if(typeof window.sendPreview!=='function'||!orderingReady())return false;
 
   originalSendPreview=window.sendPreview;
@@ -129,6 +137,7 @@ window.SinCityFlowGuard=(function(){
   installed=true;
   flush();
   document.documentElement.dataset.sinCityFlowGuard=VERSION;
+  loadPersistenceLayer();
   return true;
  }
 

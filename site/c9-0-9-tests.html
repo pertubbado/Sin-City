@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.9 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.9fr) minmax(620px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}iframe{width:100%;height:830px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="grid">
+<section class="card">
+<h1>C9.0.9 — Persistência</h1>
+<p class="muted">Testa rascunho, recarga do rascunho, backup JSON e contrato de publicação. Não conecta ao GitHub e não publica.</p>
+<button id="run">Executar novamente</button>
+<div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div>
+</section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.9"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=80)=>new Promise(resolve=>setTimeout(resolve,ms));
+const cards=d=>[...d.querySelectorAll('#cats > details.item')];
+const subs=card=>card?[...card.querySelectorAll(':scope > .sub-list > details.subitem')]:[];
+const findCard=(d,id)=>cards(d).find(card=>String(card.dataset.categoryId||'')===String(id||''));
+const findIndex=(d,id)=>cards(d).findIndex(card=>String(card.dataset.categoryId||'')===String(id||''));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function allIds(d){return cards(d).flatMap(card=>[card.dataset.categoryId,...subs(card).map(sub=>sub.dataset.subcategoryId)]).filter(Boolean);}
+async function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ const originalConfirm=w.confirm;
+ const originalDraft=w.localStorage.getItem('sin-city-editor-draft');
+ let tempId='';
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(w.SinCityFlowGuard?.version==='C9.0.8','Política de códigos C9.0.8 preservada',w.SinCityFlowGuard?.version||'ausente');
+  add(w.SinCityPersistence?.version==='C9.0.9','Camada C9.0.9 carregada',w.SinCityPersistence?.version||'ausente');
+  add(Boolean(w.SinCityPersistence?.isInstalled?.()),'Guarda de persistência instalada',String(w.SinCityPersistence?.isInstalled?.()));
+  add(d.documentElement.dataset.sinCityPersistence==='C9.0.9','Documento marcado com C9.0.9',d.documentElement.dataset.sinCityPersistence||'ausente');
+
+  const originalIds=cards(d).map(card=>String(card.dataset.categoryId||''));
+  const originalCount=originalIds.length;
+  d.getElementById('addCat')?.click();await wait();
+  let temp=cards(d).at(-1);tempId=String(temp?.dataset.categoryId||'');
+  add(Boolean(tempId)&&tempId!=='nova-categoria','Categoria temporária recebe ID definitivo',tempId||'ausente');
+
+  temp?.querySelector('[data-add-rule]')?.click();await wait();
+  temp=findCard(d,tempId);
+  let directCode=temp?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  if(directCode){directCode.value='PERSISTE-C9-09';directCode.dispatchEvent(new Event('input',{bubbles:true}));await wait();}
+  add(directCode?.value==='PERSISTE-C9-09','Código manual preparado para persistência',directCode?.value||'ausente');
+
+  temp?.querySelector('[data-add-sub]')?.click();await wait();
+  temp=findCard(d,tempId);let sub=subs(temp)[0];
+  sub?.querySelector('[data-add-sub-rule]')?.click();await wait(120);
+  temp=findCard(d,tempId);sub=subs(temp)[0];
+  let nestedCode=sub?.querySelector(':scope > .rule input[data-sub-rule][data-k="code"]');
+  const initialNested=String(sub?.dataset.subcategoryNumber||'');
+  add(nestedCode?.value===initialNested,'Código automático preparado para persistência',nestedCode?.value||'ausente');
+
+  let up=temp?.querySelector('[data-c9-move-category="up"]');up?.click();await wait();
+  up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(120);
+  temp=findCard(d,tempId);sub=subs(temp)[0];nestedCode=sub?.querySelector(':scope > .rule input[data-sub-rule][data-k="code"]');
+  const movedNumber=String(sub?.dataset.subcategoryNumber||'');
+  add(findIndex(d,tempId)===originalCount-2,'Ordem modificada antes de persistir',`posição=${findIndex(d,tempId)+1}`);
+  add(nestedCode?.value===movedNumber,'Código automático normalizado antes de persistir',nestedCode?.value||'ausente');
+  directCode=temp?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  add(directCode?.value==='PERSISTE-C9-09','Código manual preservado antes de persistir',directCode?.value||'ausente');
+
+  const expected=w.SinCityPersistence.snapshotData();
+  const expectedDigest=w.SinCityPersistence.structuralDigest(expected);
+  add(Boolean(expected),'Snapshot estrutural disponível','snapshotData');
+
+  d.getElementById('draftBtn')?.click();await wait();
+  const draft=w.SinCityPersistence.draftSnapshot();
+  add(Boolean(draft?.data),'Rascunho salvo com dados','sin-city-editor-draft');
+  add(w.SinCityPersistence.equivalent(expected,draft),'Rascunho preserva ordem, IDs e códigos','digest estrutural idêntico');
+  const draftIds=(draft?.data?.categories||[]).flatMap(c=>[c.id,...(c.subcategories||[]).map(s=>s.id)]).filter(Boolean);
+  add(new Set(draftIds).size===draftIds.length,'Rascunho preserva IDs únicos',`${new Set(draftIds).size}/${draftIds.length}`);
+
+  directCode=findCard(d,tempId)?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  if(directCode){directCode.value='ALTERADO-DEPOIS';directCode.dispatchEvent(new Event('input',{bubbles:true}));await wait();}
+  add(directCode?.value==='ALTERADO-DEPOIS','Estado em memória alterado após salvar','mudança temporária');
+  await w.load(false);await wait(220);
+  add(w.SinCityPersistence.equivalent(expected,w.SinCityPersistence.snapshotData()),'Carregar rascunho restaura estrutura salva','ordem/IDs/códigos restaurados');
+  directCode=findCard(d,tempId)?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  add(directCode?.value==='PERSISTE-C9-09','Código manual volta corretamente pelo rascunho',directCode?.value||'ausente');
+
+  let capturedBlob=null;
+  const originalCreate=w.URL.createObjectURL;
+  const originalAnchorClick=w.HTMLAnchorElement.prototype.click;
+  w.URL.createObjectURL=function(blob){capturedBlob=blob;return originalCreate.call(this,blob);};
+  w.HTMLAnchorElement.prototype.click=function(){};
+  try{d.getElementById('backupBtn')?.click();await wait(120);}finally{w.URL.createObjectURL=originalCreate;w.HTMLAnchorElement.prototype.click=originalAnchorClick;}
+  add(Boolean(capturedBlob),'Backup gera Blob JSON','blob capturado localmente');
+  const backupPayload=capturedBlob?JSON.parse(await capturedBlob.text()):null;
+  add(Boolean(backupPayload?.data),'Backup contém data','payload.data presente');
+  add(w.SinCityPersistence.equivalent(expected,backupPayload),'Backup preserva ordem, IDs e códigos','round-trip JSON idêntico');
+  const backupRoundTrip=backupPayload?JSON.parse(JSON.stringify(backupPayload)):null;
+  add(w.SinCityPersistence.equivalent(backupPayload,backupRoundTrip),'Backup suporta round-trip JSON sem perda','serializar → parsear');
+
+  const publishSource=String(w.publish||'');
+  add(typeof w.publish==='function','Função de publicação preservada','publish disponível');
+  add(/JSON\.stringify\(data/.test(publishSource),'Publicação serializa o data atual','JSON.stringify(data)');
+  add((publishSource.match(/createBlob\(rulesText\)/g)||[]).length>=2,'Publicação cria os dois blobs de regras com o mesmo rulesText','rules.json + content/rules.json');
+  add(/RULES_PATH/.test(publishSource)&&/CONTENT_RULES_PATH/.test(publishSource),'Publicação mantém os dois destinos oficiais de regras','dois paths presentes');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não conecta GitHub','nenhum token criado pelo teste');
+
+  w.confirm=()=>true;
+  findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait(130);
+  const restored=cards(d).map(card=>String(card.dataset.categoryId||''));
+  add(JSON.stringify(restored)===JSON.stringify(originalIds),'Limpeza restaura categorias originais','ordem original restaurada');
+  add(!allIds(d).includes(tempId),'Categoria temporária removida completamente',tempId);
+  add(new Set(allIds(d)).size===allIds(d).length,'IDs permanecem únicos após o ciclo completo',`${new Set(allIds(d)).size}/${allIds(d).length}`);
+ }catch(error){add(false,'Runner executado sem exceções',error?.message||String(error));}
+ finally{
+  w.confirm=originalConfirm;
+  if(tempId&&findCard(d,tempId)){
+   try{w.confirm=()=>true;findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait();}catch{}
+   w.confirm=originalConfirm;
+  }
+  try{
+   if(originalDraft===null)w.localStorage.removeItem('sin-city-editor-draft');
+   else w.localStorage.setItem('sin-city-editor-draft',originalDraft);
+  }catch{}
+ }
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,2100));document.getElementById('run').addEventListener('click',run);
+</script>
+</body>
+</html>
