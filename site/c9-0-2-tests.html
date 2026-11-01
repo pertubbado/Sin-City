@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.2 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1100px;margin:auto;padding:24px}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px;margin-bottom:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px}iframe{width:100%;height:720px;border:1px solid #34373d;border-radius:12px;background:#000}@media(max-width:850px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="card">
+  <h1>C9.0.2 — Motor de numeração automática</h1>
+  <p class="muted">Runner somente leitura. Não conecta GitHub, não publica e não altera arquivos do repositório.</p>
+  <button id="run">Executar novamente</button>
+  <div id="summary" class="status">Aguardando o Studio…</div>
+  <div id="results"></div>
+ </div>
+ <div class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.2"></iframe></div>
+</div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function run(){
+ const w=frame.contentWindow,d=frame.contentDocument;const checks=[];
+ const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(Boolean(w.SinCityOrdering),'Módulo C9.0.2 carregado',w.SinCityOrdering?.version||'ausente');
+  const cards=[...d.querySelectorAll('#cats > details.item')];
+  add(cards.length>0,'Categorias encontradas',`${cards.length} categoria(s)`);
+  const numbers=cards.map(card=>card.dataset.categoryNumber||'');
+  const expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
+  add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração das categorias sequencial',numbers.join(', '));
+  const codeInputs=[...d.querySelectorAll('#cats > details.item input[data-k="code"]')];
+  add(codeInputs.length===cards.length&&codeInputs.every((input,i)=>input.readOnly&&input.value===expected[i]),'Código da categoria automático e somente leitura',`${codeInputs.length}/${cards.length}`);
+  let subOk=true,subCount=0,subPreview=[];
+  cards.forEach((card,ci)=>{
+   [...card.querySelectorAll(':scope > .sub-list > details.subitem')].forEach((sub,si)=>{
+    subCount++;const expectedSub=`${String(ci+1).padStart(2,'0')}.${String(si+1).padStart(2,'0')}`;
+    const actual=sub.dataset.subcategoryNumber||'';if(actual!==expectedSub)subOk=false;if(subPreview.length<12)subPreview.push(actual);
+   });
+  });
+  add(subCount===0||subOk,'Numeração das subcategorias sequencial',subCount?subPreview.join(', '):'Nenhuma subcategoria encontrada');
+  add(typeof w.sendPreview==='function','Prévia do editor preservada','sendPreview disponível');
+  add(typeof w.publish==='function','Fluxo de publicação preservado','função existente; não foi executada');
+ }catch(error){add(false,'Runner executado sem exceções',error.message||String(error));}
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1200));document.getElementById('run').addEventListener('click',run);
+</script>
+</body>
+</html>
