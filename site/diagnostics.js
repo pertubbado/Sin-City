@@ -1,3 +1,3 @@
-/* Sin City C8.0.7 — loader síncrono: preserva o diagnóstico original e ativa acessibilidade. */
+/* Sin City C8.0.7 + C9.0.13 — loader síncrono dos módulos do Studio. */
 'use strict';
-document.write('<script src="./diagnostics-core.js"><\/script><script src="./accessibility.js"><\/script>');
+document.write('<script src="./diagnostics-core.js"><\/script><script src="./accessibility.js"><\/script><script src="./c9-rule-images.js"><\/script>');
