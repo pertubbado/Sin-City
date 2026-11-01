@@ -124,6 +124,14 @@ window.SinCityAccessibility=(function(){
   document.head.appendChild(script);
  }
 
+ function loadFlowGuardLayer(){
+  if(!document.getElementById('panel-rules')||window.SinCityFlowGuard||document.querySelector('script[data-sin-city-flow-guard]'))return;
+  const script=document.createElement('script');
+  script.src='./c9-flow-guard.js';
+  script.dataset.sinCityFlowGuard='C9.0.7';
+  document.head.appendChild(script);
+ }
+
  function loadPublicOrderingLayer(){
   if(!document.getElementById('nav')||window.SinCityPublicOrdering||document.querySelector('script[data-sin-city-public-ordering]'))return;
   const script=document.createElement('script');
@@ -148,6 +156,7 @@ window.SinCityAccessibility=(function(){
  function boot(){
   refresh();
   loadOrderingLayer();
+  loadFlowGuardLayer();
   loadPublicOrderingLayer();
   const observer=new MutationObserver(scheduleRefresh);
   observer.observe(document.documentElement,{childList:true,subtree:true});
