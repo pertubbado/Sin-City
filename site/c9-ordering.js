@@ -1,8 +1,8 @@
-/* Sin City C9.0.4 — numeração estrutural, IDs internos e movimentação de categorias. */
+/* Sin City C9.0.5 — numeração estrutural, IDs internos e movimentação de categorias/subcategorias. */
 'use strict';
 
 window.SinCityOrdering=(function(){
- const VERSION='C9.0.4';
+ const VERSION='C9.0.5';
  const CATEGORY_PLACEHOLDERS=new Set(['nova-categoria']);
  const SUBCATEGORY_PLACEHOLDERS=new Set(['nova-subcategoria']);
  let refreshFrame=0;
@@ -171,6 +171,10 @@ window.SinCityOrdering=(function(){
   return `${categoryNumber(index)} — ${String(category?.short||category?.name||'Categoria')}`;
  }
 
+ function subcategoryLabel(sub,categoryIndex,subcategoryIndex){
+  return `${subcategoryNumber(categoryIndex,subcategoryIndex)} — ${String(sub?.name||'Subcategoria')}`;
+ }
+
  function ensureCategoryMoveControls(card,category,categoryIndex,total){
   const actionRow=card.querySelector(':scope > .inline');
   if(!actionRow)return;
@@ -214,6 +218,55 @@ window.SinCityOrdering=(function(){
    down.style.cursor=down.disabled?'not-allowed':'';
    down.setAttribute('aria-label',`Descer categoria ${label}`);
    down.title=down.disabled?'Esta categoria já está na última posição':`Mover ${label} uma posição para baixo`;
+  }
+ }
+
+ function ensureSubcategoryMoveControls(subcard,sub,categoryIndex,subcategoryIndex,total){
+  const actionRow=subcard.querySelector(':scope > .inline');
+  if(!actionRow)return;
+  let controls=actionRow.querySelector(':scope > .c9-subcategory-move-controls');
+  if(!controls){
+   controls=document.createElement('span');
+   controls.className='c9-subcategory-move-controls inline';
+   controls.dataset.c9SubcategoryControls='true';
+
+   const up=document.createElement('button');
+   up.type='button';up.className='btn mini';up.textContent='↑ Subir';up.dataset.c9MoveSubcategory='up';
+   up.addEventListener('click',event=>{
+    event.preventDefault();event.stopPropagation();
+    moveSubcategory(Number(up.dataset.categoryIndex),Number(up.dataset.subcategoryIndex),-1);
+   });
+
+   const down=document.createElement('button');
+   down.type='button';down.className='btn mini';down.textContent='↓ Descer';down.dataset.c9MoveSubcategory='down';
+   down.addEventListener('click',event=>{
+    event.preventDefault();event.stopPropagation();
+    moveSubcategory(Number(down.dataset.categoryIndex),Number(down.dataset.subcategoryIndex),1);
+   });
+
+   controls.append(up,down);
+   actionRow.prepend(controls);
+  }
+
+  const label=subcategoryLabel(sub,categoryIndex,subcategoryIndex);
+  const up=controls.querySelector('[data-c9-move-subcategory="up"]');
+  const down=controls.querySelector('[data-c9-move-subcategory="down"]');
+  [up,down].forEach(button=>{
+   if(!button)return;
+   button.dataset.categoryIndex=String(categoryIndex);
+   button.dataset.subcategoryIndex=String(subcategoryIndex);
+  });
+  if(up){
+   up.disabled=subcategoryIndex===0;
+   up.style.cursor=up.disabled?'not-allowed':'';
+   up.setAttribute('aria-label',`Subir subcategoria ${label}`);
+   up.title=up.disabled?'Esta subcategoria já está na primeira posição':`Mover ${label} uma posição para cima`;
+  }
+  if(down){
+   down.disabled=subcategoryIndex===total-1;
+   down.style.cursor=down.disabled?'not-allowed':'';
+   down.setAttribute('aria-label',`Descer subcategoria ${label}`);
+   down.title=down.disabled?'Esta subcategoria já está na última posição':`Mover ${label} uma posição para baixo`;
   }
  }
 
@@ -287,6 +340,7 @@ window.SinCityOrdering=(function(){
      if(subSummary.textContent!==next)subSummary.textContent=next;
     }
     configureInternalIdInput(subcard.querySelector('input[data-sub][data-k="id"]'),sub.id,'ID interno da subcategoria / rota (editável)');
+    ensureSubcategoryMoveControls(subcard,sub,categoryIndex,subcategoryIndex,subcards.length);
    });
   });
  }
@@ -325,6 +379,18 @@ window.SinCityOrdering=(function(){
   return true;
  }
 
+ function moveSubcardInDom(categoryIndex,from,to){
+  const card=[...document.querySelectorAll('#cats > details.item')][categoryIndex];
+  const list=card?.querySelector(':scope > .sub-list');
+  if(!list)return false;
+  const subcards=[...list.querySelectorAll(':scope > details.subitem')];
+  const moved=subcards[from];
+  const target=subcards[to];
+  if(!moved||!target)return false;
+  if(to<from)target.before(moved);else target.after(moved);
+  return true;
+ }
+
  function moveCategory(index,direction,options={}){
   const current=getData();
   const step=direction<0?-1:direction>0?1:0;
@@ -358,6 +424,44 @@ window.SinCityOrdering=(function(){
   return result;
  }
 
+ function moveSubcategory(categoryIndex,subcategoryIndex,direction,options={}){
+  const current=getData();
+  const ci=Number(categoryIndex);
+  const from=Number(subcategoryIndex);
+  const step=direction<0?-1:direction>0?1:0;
+  if(!current||!step||!Number.isInteger(ci)||!Number.isInteger(from))return {moved:false,reason:'invalid'};
+  const category=current.categories[ci];
+  const subs=category?.subcategories;
+  if(!Array.isArray(subs))return {moved:false,reason:'invalid-category'};
+  const to=from+step;
+  if(from<0||from>=subs.length||to<0||to>=subs.length)return {moved:false,reason:'boundary'};
+
+  normalizeCategories();
+  const movedObject=subs[from];
+  const movedId=String(movedObject?.id||'');
+  const [moved]=subs.splice(from,1);
+  subs.splice(to,0,moved);
+
+  const domMoved=moveSubcardInDom(ci,from,to);
+  if(!domMoved){
+   try{if(typeof renderRules==='function')renderRules();}catch{}
+   try{if(typeof bindEditor==='function')bindEditor();}catch{}
+  }
+  updateRuleDomIndexes();
+  updateEditorLabels(current.categories);
+
+  const categoryCard=[...document.querySelectorAll('#cats > details.item')][ci];
+  const movedSubcard=[...categoryCard?.querySelectorAll(':scope > .sub-list > details.subitem')||[]].find(subcard=>subcard.dataset.subcategoryId===movedId);
+  if(categoryCard)categoryCard.open=true;
+  if(movedSubcard)movedSubcard.open=true;
+  try{if(typeof sendPreview==='function')sendPreview();}catch{}
+
+  const position=subcategoryNumber(ci,to);
+  const result={moved:true,categoryIndex:ci,from,to,position,id:movedId};
+  if(options.notify!==false)showOrderingToast(`✓ Subcategoria movida para ${position} — numeração reorganizada automaticamente.`);
+  return result;
+ }
+
  function scheduleRefresh(){
   if(refreshFrame)return;
   refreshFrame=requestAnimationFrame(()=>{
@@ -382,5 +486,5 @@ window.SinCityOrdering=(function(){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
  else boot();
 
- return {version:VERSION,categoryNumber,subcategoryNumber,normalizeCategories,normalizeIds,moveCategory,refresh};
+ return {version:VERSION,categoryNumber,subcategoryNumber,normalizeCategories,normalizeIds,moveCategory,moveSubcategory,refresh};
 })();

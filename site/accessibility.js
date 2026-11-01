@@ -120,7 +120,7 @@ window.SinCityAccessibility=(function(){
   if(!document.getElementById('panel-rules')||window.SinCityOrdering||document.querySelector('script[data-sin-city-ordering]'))return;
   const script=document.createElement('script');
   script.src='./c9-ordering.js';
-  script.dataset.sinCityOrdering='C9.0.4';
+  script.dataset.sinCityOrdering='C9.0.5';
   document.head.appendChild(script);
  }
 
