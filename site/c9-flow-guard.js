@@ -1,8 +1,8 @@
-/* Sin City C9.0.7 — guarda síncrona para criar/excluir/mover sem estados intermediários inválidos. */
+/* Sin City C9.0.8 — política explícita de códigos: subcategorias automáticas, regras diretas manuais. */
 'use strict';
 
 window.SinCityFlowGuard=(function(){
- const VERSION='C9.0.7';
+ const VERSION='C9.0.8';
  let installed=false;
  let originalSendPreview=null;
  let attempts=0;
@@ -46,6 +46,7 @@ window.SinCityFlowGuard=(function(){
       codeInput.readOnly=true;
       codeInput.setAttribute('aria-readonly','true');
       codeInput.dataset.autoRuleCode='true';
+      delete codeInput.dataset.manualRuleCode;
       codeInput.title='Código automático herdado da posição estrutural da subcategoria';
       codeInput.setAttribute('aria-label','Código automático da regra');
      }
@@ -62,15 +63,53 @@ window.SinCityFlowGuard=(function(){
   return {changed,rules};
  }
 
+ function configureDirectRuleCodes(){
+  const current=getData();
+  if(!current)return {rules:0};
+  let rules=0;
+  const categoryCards=[...document.querySelectorAll('#cats > details.item')];
+
+  current.categories.forEach((category,categoryIndex)=>{
+   const directRules=Array.isArray(category?.rules)?category.rules:[];
+   const categoryCard=categoryCards[categoryIndex];
+   const ruleCards=[...categoryCard?.querySelectorAll(':scope > .direct-list > .rule')||[]];
+
+   directRules.forEach((rule,ruleIndex)=>{
+    if(!rule||typeof rule!=='object')return;
+    rules++;
+    const ruleCard=ruleCards[ruleIndex];
+    if(!ruleCard)return;
+    const codeInput=ruleCard.querySelector('input[data-rule][data-k="code"]');
+    if(!codeInput)return;
+    codeInput.readOnly=false;
+    codeInput.removeAttribute('aria-readonly');
+    codeInput.dataset.manualRuleCode='true';
+    delete codeInput.dataset.autoRuleCode;
+    codeInput.title='Código manual da regra direta. Não muda quando a categoria é reorganizada.';
+    codeInput.setAttribute('aria-label','Código manual da regra direta');
+   });
+  });
+
+  document.documentElement.dataset.sinCityManualDirectRuleCodes='true';
+  return {rules};
+ }
+
+ function syncRuleCodePolicy(){
+  const nested=syncNestedRuleCodes();
+  const direct=configureDirectRuleCodes();
+  document.documentElement.dataset.sinCityRuleCodePolicy=VERSION;
+  return {nested,direct};
+ }
+
  function flush(){
   if(!orderingReady())return false;
   try{
    window.SinCityOrdering.refresh({preview:false});
-   const codes=syncNestedRuleCodes();
+   syncRuleCodePolicy();
    document.documentElement.dataset.sinCityFlowGuard=VERSION;
    return true;
   }catch(error){
-   console.warn('[Sin City C9.0.7] Falha ao normalizar fluxo antes da prévia.',error);
+   console.warn('[Sin City C9.0.8] Falha ao aplicar política de códigos antes da prévia.',error);
    return false;
   }
  }
@@ -111,6 +150,8 @@ window.SinCityFlowGuard=(function(){
   flush,
   install,
   syncNestedRuleCodes,
+  configureDirectRuleCodes,
+  syncRuleCodePolicy,
   isInstalled:()=>installed,
   originalSendPreview:()=>originalSendPreview
  };

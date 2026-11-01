@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.8 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.85fr) minmax(620px,1.55fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}iframe{width:100%;height:820px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C9.0.8 — Política dos códigos</h1><p class="muted">Valida lado a lado: regras de subcategoria têm código estrutural automático; regras diretas mantêm código manual mesmo após reorganizações. O teste cria uma categoria temporária e a remove ao final. Não publica.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.8"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=80)=>new Promise(r=>setTimeout(r,ms));
+const cards=d=>[...d.querySelectorAll('#cats > details.item')];
+const subs=card=>card?[...card.querySelectorAll(':scope > .sub-list > details.subitem')]:[];
+const findCard=(d,id)=>cards(d).find(card=>String(card.dataset.categoryId||'')===String(id||''));
+const findIndex=(d,id)=>cards(d).findIndex(card=>String(card.dataset.categoryId||'')===String(id||''));
+const categoryIds=d=>cards(d).map(card=>String(card.dataset.categoryId||''));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function setInput(input,value){if(!input)return;input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));}
+async function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ const oldConfirm=w.confirm;let tempId='';
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(w.SinCityOrdering?.version==='C9.0.5','Motor estrutural preservado',w.SinCityOrdering?.version||'ausente');
+  add(w.SinCityFlowGuard?.version==='C9.0.8','Política C9.0.8 carregada',w.SinCityFlowGuard?.version||'ausente');
+  add(w.sendPreview?.__sinCityFlowGuard==='C9.0.8','sendPreview protegido pela política atual',w.sendPreview?.__sinCityFlowGuard||'ausente');
+  add(typeof w.SinCityFlowGuard?.syncRuleCodePolicy==='function','API de política disponível','syncRuleCodePolicy disponível');
+
+  const existingDirect=[...d.querySelectorAll('#cats > details.item .direct-list input[data-rule][data-k="code"]')];
+  const existingSnapshot=existingDirect.map(i=>i.value);
+  w.SinCityFlowGuard.flush();await wait();
+  add(existingDirect.every(i=>!i.readOnly),'Regras diretas existentes continuam editáveis',`${existingDirect.length} campo(s)`);
+  add(existingDirect.every(i=>i.dataset.manualRuleCode==='true'),'Regras diretas existentes identificadas como manuais',`${existingDirect.filter(i=>i.dataset.manualRuleCode==='true').length}/${existingDirect.length}`);
+  add(JSON.stringify(existingDirect.map(i=>i.value))===JSON.stringify(existingSnapshot),'Flush não altera códigos diretos existentes','valores preservados');
+
+  const originalIds=categoryIds(d),originalCount=originalIds.length;
+  d.getElementById('addCat')?.click();await wait(120);
+  let temp=cards(d).at(-1);tempId=String(temp?.dataset.categoryId||'');
+  add(Boolean(tempId)&&tempId!=='nova-categoria','Categoria temporária recebe ID definitivo',tempId||'ausente');
+
+  temp.querySelector('[data-add-rule]')?.click();await wait(120);
+  temp=findCard(d,tempId);
+  let directRule=temp?.querySelector(':scope > .direct-list > .rule');
+  let directCode=directRule?.querySelector('input[data-rule][data-k="code"]');
+  add(Boolean(directRule),'Regra direta temporária criada','criada');
+  add(Boolean(directCode)&&!directCode.readOnly,'Código da regra direta nasce editável',directCode?.readOnly?'somente leitura':'editável');
+  add(directCode?.dataset.manualRuleCode==='true','Regra direta marcada como código manual',directCode?.dataset.manualRuleCode||'ausente');
+
+  const manualCode='MANUAL-C9-08';
+  setInput(directCode,manualCode);await wait(100);
+  add(directCode?.value===manualCode,'Código manual pode ser definido pelo editor',directCode?.value||'ausente');
+
+  temp.querySelector('[data-add-sub]')?.click();await wait(100);
+  temp=findCard(d,tempId);let sub=subs(temp)[0];
+  sub?.querySelector('[data-add-sub-rule]')?.click();await wait(140);
+  temp=findCard(d,tempId);sub=subs(temp)[0];
+  let nestedRule=sub?.querySelector(':scope > .rule');
+  let nestedCode=nestedRule?.querySelector('input[data-sub-rule][data-k="code"]');
+  const initialNested=String(sub?.dataset.subcategoryNumber||'');
+  add(Boolean(nestedRule),'Regra de subcategoria temporária criada','criada');
+  add(nestedCode?.value===initialNested,'Código aninhado nasce estrutural automaticamente',nestedCode?.value||'ausente');
+  add(Boolean(nestedCode?.readOnly),'Código aninhado é somente leitura','automático');
+  add(nestedCode?.dataset.autoRuleCode==='true','Regra aninhada marcada como código automático',nestedCode?.dataset.autoRuleCode||'ausente');
+
+  let up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(110);
+  up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(150);
+  temp=findCard(d,tempId);directRule=temp?.querySelector(':scope > .direct-list > .rule');directCode=directRule?.querySelector('input[data-rule][data-k="code"]');
+  sub=subs(temp)[0];nestedRule=sub?.querySelector(':scope > .rule');nestedCode=nestedRule?.querySelector('input[data-sub-rule][data-k="code"]');
+  const movedNested=String(sub?.dataset.subcategoryNumber||'');
+  add(findIndex(d,tempId)===originalCount-2,'Categoria temporária move repetidamente',`posição=${findIndex(d,tempId)+1}`);
+  add(directCode?.value===manualCode,'Mover categoria NÃO altera código da regra direta',directCode?.value||'ausente');
+  add(!directCode?.readOnly&&directCode?.dataset.manualRuleCode==='true','Regra direta permanece manual após mover','editável + manual');
+  add(nestedCode?.value===movedNested&&movedNested!==initialNested,'Mover categoria atualiza código da regra aninhada',`${initialNested} → ${nestedCode?.value||''}`);
+
+  findCard(d,tempId)?.querySelector('[data-add-sub]')?.click();await wait(100);
+  temp=findCard(d,tempId);let currentSubs=subs(temp);
+  currentSubs[1]?.querySelector('[data-c9-move-subcategory="up"]')?.click();await wait(140);
+  temp=findCard(d,tempId);currentSubs=subs(temp);
+  const originalSub=currentSubs.find(s=>s.querySelector(':scope > .rule'));
+  nestedCode=originalSub?.querySelector('input[data-sub-rule][data-k="code"]');
+  directCode=temp?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  const afterSubMove=String(originalSub?.dataset.subcategoryNumber||'');
+  add(nestedCode?.value===afterSubMove,'Mover subcategoria atualiza apenas o código automático',nestedCode?.value||'ausente');
+  add(directCode?.value===manualCode,'Mover subcategoria NÃO altera código direto',directCode?.value||'ausente');
+
+  w.SinCityFlowGuard.flush();await wait(80);
+  temp=findCard(d,tempId);directCode=temp?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  const autoInputs=[...temp.querySelectorAll('.sub-list input[data-sub-rule][data-k="code"]')];
+  add(directCode?.value===manualCode,'Refresh explícito preserva código manual','preservado');
+  add(!directCode?.readOnly,'Refresh explícito mantém código direto editável','editável');
+  add(autoInputs.every(i=>i.readOnly&&i.dataset.autoRuleCode==='true'),'Refresh mantém códigos aninhados automáticos',`${autoInputs.length} automático(s)`);
+
+  setInput(directCode,'MANUAL-FINAL');await wait(80);
+  w.SinCityFlowGuard.flush();await wait(80);
+  temp=findCard(d,tempId);directCode=temp?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');
+  add(directCode?.value==='MANUAL-FINAL','Código direto aceita nova edição após reorganizações',directCode?.value||'ausente');
+
+  w.confirm=()=>true;
+  findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait(120);
+  const restored=categoryIds(d);
+  add(restored.length===originalCount,'Categoria temporária removida ao final',`${restored.length}/${originalCount}`);
+  add(JSON.stringify(restored)===JSON.stringify(originalIds),'Ordem original restaurada','ok');
+  add(typeof w.publish==='function','Publicação preservada e não executada','publish disponível');
+ }catch(error){add(false,'Runner executado sem exceções',error?.message||String(error));}
+ finally{
+  w.confirm=oldConfirm;
+  if(tempId&&findCard(d,tempId)){
+   try{w.confirm=()=>true;findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait();}catch{}
+   w.confirm=oldConfirm;
+  }
+ }
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1900));document.getElementById('run').addEventListener('click',run);
+</script>
+</body></html>
