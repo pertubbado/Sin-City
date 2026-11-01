@@ -132,20 +132,24 @@
         <p class="dashboard-eyebrow">C8.0 · CENTRAL DE SEGURANÇA</p>
         <h2 id="diagnosticsTitle">Segurança e diagnóstico.</h2>
         <p>Uma visão organizada da integridade do Sin City, da conexão ao GitHub e da publicação do site.</p>
-        <div class="diagnostics-hero-meta"><span class="diagnostics-live-dot"></span><span>Estrutura visual preparada</span><span class="diagnostics-meta-separator">•</span><span>Verificações reais em desenvolvimento</span></div>
+        <div class="diagnostics-hero-meta"><span class="diagnostics-live-dot"></span><span>Diagnóstico local C8.0.3</span><span class="diagnostics-meta-separator">•</span><span>Somente leitura</span></div>
       </div>
       <div class="diagnostics-shield" aria-hidden="true"><span>SC</span><small>SECURITY</small></div>
     </div>
 
     <div class="diagnostics-notice" role="status">
       <span class="diagnostics-notice-icon" aria-hidden="true">i</span>
-      <div><strong>Esta é a primeira versão visual da central.</strong><p>Os módulos abaixo mostram o que será verificado. Nenhum diagnóstico real foi executado nesta etapa. As verificações serão conectadas nas etapas C8.0.3 a C8.0.5. Esta tela não altera arquivos, rascunhos, temas, autenticação ou publicação.</p></div>
+      <div><strong>C8.0.3 ativa: verificações reais de leitura.</strong><p>Esta etapa executa os módulos Saúde do projeto e Imagens e mídias. Os outros quatro módulos continuam planejados. O diagnóstico não usa o token de publicação, não corrige arquivos e não altera regras, temas ou imagens.</p></div>
     </div>
-
-    <div class="diagnostics-overview" aria-label="Resumo do desenvolvimento">
-      <article class="diagnostics-overview-card"><span>MÓDULOS PLANEJADOS</span><strong>06</strong><small>Áreas de verificação</small></article>
-      <article class="diagnostics-overview-card"><span>DIAGNÓSTICOS EXECUTADOS</span><strong>—</strong><small>Execução será habilitada depois</small></article>
-      <article class="diagnostics-overview-card"><span>AÇÕES AUTOMÁTICAS</span><strong>00</strong><small>Nenhuma correção automática</small></article>
+    <div class="diagnostics-toolbar">
+      <div class="diagnostics-toolbar-copy"><strong>Diagnóstico local do projeto</strong><span id="diagnosticsRunMeta">Ainda não executado nesta sessão.</span></div>
+      <div class="diagnostics-toolbar-actions"><button class="btn primary" id="runLocalDiagnosticsBtn" type="button">⌕ EXECUTAR DIAGNÓSTICO</button><button class="btn" id="copyDiagnosticsReportBtn" type="button" disabled>Copiar relatório</button></div>
+    </div>
+    <div class="diagnostics-summary" id="diagnosticsSummaryText" role="status" aria-live="polite">Abra esta seção para executar automaticamente a primeira verificação.</div>
+    <div class="diagnostics-overview" aria-label="Resumo das verificações executadas">
+      <article class="diagnostics-overview-card"><span>VERIFICAÇÕES APROVADAS</span><strong id="diagnosticsPassCount">—</strong><small>Itens confirmados</small></article>
+      <article class="diagnostics-overview-card"><span>PONTOS DE ATENÇÃO</span><strong id="diagnosticsAttentionCount">—</strong><small>Inclui verificações indisponíveis</small></article>
+      <article class="diagnostics-overview-card"><span>ERROS ENCONTRADOS</span><strong id="diagnosticsErrorCount">—</strong><small>Itens que precisam de revisão</small></article>
     </div>
 
     <div class="diagnostics-section-heading"><div><p class="dashboard-eyebrow">MAPA DE VERIFICAÇÃO</p><h3>O que a central vai analisar</h3></div><span>Escopo planejado da C8.0</span></div>
@@ -159,10 +163,11 @@
       </article>
 
       <article class="diagnostic-module">
-        <div class="diagnostic-module-top"><span class="diagnostic-icon">⌘</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">⌘</span><span class="diagnostic-planned" id="diagnosticHealthStatus">AGUARDANDO</span></div>
         <p class="diagnostic-kicker">02 · ACESSO</p><h3>Conexão e segurança</h3><p class="diagnostic-description">Apresenta o estado da sessão e verifica o acesso necessário ao repositório.</p>
         <ul><li>Estado da conexão GitHub</li><li>Acesso de leitura ao repositório</li><li>Disponibilidade da branch principal</li><li>Sessão sem exibir ou exportar o token</li></ul>
         <div class="diagnostic-module-foot"><span>GitHub API</span><span>Sem expor credenciais</span></div>
+        <div class="diagnostic-check-list" id="diagnosticHealthResults"><p class="diagnostic-empty">Aguardando a execução do diagnóstico.</p></div>
       </article>
 
       <article class="diagnostic-module">
@@ -173,10 +178,11 @@
       </article>
 
       <article class="diagnostic-module">
-        <div class="diagnostic-module-top"><span class="diagnostic-icon">▤</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▤</span><span class="diagnostic-planned" id="diagnosticMediaStatus">AGUARDANDO</span></div>
         <p class="diagnostic-kicker">04 · RECUPERAÇÃO</p><h3>Rascunhos e backups</h3><p class="diagnostic-description">Ajuda a identificar dados salvos localmente e entender o que cada backup contém.</p>
         <ul><li>Disponibilidade e leitura do rascunho</li><li>Validade da estrutura salva</li><li>Biblioteca de temas pessoais</li><li>Conteúdo e limites do backup geral</li></ul>
         <div class="diagnostic-module-foot"><span>Armazenamento local</span><span>Sem sobrescrever dados</span></div>
+        <div class="diagnostic-check-list" id="diagnosticMediaResults"><p class="diagnostic-empty">Aguardando a execução do diagnóstico.</p></div>
       </article>
 
       <article class="diagnostic-module">
@@ -195,8 +201,8 @@
     </div>
 
     <section class="diagnostics-roadmap">
-      <div><p class="dashboard-eyebrow">PRÓXIMAS ETAPAS</p><h3>Da interface às verificações reais.</h3><p>A central será habilitada gradualmente, com testes separados e resultados explicados antes de qualquer ação corretiva.</p></div>
-      <div class="diagnostics-roadmap-steps"><span><b>C8.0.2</b> Interface visual</span><span><b>C8.0.3</b> Arquivos, dados e mídias</span><span><b>C8.0.4</b> GitHub e implantação</span><span><b>C8.0.5</b> Prévia e armazenamento</span></div>
+      <div><p class="dashboard-eyebrow">PRÓXIMAS ETAPAS</p><h3>Diagnóstico ativado por etapas.</h3><p>Os módulos 01 e 03 já executam verificações reais. Os demais serão conectados nas próximas entregas, sem automatizar correções.</p></div>
+      <div class="diagnostics-roadmap-steps"><span><b>C8.0.2</b> Interface visual</span><span><b>C8.0.3</b> Arquivos, dados e mídias · ativa</span><span><b>C8.0.4</b> GitHub e implantação</span><span><b>C8.0.5</b> Prévia e armazenamento</span></div>
     </section>
     <div class="diagnostics-footer"><span>Sin City Studio · Central de Segurança</span><button class="btn" type="button" data-dashboard-tab="dashboard">← Voltar à visão geral</button></div>
   </section>
@@ -236,6 +242,7 @@
 </div>
 <div id="toast" class="toast"></div>
 <script src="./saved-themes.js"></script>
+<script src="./diagnostics.js"></script>
 <script>
 'use strict';
 // Configuração do novo repositório da Sin City.
@@ -262,6 +269,7 @@ const defaults = {
  cursor:{enabled:true,trail_enabled:true,size:38,image:'./assets/pumpkin-cursor.svg',trail_type:'glow',trail_color:'#2D1243',trail_count:16,falling_particles:{enabled:true,type:'mixed',color:'#AF7AFF',count:15,size:13}}
 };
 function mergeSite(a={}, b=defaults){return {...b,...a,theme:{...b.theme,...(a.theme||{})},layout:{...b.layout,...(a.layout||{})},cursor:{...b.cursor,...(a.cursor||{}),falling_particles:{...b.cursor.falling_particles,...(a.cursor?.falling_particles||{})}}};}
+const diagnosticsManager = window.SinCityDiagnostics.create({repo:REPO,branch:BRANCH,toast:toast});
 function toast(text,type=''){const el=$('#toast');el.textContent=text;el.className='toast show '+type;clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.className='toast',4200);}
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function getPath(path){return path.split('.').reduce((o,k)=>o?.[k],site) ?? '';}
@@ -1063,6 +1071,7 @@ function activateStudioPanel(name){
  const target=$('#panel-'+name);if(target)target.classList.add('active');
  const workspace=$('#editorWorkspace');if(workspace)workspace.scrollTop=0;
  if(name==='dashboard')updateDashboard();
+ if(name==='diagnostics')diagnosticsManager.run();
 }
 function activateStudioJump(id,key){
  activateStudioPanel('site');
@@ -1123,6 +1132,7 @@ document.addEventListener('keydown',event=>{
 });
 
 $('#preview').addEventListener('load',sendPreview);$('#reloadBtn').onclick=()=>{if(confirm('Recarregar os dados publicados? Um rascunho não salvo pode ser perdido.'))load(true);};$('#draftBtn').onclick=saveDraft;$('#backupBtn').onclick=backup;$('#siteBtn').onclick=()=>window.open('./index.html','_blank','noopener');$('#loginBtn').onclick=login;$('#publishBtn').onclick=publish;$('#cancelTokenBtn').onclick=()=>{$('#tokenModal').hidden=true;$('#tokenInput').value='';};$('#connectTokenBtn').onclick=connectWithToken;$('#tokenInput').addEventListener('keydown',e=>{if(e.key==='Enter')connectWithToken();if(e.key==='Escape')$('#tokenModal').hidden=true;});$('#tokenModal').addEventListener('click',e=>{if(e.target.id==='tokenModal')$('#tokenModal').hidden=true;});
+diagnosticsManager.bind();
 load();updateAuthUI();if(githubToken)loadGitHubUser();
 </script>
 </body>

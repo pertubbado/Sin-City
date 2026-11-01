@@ -37,6 +37,7 @@ jobs:
           required = [
               "site/index.html",
               "site/editor.html",
+              "site/diagnostics.js",
               "site/app.js",
               "site/style.css",
               "site/content/site.json",
