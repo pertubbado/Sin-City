@@ -11,10 +11,62 @@ window.SinCityFlowGuard=(function(){
   return Boolean(window.SinCityOrdering&&typeof window.SinCityOrdering.refresh==='function');
  }
 
+ function getData(){
+  try{return typeof data!=='undefined'&&data&&Array.isArray(data.categories)?data:null;}
+  catch{return null;}
+ }
+
+ function syncNestedRuleCodes(){
+  const current=getData();
+  if(!current||!orderingReady())return {changed:false,rules:0};
+  let changed=false;
+  let rules=0;
+  const categoryCards=[...document.querySelectorAll('#cats > details.item')];
+
+  current.categories.forEach((category,categoryIndex)=>{
+   const subcategories=Array.isArray(category?.subcategories)?category.subcategories:[];
+   const categoryCard=categoryCards[categoryIndex];
+   const subcards=[...categoryCard?.querySelectorAll(':scope > .sub-list > details.subitem')||[]];
+
+   subcategories.forEach((sub,subcategoryIndex)=>{
+    const expected=window.SinCityOrdering.subcategoryNumber(categoryIndex,subcategoryIndex);
+    const subRules=Array.isArray(sub?.rules)?sub.rules:[];
+    const ruleCards=[...subcards[subcategoryIndex]?.querySelectorAll(':scope > .rule')||[]];
+
+    subRules.forEach((rule,ruleIndex)=>{
+     if(!rule||typeof rule!=='object')return;
+     rules++;
+     if(String(rule.code||'')!==expected){rule.code=expected;changed=true;}
+
+     const ruleCard=ruleCards[ruleIndex];
+     if(!ruleCard)return;
+     const codeInput=ruleCard.querySelector('input[data-sub-rule][data-k="code"]');
+     if(codeInput){
+      if(codeInput.value!==expected)codeInput.value=expected;
+      codeInput.readOnly=true;
+      codeInput.setAttribute('aria-readonly','true');
+      codeInput.dataset.autoRuleCode='true';
+      codeInput.title='Código automático herdado da posição estrutural da subcategoria';
+      codeInput.setAttribute('aria-label','Código automático da regra');
+     }
+     const heading=ruleCard.querySelector(':scope > .item-head strong');
+     if(heading){
+      const next=`${expected} • ${String(rule.title||'Sem título')}`;
+      if(heading.textContent!==next)heading.textContent=next;
+     }
+    });
+   });
+  });
+
+  document.documentElement.dataset.sinCityAutoRuleCodes='true';
+  return {changed,rules};
+ }
+
  function flush(){
   if(!orderingReady())return false;
   try{
    window.SinCityOrdering.refresh({preview:false});
+   const codes=syncNestedRuleCodes();
    document.documentElement.dataset.sinCityFlowGuard=VERSION;
    return true;
   }catch(error){
@@ -58,6 +110,7 @@ window.SinCityFlowGuard=(function(){
   version:VERSION,
   flush,
   install,
+  syncNestedRuleCodes,
   isInstalled:()=>installed,
   originalSendPreview:()=>originalSendPreview
  };
