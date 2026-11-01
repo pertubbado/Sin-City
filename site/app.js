@@ -377,11 +377,11 @@ Object.entries(sideFooterColors).forEach(([property, value]) => {
 
   function setActiveNavigation(route) {
     setActiveRule('');
-    $('.nav-category').forEach(button => {
+    $$('.nav-category').forEach(button => {
       const active = button.dataset.categoryNav === state.categoryId && route === 'category';
       button.classList.toggle('active', active);
     });
-    $('.nav-group').forEach(group => {
+    $$('.nav-group').forEach(group => {
       const isCurrent = group.dataset.navGroup === state.categoryId && route === 'category';
       if (isCurrent) setCategoryExpanded(group, true);
     });
@@ -630,7 +630,7 @@ function setupAmbientParticles(config = {}) {
   }
 }
   function setActiveRule(ruleId) {
-    $('.nav-rule-link').forEach(button => {
+    $$('.nav-rule-link').forEach(button => {
       const active = Boolean(ruleId)
         && button.dataset.navCategory === state.categoryId
         && button.dataset.navRule === ruleId;
@@ -640,7 +640,7 @@ function setupAmbientParticles(config = {}) {
 
   function syncActiveRule() {
     if (!state.categoryId || !$('#categoryPage')?.classList.contains('active')) return;
-    const cards = $('.rule-card');
+    const cards = $$('.rule-card');
     if (!cards.length) {
       setActiveRule('');
       return;
@@ -670,7 +670,7 @@ function setupAmbientParticles(config = {}) {
   function observeRules() {
     categoryObserver?.disconnect();
     categoryObserver = null;
-    const cards = $('.rule-card');
+    const cards = $$('.rule-card');
     if (!cards.length) {
       setActiveRule('');
       return;
