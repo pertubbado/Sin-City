@@ -67,6 +67,9 @@
   <button class="studio-nav-item tab" type="button" data-tab="rules" title="Categorias e regras" aria-label="Categorias e regras"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Regras</span></button>
   <button class="studio-nav-item" type="button" data-jump="cleanThemeCard" data-nav-key="themes" title="Biblioteca de temas" aria-label="Biblioteca de temas"><span class="nav-icon" aria-hidden="true">✧</span><span class="nav-label">Temas</span></button>
   <button class="studio-nav-item" type="button" data-jump="mediaSection" data-nav-key="media" title="Central de imagens" aria-label="Central de imagens"><span class="nav-icon" aria-hidden="true">▧</span><span class="nav-label">Mídias</span></button>
+  <div class="studio-nav-divider"></div>
+  <span class="studio-nav-caption">SISTEMA</span>
+  <button class="studio-nav-item" type="button" data-tab="diagnostics" title="Central de segurança e diagnóstico" aria-label="Central de segurança e diagnóstico"><span class="nav-icon" aria-hidden="true">⌕</span><span class="nav-label">Diagnóstico</span></button>
   <div class="studio-nav-bottom">
     <div class="studio-nav-note">C7.9 · SIN CITY STUDIO</div>
     <button class="studio-nav-toggle" id="toggleNavBtn" type="button" aria-expanded="false" aria-label="Expandir navegação" title="Expandir navegação"><span class="nav-icon" aria-hidden="true">⇥</span><span class="nav-label">Expandir navegação</span></button>
@@ -96,6 +99,7 @@
         <button class="dashboard-shortcut" type="button" data-dashboard-tab="rules"><span class="shortcut-icon">▤</span><span class="shortcut-copy"><strong>Gerenciar regras</strong><small>Categorias, subcategorias e atualizações</small></span><span class="shortcut-arrow">↗</span></button>
         <button class="dashboard-shortcut" type="button" data-dashboard-jump="cleanThemeCard"><span class="shortcut-icon">✧</span><span class="shortcut-copy"><strong>Biblioteca de temas</strong><small>Sete temas e seus visuais personalizados</small></span><span class="shortcut-arrow">↗</span></button>
         <button class="dashboard-shortcut" type="button" data-dashboard-jump="mediaSection"><span class="shortcut-icon">▧</span><span class="shortcut-copy"><strong>Central de imagens</strong><small>Logo, favicon, banner, fundo e cursor</small></span><span class="shortcut-arrow">↗</span></button>
+        <button class="dashboard-shortcut" type="button" data-dashboard-tab="diagnostics"><span class="shortcut-icon">⌕</span><span class="shortcut-copy"><strong>Segurança e diagnóstico</strong><small>Integridade, conexão, mídias e publicação</small></span><span class="shortcut-arrow">↗</span></button>
       </div>
     </section>
     <div class="dashboard-bottom-grid">
@@ -121,7 +125,80 @@
     </section>
   </section>
   <section class="panel" id="panel-site" aria-label="Configurações do site"></section>
-  <section class="panel" id="panel-rules" aria-label="Gerenciamento de regras"></section>
+  <section class="panel diagnostics-panel" id="panel-diagnostics" aria-labelledby="diagnosticsTitle">
+    <div class="diagnostics-hero">
+      <div class="diagnostics-hero-copy">
+        <p class="dashboard-eyebrow">C8.0 · CENTRAL DE SEGURANÇA</p>
+        <h2 id="diagnosticsTitle">Segurança e diagnóstico.</h2>
+        <p>Uma visão organizada da integridade do Sin City, da conexão ao GitHub e da publicação do site.</p>
+        <div class="diagnostics-hero-meta"><span class="diagnostics-live-dot"></span><span>Estrutura visual preparada</span><span class="diagnostics-meta-separator">•</span><span>Verificações reais em desenvolvimento</span></div>
+      </div>
+      <div class="diagnostics-shield" aria-hidden="true"><span>SC</span><small>SECURITY</small></div>
+    </div>
+
+    <div class="diagnostics-notice" role="status">
+      <span class="diagnostics-notice-icon" aria-hidden="true">i</span>
+      <div><strong>Esta é a primeira versão visual da central.</strong><p>Os módulos abaixo mostram o que será verificado. Nenhum diagnóstico real foi executado nesta etapa. As verificações serão conectadas nas etapas C8.0.3 a C8.0.5. Esta tela não altera arquivos, rascunhos, temas, autenticação ou publicação.</p></div>
+    </div>
+
+    <div class="diagnostics-overview" aria-label="Resumo do desenvolvimento">
+      <article class="diagnostics-overview-card"><span>MÓDULOS PLANEJADOS</span><strong>06</strong><small>Áreas de verificação</small></article>
+      <article class="diagnostics-overview-card"><span>DIAGNÓSTICOS EXECUTADOS</span><strong>—</strong><small>Execução será habilitada depois</small></article>
+      <article class="diagnostics-overview-card"><span>AÇÕES AUTOMÁTICAS</span><strong>00</strong><small>Nenhuma correção automática</small></article>
+    </div>
+
+    <div class="diagnostics-section-heading"><div><p class="dashboard-eyebrow">MAPA DE VERIFICAÇÃO</p><h3>O que a central vai analisar</h3></div><span>Escopo planejado da C8.0</span></div>
+
+    <div class="diagnostics-grid">
+      <article class="diagnostic-module">
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▦</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <p class="diagnostic-kicker">01 · ESTRUTURA</p><h3>Saúde do projeto</h3><p class="diagnostic-description">Confere se os arquivos essenciais e os dados que alimentam o site estão íntegros.</p>
+        <ul><li>Arquivos principais presentes</li><li>JSON válido e campos obrigatórios</li><li>Cópias das regras sincronizadas</li><li>Estrutura de categorias e atualizações</li></ul>
+        <div class="diagnostic-module-foot"><span>Verificações locais</span><span>Somente leitura</span></div>
+      </article>
+
+      <article class="diagnostic-module">
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">⌘</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <p class="diagnostic-kicker">02 · ACESSO</p><h3>Conexão e segurança</h3><p class="diagnostic-description">Apresenta o estado da sessão e verifica o acesso necessário ao repositório.</p>
+        <ul><li>Estado da conexão GitHub</li><li>Acesso de leitura ao repositório</li><li>Disponibilidade da branch principal</li><li>Sessão sem exibir ou exportar o token</li></ul>
+        <div class="diagnostic-module-foot"><span>GitHub API</span><span>Sem expor credenciais</span></div>
+      </article>
+
+      <article class="diagnostic-module">
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▧</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <p class="diagnostic-kicker">03 · RECURSOS</p><h3>Imagens e mídias</h3><p class="diagnostic-description">Localiza referências quebradas e recursos visuais que não podem ser carregados.</p>
+        <ul><li>Imagens referenciadas no conteúdo</li><li>Arquivos ausentes ou inacessíveis</li><li>Formato e extensão dos recursos</li><li>Referências dos temas oficiais</li></ul>
+        <div class="diagnostic-module-foot"><span>Arquivos e caminhos</span><span>Sem excluir mídias</span></div>
+      </article>
+
+      <article class="diagnostic-module">
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">▤</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <p class="diagnostic-kicker">04 · RECUPERAÇÃO</p><h3>Rascunhos e backups</h3><p class="diagnostic-description">Ajuda a identificar dados salvos localmente e entender o que cada backup contém.</p>
+        <ul><li>Disponibilidade e leitura do rascunho</li><li>Validade da estrutura salva</li><li>Biblioteca de temas pessoais</li><li>Conteúdo e limites do backup geral</li></ul>
+        <div class="diagnostic-module-foot"><span>Armazenamento local</span><span>Sem sobrescrever dados</span></div>
+      </article>
+
+      <article class="diagnostic-module">
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">◉</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <p class="diagnostic-kicker">05 · EXPERIÊNCIA</p><h3>Prévia e funcionamento</h3><p class="diagnostic-description">Acompanha o carregamento da prévia e identifica falhas no navegador.</p>
+        <ul><li>Carregamento do iframe</li><li>Comunicação entre editor e prévia</li><li>Atualização visual em tempo real</li><li>Erros JavaScript e recursos bloqueados</li></ul>
+        <div class="diagnostic-module-foot"><span>Ambiente do navegador</span><span>Sem alterar o site</span></div>
+      </article>
+
+      <article class="diagnostic-module">
+        <div class="diagnostic-module-top"><span class="diagnostic-icon">⇧</span><span class="diagnostic-planned">PLANEJADO</span></div>
+        <p class="diagnostic-kicker">06 · ENTREGA</p><h3>Publicação e implantação</h3><p class="diagnostic-description">Mostra o estado do GitHub Actions e a situação da última implantação.</p>
+        <ul><li>Última execução do workflow</li><li>Resultado do processo de deploy</li><li>Branch e commit implantados</li><li>Data e endereço da publicação</li></ul>
+        <div class="diagnostic-module-foot"><span>GitHub Actions</span><span>Sem publicar alterações</span></div>
+      </article>
+    </div>
+
+    <section class="diagnostics-roadmap">
+      <div><p class="dashboard-eyebrow">PRÓXIMAS ETAPAS</p><h3>Da interface às verificações reais.</h3><p>A central será habilitada gradualmente, com testes separados e resultados explicados antes de qualquer ação corretiva.</p></div>
+      <div class="diagnostics-roadmap-steps"><span><b>C8.0.2</b> Interface visual</span><span><b>C8.0.3</b> Arquivos, dados e mídias</span><span><b>C8.0.4</b> GitHub e implantação</span><span><b>C8.0.5</b> Prévia e armazenamento</span></div>
+    </section>
+    <div class="diagnostics-footer"><span>Sin City Studio · Central de Segurança</span><button class="btn" type="button" data-dashboard-tab="dashboard">← Voltar à visão geral</button></div>
+  </section>
 </main>
 <section class="preview-area" id="previewArea" aria-label="Prévia ao vivo do site">
   <div class="preview-box" id="previewBox" data-device="desktop">
