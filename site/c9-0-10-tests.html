@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.10 Regressão Consolidada</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1540px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(410px,.92fr) minmax(650px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}.group{margin:15px 0 7px;font-size:12px;letter-spacing:.08em;color:#c9cdd3;text-transform:uppercase}iframe{width:100%;height:850px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C9.0.10 — Regressão consolidada</h1><p class="muted">Bateria final da C9: estrutura, IDs, movimentação, preview público, códigos e persistência. Cria apenas dados temporários em memória/localStorage, limpa tudo no final, não conecta GitHub e não publica.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.10"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=90)=>new Promise(r=>setTimeout(r,ms));
+const cards=d=>[...d.querySelectorAll('#cats > details.item')];
+const subs=card=>card?[...card.querySelectorAll(':scope > .sub-list > details.subitem')]:[];
+const findCard=(d,id)=>cards(d).find(c=>String(c.dataset.categoryId||'')===String(id||''));
+const findIndex=(d,id)=>cards(d).findIndex(c=>String(c.dataset.categoryId||'')===String(id||''));
+const allIds=d=>cards(d).flatMap(c=>[c.dataset.categoryId,...subs(c).map(s=>s.dataset.subcategoryId)]).filter(Boolean);
+const previewDoc=d=>{try{return d.getElementById('preview')?.contentDocument||null}catch{return null}};
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function group(title){return `<div class="group">${title}</div>`}
+async function openPreviewCategory(d,id){const pd=previewDoc(d);if(!pd)return false;const b=pd.querySelector(`[data-category-nav="${id}"]`);if(!b)return false;b.click();await wait(150);return true;}
+function previewRuleCode(d,title){const pd=previewDoc(d);if(!pd)return '';const rule=[...pd.querySelectorAll('.rule-card')].find(el=>(el.querySelector('h3')?.textContent||'').trim()===title);return String(rule?.querySelector('.rule-code')?.textContent||'').trim();}
+async function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];let section='';
+ const add=(ok,title,detail='')=>checks.push({section,ok:Boolean(ok),title,detail});
+ const originalConfirm=w.confirm,originalDraft=w.localStorage.getItem('sin-city-editor-draft');let tempId='';
+ try{
+  section='01 · Módulos e estrutura base';
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(w.SinCityOrdering?.version==='C9.0.5','Motor de ordenação preservado',w.SinCityOrdering?.version||'ausente');
+  add(w.SinCityPublicOrdering?.version==='C9.0.6'||previewDoc(d)?.defaultView?.SinCityPublicOrdering?.version==='C9.0.6','Camada pública C9.0.6 disponível',previewDoc(d)?.defaultView?.SinCityPublicOrdering?.version||w.SinCityPublicOrdering?.version||'ausente');
+  add(w.SinCityFlowGuard?.version==='C9.0.8','Política de códigos C9.0.8 carregada',w.SinCityFlowGuard?.version||'ausente');
+  add(w.SinCityPersistence?.version==='C9.0.9','Persistência C9.0.9 carregada',w.SinCityPersistence?.version||'ausente');
+  add(Boolean(w.SinCityFlowGuard?.isInstalled?.()),'Guarda de fluxo instalada',String(w.SinCityFlowGuard?.isInstalled?.()));
+  add(Boolean(w.SinCityPersistence?.isInstalled?.()),'Guarda de persistência instalada',String(w.SinCityPersistence?.isInstalled?.()));
+  const originalIds=cards(d).map(c=>String(c.dataset.categoryId||'')),originalCount=originalIds.length;
+  add(originalCount>2,'Categorias base disponíveis',`${originalCount} categoria(s)`);
+  add(new Set(allIds(d)).size===allIds(d).length,'IDs base únicos',`${new Set(allIds(d)).size}/${allIds(d).length}`);
+
+  section='02 · Criar, IDs e numeração';
+  d.getElementById('addCat')?.click();await wait();let temp=cards(d).at(-1);tempId=String(temp?.dataset.categoryId||'');
+  add(cards(d).length===originalCount+1,'Criar categoria atualiza estrutura',`${originalCount} → ${cards(d).length}`);
+  add(Boolean(tempId)&&tempId!=='nova-categoria','Categoria recebe ID definitivo',tempId||'ausente');
+  add(String(temp?.dataset.categoryNumber||'')===String(originalCount+1).padStart(2,'0'),'Categoria recebe número estrutural correto',temp?.dataset.categoryNumber||'ausente');
+  add(temp?.querySelectorAll('[data-c9-move-category]').length===2,'Controles ↑/↓ da categoria presentes','2 controles');
+  temp?.querySelector('[data-add-sub]')?.click();await wait();temp=findCard(d,tempId);temp?.querySelector('[data-add-sub]')?.click();await wait();
+  let ss=subs(findCard(d,tempId));const subA=String(ss[0]?.dataset.subcategoryId||''),subB=String(ss[1]?.dataset.subcategoryId||'');
+  add(ss.length===2,'Criar duas subcategorias funciona','2 criadas');
+  add(Boolean(subA)&&Boolean(subB)&&subA!==subB&&subA!=='nova-subcategoria'&&subB!=='nova-subcategoria','Subcategorias recebem IDs definitivos e únicos',`${subA} | ${subB}`);
+  const catNo=String(findCard(d,tempId)?.dataset.categoryNumber||'');
+  add(ss.map(s=>s.dataset.subcategoryNumber).join(',')===`${catNo}.01,${catNo}.02`,'Numeração inicial das subcategorias correta',ss.map(s=>s.dataset.subcategoryNumber).join(', '));
+
+  section='03 · Regras e política de códigos';
+  temp=findCard(d,tempId);temp?.querySelector('[data-add-rule]')?.click();await wait();
+  temp=findCard(d,tempId);let direct=temp?.querySelector(':scope > .direct-list > .rule');let directCode=direct?.querySelector('input[data-rule][data-k="code"]');
+  if(directCode){directCode.value='REGRA-DIRETA-C9-FINAL';directCode.dispatchEvent(new Event('input',{bubbles:true}));await wait();}
+  add(directCode?.dataset.manualRuleCode==='true','Regra direta marcada como código manual',directCode?.dataset.manualRuleCode||'ausente');
+  add(!directCode?.readOnly,'Código de regra direta permanece editável',String(!directCode?.readOnly));
+  add(directCode?.value==='REGRA-DIRETA-C9-FINAL','Código manual aceita valor personalizado',directCode?.value||'ausente');
+  ss=subs(findCard(d,tempId));ss[0]?.querySelector('[data-add-sub-rule]')?.click();await wait(130);
+  ss=subs(findCard(d,tempId));let nested=ss[0]?.querySelector(':scope > .rule');let nestedCode=nested?.querySelector('input[data-sub-rule][data-k="code"]');
+  add(nestedCode?.dataset.autoRuleCode==='true','Regra de subcategoria marcada como automática',nestedCode?.dataset.autoRuleCode||'ausente');
+  add(Boolean(nestedCode?.readOnly),'Código de subcategoria somente leitura',String(nestedCode?.readOnly));
+  add(nestedCode?.value===ss[0]?.dataset.subcategoryNumber,'Código automático nasce igual à subcategoria',nestedCode?.value||'ausente');
+
+  section='04 · Movimentação e sincronização';
+  let up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(130);up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait(170);
+  temp=findCard(d,tempId);const movedNo=String(temp?.dataset.categoryNumber||'');
+  add(findIndex(d,tempId)===originalCount-2,'Categoria move repetidamente sem travar',`posição=${findIndex(d,tempId)+1}`);
+  add(String(temp?.dataset.categoryId||'')===tempId,'ID da categoria preservado após mover',tempId);
+  add(subs(temp).every((s,i)=>s.dataset.subcategoryNumber===`${movedNo}.${String(i+1).padStart(2,'0')}`),'Subcategorias acompanham número da categoria',subs(temp).map(s=>s.dataset.subcategoryNumber).join(', '));
+  directCode=temp?.querySelector(':scope > .direct-list > .rule input[data-rule][data-k="code"]');nestedCode=subs(temp)[0]?.querySelector(':scope > .rule input[data-sub-rule][data-k="code"]');
+  add(directCode?.value==='REGRA-DIRETA-C9-FINAL','Código manual não muda ao mover categoria',directCode?.value||'ausente');
+  add(nestedCode?.value===`${movedNo}.01`,'Código automático acompanha categoria movida',nestedCode?.value||'ausente');
+  ss=subs(temp);ss[1]?.querySelector('[data-c9-move-subcategory="up"]')?.click();await wait(170);ss=subs(findCard(d,tempId));
+  add(String(ss[0]?.dataset.subcategoryId||'')===subB,'Subcategoria move para cima corretamente',ss[0]?.dataset.subcategoryId||'ausente');
+  add(ss[0]?.dataset.subcategoryNumber===`${movedNo}.01`&&ss[1]?.dataset.subcategoryNumber===`${movedNo}.02`,'Subcategorias renumeram após troca',ss.map(s=>s.dataset.subcategoryNumber).join(', '));
+  nestedCode=ss[1]?.querySelector(':scope > .rule input[data-sub-rule][data-k="code"]');
+  add(nestedCode?.value===`${movedNo}.02`,'Código da regra acompanha a própria subcategoria movida',nestedCode?.value||'ausente');
+
+  section='05 · Preview público';
+  const opened=await openPreviewCategory(d,tempId);add(opened,'Categoria temporária abre no preview','navegação pública');
+  add(previewRuleCode(d,'Nova regra')===`${movedNo}.02`,'Cartão da regra automática no preview usa numeração atual',previewRuleCode(d,'Nova regra')||'ausente');
+  const pd=previewDoc(d),navGroup=[...pd.querySelectorAll('#nav > .nav-group')].find(g=>g.querySelector(`[data-nav-category="${tempId}"]`));
+  add(Boolean(navGroup),'Categoria temporária existe na navegação pública','grupo encontrado');
+  const structuralCodes=navGroup?[...navGroup.querySelectorAll('.nav-rule-code')].map(el=>el.textContent.trim()).filter(Boolean):[];
+  add(structuralCodes.some(v=>v===`${movedNo}.01`)||structuralCodes.some(v=>v===`${movedNo}.02`),'Sidebar pública exibe numeração estrutural da subcategoria',structuralCodes.join(', ')||'ausente');
+
+  section='06 · Exclusão e recriação';
+  w.confirm=()=>true;ss=subs(findCard(d,tempId));ss[1]?.querySelector('[data-del-sub]')?.click();await wait(130);ss=subs(findCard(d,tempId));
+  add(ss.length===1,'Excluir subcategoria mantém estrutura válida','1 restante');
+  add(ss[0]?.dataset.subcategoryNumber===`${movedNo}.01`,'Subcategoria sobrevivente renumera para .01',ss[0]?.dataset.subcategoryNumber||'ausente');
+  findCard(d,tempId)?.querySelector('[data-add-sub]')?.click();await wait();ss=subs(findCard(d,tempId));const recreated=String(ss[1]?.dataset.subcategoryId||'');
+  add(ss.length===2,'Criar novamente após exclusão funciona','2 subcategorias');
+  add(Boolean(recreated)&&recreated!==subA&&recreated!==subB&&recreated!=='nova-subcategoria','Novo ID não reutiliza IDs anteriores',recreated||'ausente');
+  add(ss[1]?.dataset.subcategoryNumber===`${movedNo}.02`,'Nova subcategoria recebe próxima numeração estrutural',ss[1]?.dataset.subcategoryNumber||'ausente');
+
+  section='07 · Persistência';
+  const expected=w.SinCityPersistence.snapshotData();add(Boolean(expected),'Snapshot C9 disponível','snapshotData');
+  d.getElementById('draftBtn')?.click();await wait();const draft=w.SinCityPersistence.draftSnapshot();
+  add(Boolean(draft?.data),'Rascunho contém dados','payload.data');
+  add(w.SinCityPersistence.equivalent(expected,draft),'Rascunho preserva ordem, IDs e códigos','digest idêntico');
+  let capturedBlob=null;const originalCreate=w.URL.createObjectURL,originalClick=w.HTMLAnchorElement.prototype.click;
+  w.URL.createObjectURL=function(blob){capturedBlob=blob;return originalCreate.call(this,blob)};w.HTMLAnchorElement.prototype.click=function(){};
+  try{d.getElementById('backupBtn')?.click();await wait(120)}finally{w.URL.createObjectURL=originalCreate;w.HTMLAnchorElement.prototype.click=originalClick;}
+  const backupPayload=capturedBlob?JSON.parse(await capturedBlob.text()):null;
+  add(Boolean(backupPayload?.data),'Backup JSON contém data','payload.data');
+  add(w.SinCityPersistence.equivalent(expected,backupPayload),'Backup preserva estrutura C9','digest idêntico');
+  add(w.SinCityPersistence.equivalent(backupPayload,JSON.parse(JSON.stringify(backupPayload))),'Backup suporta round-trip JSON sem perda','stringify → parse');
+  const publishSource=String(w.publish||'');
+  add(typeof w.publish==='function','Função PUBLICAR preservada','publish disponível');
+  add(/JSON\.stringify\(data/.test(publishSource),'PUBLICAR serializa o data atual','JSON.stringify(data)');
+  add((publishSource.match(/createBlob\(rulesText\)/g)||[]).length>=2,'PUBLICAR usa o mesmo rulesText nos dois arquivos de regras','2 blobs');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não conecta GitHub','nenhum token criado');
+
+  section='08 · Limpeza e regressão final';
+  findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait(150);const restored=cards(d).map(c=>String(c.dataset.categoryId||''));
+  add(restored.length===originalCount,'Quantidade de categorias restaurada',`${restored.length}/${originalCount}`);
+  add(JSON.stringify(restored)===JSON.stringify(originalIds),'Ordem original restaurada exatamente','IDs na ordem original');
+  add(!allIds(d).includes(tempId),'Categoria temporária removida completamente',tempId);
+  add(new Set(allIds(d)).size===allIds(d).length,'Nenhum ID duplicado ao final',`${new Set(allIds(d)).size}/${allIds(d).length}`);
+  const nums=cards(d).map(c=>c.dataset.categoryNumber||''),expectedNums=cards(d).map((_,i)=>String(i+1).padStart(2,'0'));
+  add(JSON.stringify(nums)===JSON.stringify(expectedNums),'Numeração global continua sequencial',nums.join(', '));
+ }catch(error){add(false,'Runner executado sem exceções',error?.message||String(error));}
+ finally{
+  w.confirm=originalConfirm;
+  if(tempId&&findCard(d,tempId)){try{w.confirm=()=>true;findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait()}catch{}w.confirm=originalConfirm;}
+  try{if(originalDraft===null)w.localStorage.removeItem('sin-city-editor-draft');else w.localStorage.setItem('sin-city-editor-draft',originalDraft)}catch{}
+ }
+ let html='',last='';for(const c of checks){if(c.section!==last){last=c.section;html+=group(last)}html+=row(c.ok,c.title,c.detail)}results.innerHTML=html;
+ const passed=checks.filter(x=>x.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,2300));document.getElementById('run').addEventListener('click',run);
+</script></body></html>
