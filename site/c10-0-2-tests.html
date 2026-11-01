@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C10.0.2 Motor de Reordenação</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.9fr) minmax(650px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}.group{margin:15px 0 7px;font-size:12px;letter-spacing:.08em;color:#c9cdd3;text-transform:uppercase}iframe{width:100%;height:840px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C10.0.2 — Motor de reordenação</h1><p class="muted">Valida o helper genérico e as APIs absolutas de categoria, subcategoria e regras. Não conecta GitHub, não publica e restaura a ordem original no final.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C10.0.2"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=110)=>new Promise(r=>setTimeout(r,ms));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function group(title){return `<div class="group">${title}</div>`}
+async function ready(w){for(let i=0;i<80;i++){if(w.SinCityReorderEngine?.version==='C10.0.2'&&w.SinCityOrdering&&w.SinCityFlowGuard&&w.document.querySelector('#cats > details.item'))return true;await wait(75)}return false}
+async function run(){
+ const w=frame.contentWindow,checks=[];let section='';
+ const add=(ok,title,detail='')=>checks.push({section,ok:Boolean(ok),title,detail});
+ try{
+  const loaded=await ready(w);section='01 · Carregamento';
+  add(loaded,'Studio e camadas carregadas',loaded?'pronto':'tempo esgotado');
+  const e=w.SinCityReorderEngine;
+  add(e?.version==='C10.0.2','Motor C10.0.2 disponível',e?.version||'ausente');
+  add(typeof e?.reorderArray==='function','Helper reorderArray disponível');
+  add(typeof e?.moveCategoryTo==='function'&&typeof e?.moveSubcategoryTo==='function','APIs estruturais disponíveis');
+  add(typeof e?.moveDirectRuleTo==='function'&&typeof e?.moveNestedRuleTo==='function','APIs de regras disponíveis');
+
+  section='02 · Helper puro';
+  const a=[{id:'a'},{id:'b'},{id:'c'},{id:'d'}],ref=a[0];
+  let r=e.reorderArray(a,0,3);
+  add(r.moved&&a.map(x=>x.id).join(',')==='b,c,d,a','Move várias posições em uma operação',a.map(x=>x.id).join(','));
+  add(a[3]===ref,'Preserva identidade do objeto movido');
+  r=e.reorderArray(a,3,0);add(r.moved&&a.map(x=>x.id).join(',')==='a,b,c,d','Movimento inverso restaura a ordem');
+  add(!e.reorderArray(a,-1,2).moved,'Rejeita índice negativo');
+  add(!e.reorderArray(a,0,99).moved,'Rejeita destino fora do limite');
+  add(!e.reorderArray(a,1,1).moved,'Mesmo índice não cria movimento');
+
+  const data=w.data;const original=JSON.stringify(data);
+  section='03 · Categoria';
+  if(data.categories.length>1){
+   const first=data.categories[0],id=first.id;const result=e.moveCategoryTo(0,data.categories.length-1,{notify:false,preview:false});await wait();
+   add(result.moved,'Categoria move para destino absoluto',`0 → ${data.categories.length-1}`);
+   add(data.categories.at(-1)===first&&data.categories.at(-1).id===id,'Categoria preserva objeto e ID',id);
+   const back=e.moveCategoryTo(data.categories.length-1,0,{notify:false,preview:false});await wait();
+   add(back.moved&&data.categories[0]===first,'Categoria retorna à posição original');
+  }else add(false,'Há categorias suficientes para testar');
+
+  section='04 · Subcategoria';
+  const ci=data.categories.findIndex(c=>Array.isArray(c.subcategories)&&c.subcategories.length>1);
+  if(ci>=0){
+   const list=data.categories[ci].subcategories,first=list[0],id=first.id,last=list.length-1;
+   const result=e.moveSubcategoryTo(ci,0,last,{notify:false,preview:false});await wait();
+   add(result.moved,'Subcategoria move para destino absoluto',`0 → ${last}`);
+   add(list[last]===first&&list[last].id===id,'Subcategoria preserva objeto e ID',id);
+   e.moveSubcategoryTo(ci,last,0,{notify:false,preview:false});await wait();
+   add(list[0]===first,'Subcategoria retorna à posição original');
+  }else add(true,'Teste de subcategoria não aplicável','nenhuma categoria com 2+ subcategorias');
+
+  section='05 · Regra direta';
+  const dci=data.categories.findIndex(c=>Array.isArray(c.rules)&&c.rules.length>1);
+  if(dci>=0){
+   const list=data.categories[dci].rules,first=list[0],code=first.code,last=list.length-1;
+   const result=e.moveDirectRuleTo(dci,0,last,{notify:false,preview:false});await wait();
+   add(result.moved,'Regra direta move para destino absoluto',`0 → ${last}`);
+   add(list[last]===first,'Regra direta preserva identidade');
+   add(String(list[last].code||'')===String(code||''),'Código manual da regra direta permanece intacto',String(code||''));
+   e.moveDirectRuleTo(dci,last,0,{notify:false,preview:false});await wait();
+   add(list[0]===first,'Regra direta retorna à posição original');
+  }else add(true,'Teste de regra direta não aplicável','nenhuma categoria com 2+ regras diretas');
+
+  section='06 · Regra de subcategoria';
+  let found=null;for(let x=0;x<data.categories.length&&!found;x++){const subs=data.categories[x].subcategories||[];for(let y=0;y<subs.length;y++){if((subs[y].rules||[]).length>1){found=[x,y];break}}}
+  if(found){
+   const [x,y]=found,list=data.categories[x].subcategories[y].rules,first=list[0],last=list.length-1;
+   const expectedCode=w.SinCityOrdering.subcategoryNumber(x,y);
+   const result=e.moveNestedRuleTo(x,y,0,last,{notify:false,preview:false});await wait();
+   add(result.moved,'Regra de subcategoria move no próprio bloco',`0 → ${last}`);
+   add(list[last]===first,'Regra aninhada preserva identidade');
+   add(String(list[last].code||'')===expectedCode,'Código automático continua igual à subcategoria',expectedCode);
+   e.moveNestedRuleTo(x,y,last,0,{notify:false,preview:false});await wait();
+   add(list[0]===first,'Regra aninhada retorna à posição original');
+  }else add(true,'Teste de regra aninhada não aplicável','nenhuma subcategoria com 2+ regras');
+
+  section='07 · Regressão final';
+  w.SinCityFlowGuard.flush();await wait();
+  add(JSON.stringify(data)===original,'Estado de dados restaurado exatamente','ordem e conteúdo iguais ao início');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não cria sessão GitHub');
+ }catch(error){checks.push({section:section||'Erro',ok:false,title:'Runner executado sem exceções',detail:error?.message||String(error)});}
+ let html='',last='';for(const c of checks){if(c.section!==last){last=c.section;html+=group(last)}html+=row(c.ok,c.title,c.detail)}results.innerHTML=html;
+ const passed=checks.filter(x=>x.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,2200));document.getElementById('run').addEventListener('click',run);
+</script></body></html>
