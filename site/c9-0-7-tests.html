@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C9.0.7 Tests</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(380px,.85fr) minmax(620px,1.55fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}iframe{width:100%;height:820px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="grid">
+<section class="card">
+<h1>C9.0.7 — Fluxos combinados</h1>
+<p class="muted">Cria uma categoria temporária e subcategorias na memória do Studio, move, exclui, recria e remove tudo ao final. Não conecta GitHub e não publica.</p>
+<button id="run">Executar novamente</button>
+<div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div>
+</section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C9.0.7"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=60)=>new Promise(resolve=>setTimeout(resolve,ms));
+const cards=d=>[...d.querySelectorAll('#cats > details.item')];
+const subs=card=>card?[...card.querySelectorAll(':scope > .sub-list > details.subitem')]:[];
+const ids=d=>cards(d).map(card=>String(card.dataset.categoryId||''));
+const findCard=(d,id)=>cards(d).find(card=>String(card.dataset.categoryId||'')===String(id||''));
+const findIndex=(d,id)=>cards(d).findIndex(card=>String(card.dataset.categoryId||'')===String(id||''));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+async function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,title,detail='')=>checks.push({ok:Boolean(ok),title,detail});
+ const originalConfirm=w.confirm;
+ let tempId='';
+ try{
+  add(d.readyState==='complete','Studio carregado',d.readyState);
+  add(w.SinCityOrdering?.version==='C9.0.5','Motor de ordenação preservado',w.SinCityOrdering?.version||'ausente');
+  add(w.SinCityFlowGuard?.version==='C9.0.7','Guarda C9.0.7 carregada',w.SinCityFlowGuard?.version||'ausente');
+  add(Boolean(w.SinCityFlowGuard?.isInstalled?.()),'Guarda instalada no sendPreview',String(w.SinCityFlowGuard?.isInstalled?.()));
+  add(w.sendPreview?.__sinCityFlowGuard==='C9.0.7','sendPreview protegido antes do envio',w.sendPreview?.__sinCityFlowGuard||'sem guarda');
+
+  const originalIds=ids(d),originalCount=originalIds.length;
+  add(originalCount>2,'Categorias base disponíveis',`${originalCount} categoria(s)`);
+  add(new Set(originalIds).size===originalIds.length,'IDs base únicos',`${new Set(originalIds).size}/${originalIds.length}`);
+
+  d.getElementById('addCat')?.click();
+  await wait();
+  let now=cards(d),temp=now.at(-1);
+  tempId=String(temp?.dataset.categoryId||'');
+  add(now.length===originalCount+1,'Criar categoria atualiza estrutura imediatamente',`${originalCount} → ${now.length}`);
+  add(Boolean(tempId)&&tempId!=='nova-categoria','Nova categoria recebe ID definitivo antes da prévia',tempId||'ausente');
+  add(/^\d{2,}$/.test(temp?.dataset.categoryNumber||''),'Nova categoria recebe número estrutural',temp?.dataset.categoryNumber||'ausente');
+  add(temp?.querySelectorAll('[data-c9-move-category]').length===2,'Nova categoria recebe controles de movimento','↑/↓ presentes');
+
+  let addSub=findCard(d,tempId)?.querySelector('[data-add-sub]');
+  addSub?.click();await wait();
+  addSub=findCard(d,tempId)?.querySelector('[data-add-sub]');
+  addSub?.click();await wait();
+  temp=findCard(d,tempId);let tempSubs=subs(temp);
+  const firstSubId=String(tempSubs[0]?.dataset.subcategoryId||''),secondSubId=String(tempSubs[1]?.dataset.subcategoryId||'');
+  add(tempSubs.length===2,'Criar duas subcategorias em sequência',`${tempSubs.length} criadas`);
+  add(Boolean(firstSubId)&&Boolean(secondSubId)&&firstSubId!=='nova-subcategoria'&&secondSubId!=='nova-subcategoria','Subcategorias recebem IDs definitivos antes da prévia',`${firstSubId} | ${secondSubId}`);
+  add(firstSubId!==secondSubId,'IDs das novas subcategorias são únicos','IDs diferentes');
+  const prefix=String(temp?.dataset.categoryNumber||'');
+  add(tempSubs.map(x=>x.dataset.subcategoryNumber).join(',')===`${prefix}.01,${prefix}.02`,'Numeração inicial das subcategorias correta',tempSubs.map(x=>x.dataset.subcategoryNumber).join(', '));
+
+  let up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait();
+  up=findCard(d,tempId)?.querySelector('[data-c9-move-category="up"]');up?.click();await wait();
+  const movedIndex=findIndex(d,tempId),movedCard=findCard(d,tempId);
+  add(movedIndex===originalCount-2,'Categoria recém-criada pode mover repetidamente',`posição=${movedIndex+1}`);
+  add(String(movedCard?.dataset.categoryId||'')===tempId,'ID da categoria preservado após mover',tempId);
+  const movedPrefix=String(movedCard?.dataset.categoryNumber||'');
+  add(subs(movedCard).every((sub,i)=>sub.dataset.subcategoryNumber===`${movedPrefix}.${String(i+1).padStart(2,'0')}`),'Subcategorias acompanham categoria movida',subs(movedCard).map(x=>x.dataset.subcategoryNumber).join(', '));
+
+  let currentSubs=subs(movedCard);
+  currentSubs[1]?.querySelector('[data-c9-move-subcategory="up"]')?.click();await wait();
+  currentSubs=subs(findCard(d,tempId));
+  add(String(currentSubs[0]?.dataset.subcategoryId||'')===secondSubId,'Subcategoria recém-criada pode subir',`primeira=${currentSubs[0]?.dataset.subcategoryId||''}`);
+  add(currentSubs[0]?.dataset.subcategoryNumber===`${movedPrefix}.01`&&currentSubs[1]?.dataset.subcategoryNumber===`${movedPrefix}.02`,'Numeração reorganiza após mover subcategoria',currentSubs.map(x=>x.dataset.subcategoryNumber).join(', '));
+
+  w.confirm=()=>true;
+  const deleteTarget=currentSubs[1];
+  deleteTarget?.querySelector('[data-del-sub]')?.click();await wait();
+  currentSubs=subs(findCard(d,tempId));
+  add(currentSubs.length===1,'Excluir subcategoria no meio do fluxo mantém estrutura',`${currentSubs.length} restante`);
+  add(currentSubs[0]?.dataset.subcategoryNumber===`${movedPrefix}.01`,'Subcategoria restante renumera para .01',currentSubs[0]?.dataset.subcategoryNumber||'ausente');
+  add(String(currentSubs[0]?.dataset.subcategoryId||'')===secondSubId,'ID da subcategoria sobrevivente preservado',secondSubId);
+
+  findCard(d,tempId)?.querySelector('[data-add-sub]')?.click();await wait();
+  currentSubs=subs(findCard(d,tempId));
+  const recreatedId=String(currentSubs[1]?.dataset.subcategoryId||'');
+  add(currentSubs.length===2,'Criar novamente após exclusão funciona',`${currentSubs.length} subcategorias`);
+  add(Boolean(recreatedId)&&recreatedId!==firstSubId&&recreatedId!==secondSubId&&recreatedId!=='nova-subcategoria','ID recriado não reutiliza placeholder nem IDs anteriores',recreatedId||'ausente');
+  add(currentSubs[1]?.dataset.subcategoryNumber===`${movedPrefix}.02`,'Nova subcategoria recebe próxima numeração correta',currentSubs[1]?.dataset.subcategoryNumber||'ausente');
+
+  const tempCard=findCard(d,tempId);
+  tempCard?.querySelector('[data-del-cat]')?.click();await wait(100);
+  const restored=ids(d);
+  add(restored.length===originalCount,'Excluir categoria temporária restaura quantidade original',`${restored.length}/${originalCount}`);
+  add(JSON.stringify(restored)===JSON.stringify(originalIds),'Categorias originais mantêm ordem e IDs após fluxo combinado','ordem original restaurada');
+  add(!restored.includes(tempId),'Categoria temporária removida completamente',tempId);
+
+  const categoryNumbers=cards(d).map(card=>card.dataset.categoryNumber||'');
+  const expectedNumbers=cards(d).map((_,i)=>String(i+1).padStart(2,'0'));
+  add(JSON.stringify(categoryNumbers)===JSON.stringify(expectedNumbers),'Numeração global permanece sequencial ao final',categoryNumbers.join(', '));
+  const allIds=[...d.querySelectorAll('#cats > details.item')].flatMap(card=>[card.dataset.categoryId,...subs(card).map(sub=>sub.dataset.subcategoryId)]).filter(Boolean);
+  add(new Set(allIds).size===allIds.length,'Nenhum ID duplicado após criar/excluir/mover',`${new Set(allIds).size}/${allIds.length}`);
+  add(typeof w.publish==='function','Publicação preservada e não executada','publish disponível');
+ }catch(error){add(false,'Runner executado sem exceções',error?.message||String(error));}
+ finally{
+  w.confirm=originalConfirm;
+  if(tempId&&findCard(d,tempId)){
+   try{w.confirm=()=>true;findCard(d,tempId)?.querySelector('[data-del-cat]')?.click();await wait();}catch{}
+   w.confirm=originalConfirm;
+  }
+ }
+ const passed=checks.filter(x=>x.ok).length;results.innerHTML=checks.map(x=>row(x.ok,x.title,x.detail)).join('');summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1700));document.getElementById('run').addEventListener('click',run);
+</script>
+</body>
+</html>
