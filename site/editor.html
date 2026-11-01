@@ -269,7 +269,48 @@ const defaults = {
  cursor:{enabled:true,trail_enabled:true,size:38,image:'./assets/pumpkin-cursor.svg',trail_type:'glow',trail_color:'#2D1243',trail_count:16,falling_particles:{enabled:true,type:'mixed',color:'#AF7AFF',count:15,size:13}}
 };
 function mergeSite(a={}, b=defaults){return {...b,...a,theme:{...b.theme,...(a.theme||{})},layout:{...b.layout,...(a.layout||{})},cursor:{...b.cursor,...(a.cursor||{}),falling_particles:{...b.cursor.falling_particles,...(a.cursor?.falling_particles||{})}}};}
-const diagnosticsManager = window.SinCityDiagnostics.create({repo:REPO,branch:BRANCH,toast:toast});
+let diagnosticsManager;
+try {
+ const diagnosticsApi = window.SinCityDiagnostics;
+ if(!diagnosticsApi || typeof diagnosticsApi.create !== 'function') {
+  throw new Error('O módulo diagnostics.js não foi carregado corretamente.');
+ }
+ const diagnosticsInstance = diagnosticsApi.create({repo:REPO,branch:BRANCH,toast:toast});
+ if(!diagnosticsInstance || typeof diagnosticsInstance.bind !== 'function' || typeof diagnosticsInstance.run !== 'function') {
+  throw new Error('A API do módulo de diagnóstico está incompleta.');
+ }
+ diagnosticsManager = {
+  bind() {
+   try { diagnosticsInstance.bind(); }
+   catch(error) {
+    console.error('[Sin City Studio] Falha ao conectar o diagnóstico:',error);
+    toast('O diagnóstico não pôde ser inicializado. O restante do Studio continua disponível.','error');
+   }
+  },
+  run() {
+   try {
+    return Promise.resolve(diagnosticsInstance.run()).catch(error=>{
+     console.error('[Sin City Studio] Falha ao executar o diagnóstico:',error);
+     toast('O diagnóstico falhou, mas o restante do Studio continua disponível.','error');
+     return null;
+    });
+   } catch(error) {
+    console.error('[Sin City Studio] Falha ao executar o diagnóstico:',error);
+    toast('O diagnóstico falhou, mas o restante do Studio continua disponível.','error');
+    return Promise.resolve(null);
+   }
+  }
+ };
+} catch(error) {
+ console.error('[Sin City Studio] Módulo de diagnóstico indisponível:',error);
+ diagnosticsManager = {
+  bind(){},
+  run(){
+   toast('Diagnóstico indisponível. O restante do Studio continua funcionando.','error');
+   return Promise.resolve(null);
+  }
+ };
+}
 function toast(text,type=''){const el=$('#toast');el.textContent=text;el.className='toast show '+type;clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.className='toast',4200);}
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function getPath(path){return path.split('.').reduce((o,k)=>o?.[k],site) ?? '';}

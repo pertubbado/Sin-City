@@ -1,4 +1,4 @@
-(function () {
+window.SinCityDiagnostics = (function () {
 'use strict';
 const REQUIRED_FILES=['site/index.html','site/editor.html','site/app.js','site/style.css','site/theme-controls.css','site/editor-studio.css','site/saved-themes.js','site/content/site.json','site/rules.json','site/content/rules.json','.github/workflows/deploy.yml'];
 const DEFAULT_ASSETS=['site/assets/cemetery-halloween.svg','site/assets/cemetery-night.webp','site/assets/cursor-esqueleto.png','site/assets/logo-sin-city.webp','site/assets/particle-bat.svg','site/assets/particle-pumpkin.svg','site/assets/pumpkin-cursor.svg','site/assets/sin-city-mark.svg'];
