@@ -34,7 +34,7 @@ function run(){
   const numbers=cards.map(card=>card.dataset.categoryNumber||'');
   const expected=cards.map((_,i)=>String(i+1).padStart(2,'0'));
   add(JSON.stringify(numbers)===JSON.stringify(expected),'Numeração das categorias sequencial',numbers.join(', '));
-  const codeInputs=[...d.querySelectorAll('#cats > details.item input[data-k="code"]')];
+  const codeInputs=[...d.querySelectorAll('#cats > details.item input[data-cat][data-k="code"]')];
   add(codeInputs.length===cards.length&&codeInputs.every((input,i)=>input.readOnly&&input.value===expected[i]),'Código da categoria automático e somente leitura',`${codeInputs.length}/${cards.length}`);
   let subOk=true,subCount=0,subPreview=[];
   cards.forEach((card,ci)=>{
