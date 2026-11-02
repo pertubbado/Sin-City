@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C10.0.8 Persistência e Regressões</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1540px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(410px,.92fr) minmax(650px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}.group{margin:15px 0 7px;font-size:12px;letter-spacing:.08em;color:#c9cdd3;text-transform:uppercase}iframe{width:100%;height:850px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}.regression{height:420px;margin-top:14px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}.regression{height:500px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C10.0.8 — Persistência e regressões C9</h1><p class="muted">Reordena dados reais somente em memória, valida rascunho, backup, contrato de publicação e executa a bateria consolidada C9. Restaura a ordem e o rascunho ao final. Não conecta GitHub e não publica.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C10.0.8"></iframe><iframe id="c9" class="regression" src="about:blank" title="Regressão consolidada C9"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const studio=document.getElementById('studio'),c9=document.getElementById('c9'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=100)=>new Promise(r=>setTimeout(r,ms));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function group(title){return `<div class="group">${title}</div>`}
+function images(rule){return (Array.isArray(rule?.images)?rule.images:(rule?.image?[rule.image]:[])).map(String)}
+function digest(source){return (source?.categories||[]).map(c=>({id:String(c?.id||''),code:String(c?.code||''),name:String(c?.name||''),rules:(c?.rules||[]).map(r=>({code:String(r?.code||''),title:String(r?.title||''),images:images(r)})),subcategories:(c?.subcategories||[]).map(s=>({id:String(s?.id||''),name:String(s?.name||''),rules:(s?.rules||[]).map(r=>({code:String(r?.code||''),title:String(r?.title||''),images:images(r)}))}))}))}
+const same=(a,b)=>JSON.stringify(digest(a?.data||a))===JSON.stringify(digest(b?.data||b));
+async function ready(w,d){for(let i=0;i<120;i++){if(w.SinCityReorderEngine?.getData?.()&&w.SinCityPersistence?.isInstalled?.()&&w.SinCityRuleImages?.refreshBindings&&d.querySelector('#cats > details.item'))return true;await wait(75)}return false}
+function findDirect(data){for(let ci=0;ci<data.categories.length;ci++){if((data.categories[ci].rules||[]).length>1)return {ci,list:data.categories[ci].rules}}return null}
+function findNested(data){for(let ci=0;ci<data.categories.length;ci++){for(let si=0;si<(data.categories[ci].subcategories||[]).length;si++){const list=data.categories[ci].subcategories[si].rules||[];if(list.length>1)return {ci,si,list}}}return null}
+function firstRule(data){for(const c of data.categories||[]){if((c.rules||[]).length)return c.rules[0];for(const s of c.subcategories||[]){if((s.rules||[]).length)return s.rules[0]}}return null}
+async function waitC9(){
+ c9.src='./c9-0-10-tests.html?c10='+Date.now();
+ for(let i=0;i<260;i++){
+  await wait(100);
+  try{
+   const text=String(c9.contentDocument?.getElementById('summary')?.textContent||'').trim();
+   const m=text.match(/^(\d+)\/(\d+) aprovados$/);
+   if(m)return {ok:m[1]===m[2],text};
+  }catch{}
+ }
+ return {ok:false,text:'tempo esgotado aguardando o runner C9'};
+}
+async function run(){
+ const w=studio.contentWindow,d=studio.contentDocument,checks=[];let section='';
+ const add=(ok,title,detail='')=>checks.push({section,ok:Boolean(ok),title,detail});
+ let originalDraft=null,originalDigest=null,imageRule=null,imageBackup=null;
+ const ops={category:null,subcategory:null,direct:null,nested:null};
+ async function restore(){
+  try{
+   const e=w.SinCityReorderEngine,data=e?.getData?.();if(!data)return;
+   if(imageRule&&imageBackup){if(imageBackup.hadImages)imageRule.images=imageBackup.images;else delete imageRule.images;if(imageBackup.hadImage)imageRule.image=imageBackup.image;else delete imageRule.image;}
+   if(ops.nested){const ci=data.categories.indexOf(ops.nested.category);const si=ops.nested.category?.subcategories?.indexOf(ops.nested.sub);const list=ops.nested.sub?.rules||[];const now=list.indexOf(ops.nested.rule);if(ci>=0&&si>=0&&now>=0&&now!==ops.nested.from)e.moveNestedRuleTo(ci,si,now,ops.nested.from,{notify:false,preview:false,render:true});}
+   if(ops.direct){const ci=data.categories.indexOf(ops.direct.category);const list=ops.direct.category?.rules||[];const now=list.indexOf(ops.direct.rule);if(ci>=0&&now>=0&&now!==ops.direct.from)e.moveDirectRuleTo(ci,now,ops.direct.from,{notify:false,preview:false,render:true});}
+   if(ops.subcategory){const ci=data.categories.indexOf(ops.subcategory.category);const list=ops.subcategory.category?.subcategories||[];const now=list.indexOf(ops.subcategory.sub);if(ci>=0&&now>=0&&now!==ops.subcategory.from)e.moveSubcategoryTo(ci,now,ops.subcategory.from,{notify:false,preview:false,render:true});}
+   if(ops.category){const now=data.categories.indexOf(ops.category.category);if(now>=0&&now!==ops.category.from)e.moveCategoryTo(now,ops.category.from,{notify:false,preview:false,render:true});}
+   w.SinCityFlowGuard?.flush?.();w.SinCityRuleImages?.refreshBindings?.();
+  }catch(error){console.warn('Falha ao restaurar dados do runner C10.0.8',error)}
+  try{if(originalDraft===null)w.localStorage.removeItem('sin-city-editor-draft');else w.localStorage.setItem('sin-city-editor-draft',originalDraft)}catch{}
+ }
+ try{
+  section='01 · Camadas críticas';
+  const loaded=await ready(w,d);add(loaded,'Studio e camadas de persistência carregados',loaded?'pronto':'tempo esgotado');
+  const e=w.SinCityReorderEngine,data=e?.getData?.();
+  add(w.SinCityPersistence?.version==='C9.0.9','Persistência C9.0.9 preservada',w.SinCityPersistence?.version||'ausente');
+  add(Boolean(w.SinCityPersistence?.isInstalled?.()),'Guarda de persistência instalada');
+  add(Boolean(w.SinCityFlowGuard?.isInstalled?.()),'Guarda de fluxo instalada');
+  add(Boolean(w.SinCityRuleImages?.refreshBindings),'Integração de imagens disponível');
+  originalDraft=w.localStorage.getItem('sin-city-editor-draft');
+  originalDigest=digest(data);
+
+  section='02 · Reordenação combinada';
+  if(data.categories.length>1){const category=data.categories[0],to=data.categories.length-1;ops.category={category,from:0};const r=e.moveCategoryTo(0,to,{notify:false,preview:false,render:true});await wait(100);add(r.moved&&data.categories[to]===category,'Categoria reordenada para teste de persistência',`01 → ${to+1}`)}else add(true,'Categoria: teste não aplicável','menos de 2 categorias');
+  const catWithSubs=data.categories.find(c=>(c.subcategories||[]).length>1);
+  if(catWithSubs){const ci=data.categories.indexOf(catWithSubs),sub=catWithSubs.subcategories[0],to=catWithSubs.subcategories.length-1;ops.subcategory={category:catWithSubs,sub,from:0};const r=e.moveSubcategoryTo(ci,0,to,{notify:false,preview:false,render:true});await wait(100);add(r.moved&&catWithSubs.subcategories[to]===sub,'Subcategoria reordenada para teste de persistência',`01 → ${to+1}`)}else add(true,'Subcategoria: teste não aplicável','nenhum bloco com 2+ subcategorias');
+  const direct=findDirect(data);
+  if(direct){const category=data.categories[direct.ci],rule=direct.list[0],to=direct.list.length-1;ops.direct={category,rule,from:0};const r=e.moveDirectRuleTo(direct.ci,0,to,{notify:false,preview:false,render:true});await wait(100);add(r.moved&&direct.list[to]===rule,'Regra direta reordenada para teste de persistência',`01 → ${to+1}`)}else add(true,'Regra direta: teste não aplicável','nenhum bloco com 2+ regras');
+  const nested=findNested(data);
+  if(nested){const category=data.categories[nested.ci],sub=category.subcategories[nested.si],rule=nested.list[0],to=nested.list.length-1;ops.nested={category,sub,rule,from:0};const r=e.moveNestedRuleTo(nested.ci,nested.si,0,to,{notify:false,preview:false,render:true});await wait(100);add(r.moved&&nested.list[to]===rule,'Regra de subcategoria reordenada para teste de persistência',`01 → ${to+1}`)}else add(true,'Regra aninhada: teste não aplicável','nenhum bloco com 2+ regras');
+
+  imageRule=ops.direct?.rule||ops.nested?.rule||firstRule(data);
+  if(imageRule){imageBackup={hadImages:Object.prototype.hasOwnProperty.call(imageRule,'images'),images:Array.isArray(imageRule.images)?imageRule.images.slice():imageRule.images,hadImage:Object.prototype.hasOwnProperty.call(imageRule,'image'),image:imageRule.image};imageRule.images=['./assets/logo-sin-city.webp'];imageRule.image='./assets/logo-sin-city.webp';w.SinCityRuleImages.refreshBindings();add(images(imageRule)[0]==='./assets/logo-sin-city.webp','Imagem de controle ligada à mesma regra','./assets/logo-sin-city.webp')}else add(true,'Imagem: teste não aplicável','nenhuma regra encontrada');
+  w.SinCityFlowGuard.flush();const expected=JSON.parse(JSON.stringify(data));
+
+  section='03 · Rascunho';
+  d.getElementById('draftBtn')?.click();await wait(120);const rawDraft=w.localStorage.getItem('sin-city-editor-draft');const draft=rawDraft?JSON.parse(rawDraft):null;
+  add(Boolean(draft?.data),'Rascunho contém payload de regras');
+  add(same(expected,draft),'Rascunho preserva ordem, conteúdo e imagens publicadas','digest C10 idêntico');
+  if(imageRule)add(images(draft.data.categories.flatMap(c=>[...(c.rules||[]),...(c.subcategories||[]).flatMap(s=>s.rules||[])]).find(r=>r.title===imageRule.title&&r.code===imageRule.code)||{})[0]==='./assets/logo-sin-city.webp','Rascunho preserva imagem da regra de controle');
+
+  section='04 · Backup';
+  let capturedBlob=null;const originalCreate=w.URL.createObjectURL,originalClick=w.HTMLAnchorElement.prototype.click;
+  w.URL.createObjectURL=function(blob){capturedBlob=blob;return 'blob:c10-0-8-test'};w.HTMLAnchorElement.prototype.click=function(){};
+  try{d.getElementById('backupBtn')?.click();await wait(120)}finally{w.URL.createObjectURL=originalCreate;w.HTMLAnchorElement.prototype.click=originalClick;}
+  const backup=capturedBlob?JSON.parse(await capturedBlob.text()):null;
+  add(Boolean(backup?.data),'Backup contém payload de regras');
+  add(same(expected,backup),'Backup preserva ordem, conteúdo e imagens','digest C10 idêntico');
+  add(backup&&same(backup,JSON.parse(JSON.stringify(backup))),'Backup suporta round-trip JSON sem perda');
+
+  section='05 · Contrato de publicação';
+  const publishSource=String(w.publish||'');
+  add(typeof w.publish==='function','Função PUBLICAR preservada');
+  add(/structuredClone\(data\)/.test(publishSource),'PUBLICAR parte do data atual','structuredClone(data)');
+  add(/JSON\.stringify\(publishedData/.test(publishSource),'PUBLICAR serializa os dados reordenados','JSON.stringify(publishedData)');
+  add((publishSource.match(/createBlob\(rulesText\)/g)||[]).length>=2,'PUBLICAR usa o mesmo rulesText nos dois JSONs','2 blobs');
+  add(/allRules\(publishedData\)/.test(publishSource),'PUBLICAR processa imagens nas regras reordenadas');
+  add(/force:false/.test(publishSource),'PUBLICAR mantém atualização não forçada da branch','force:false');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não cria sessão GitHub');
+
+  section='06 · Restauração antes da regressão C9';
+  await restore();
+  const restored=e.getData();
+  add(JSON.stringify(digest(restored))===JSON.stringify(originalDigest),'Dados restaurados exatamente após os testes','ordem/conteúdo/imagens originais');
+  add((originalDraft===null&&!w.localStorage.getItem('sin-city-editor-draft'))||(originalDraft!==null&&w.localStorage.getItem('sin-city-editor-draft')===originalDraft),'Rascunho local anterior restaurado');
+
+  section='07 · Regressão consolidada C9';
+  const c9result=await waitC9();add(c9result.ok,'Runner consolidado C9 continua aprovado',c9result.text);
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Regressões não conectaram GitHub');
+ }catch(error){checks.push({section:section||'Erro',ok:false,title:'Runner executado sem exceções',detail:error?.message||String(error)});await restore();}
+ let html='',last='';for(const c of checks){if(c.section!==last){last=c.section;html+=group(last)}html+=row(c.ok,c.title,c.detail)}results.innerHTML=html;
+ const passed=checks.filter(x=>x.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+studio.addEventListener('load',()=>setTimeout(run,2200));document.getElementById('run').addEventListener('click',run);
+</script></body></html>
