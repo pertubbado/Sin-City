@@ -1,1 +1,67 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>C10 • Regressão imagem + reordenação</title><style>body{margin:0;background:#101114;color:#f6f6f7;font-family:system-ui,Segoe UI,Arial,sans-serif}.wrap{max-width:1450px;margin:auto;padding:18px}.grid{display:grid;grid-template-columns:minmax(380px,.9fr) minmax(650px,1.5fr);gap:14px}.card{background:#181a1e;border:1px solid #363a42;border-radius:13px;padding:16px}.status{padding:9px 11px;border:1px solid #3c4149;border-radius:8px;margin:7px 0}.ok{border-color:#2c7659}.bad{border-color:#98414c}.muted{font-size:12px;color:#aeb4bd}iframe{width:100%;height:820px;border:1px solid #343840;border-radius:10px;background:#000}@media(max-width:1000px){.grid{grid-template-columns:1fr}}</style></head><body><div class="wrap"><div class="grid"><section class="card"><h1>Imagem + reordenação de subcategoria</h1><p class="muted">Simula a presença de imagem em uma regra, força o rebind da galeria e valida se ↑/↓ e o módulo de drag da subcategoria continuam operacionais. Não publica.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando…</div><div id="results"></div></section><section class="card"><iframe id="studio" src="./editor.html" title="Studio"></iframe></section></div></div><script>'use strict';const frame=document.getElementById('studio'),summary=document.getElementById('summary'),results=document.getElementById('results');const wait=(ms=100)=>new Promise(r=>setTimeout(r,ms));const row=(ok,t,d='')=>`<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${t}</strong>${d?`<div class="muted">${d}</div>`:''}</div>`;async function ready(w,d){for(let i=0;i<160;i++){if(w.SinCityImageReorderBridge?.refresh&&w.SinCitySubcategoryDrag?.refresh&&w.SinCityOrdering?.refresh&&d.querySelector('#cats > details.item'))return true;await wait(75)}return false}function findTarget(data){for(let ci=0;ci<(data.categories||[]).length;ci++){const c=data.categories[ci];if((c.subcategories||[]).length>1){for(let si=0;si<c.subcategories.length;si++){if((c.subcategories[si].rules||[]).length)return{ci,si,c,sub:c.subcategories[si],rule:c.subcategories[si].rules[0]}}}}return null}async function run(){const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,t,x='')=>checks.push({ok:Boolean(ok),t,x});let original=null,target=null;try{add(await ready(w,d),'Camadas necessárias carregadas');const data=w.SinCityReorderEngine?.getData?.();target=findTarget(data);if(!target){add(false,'Existe subcategoria com regra e vizinha para teste','dados insuficientes');throw new Error('Sem estrutura adequada para o teste');}original={subIndex:target.si,images:Array.isArray(target.rule.images)?target.rule.images.slice():target.rule.images,image:target.rule.image,hadImages:Object.prototype.hasOwnProperty.call(target.rule,'images'),hadImage:Object.prototype.hasOwnProperty.call(target.rule,'image')};target.rule.images=['./assets/logo-sin-city.webp'];target.rule.image='./assets/logo-sin-city.webp';w.SinCityRuleImages?.refreshBindings?.();w.SinCityImageReorderBridge.refresh();await wait(100);const card=[...d.querySelectorAll('#cats > details.item')][target.ci];const subcards=[...card.querySelectorAll(':scope > .sub-list > details.subitem')];const subcard=subcards[target.si];const up=subcard.querySelector('[data-c9-move-subcategory="up"]'),down=subcard.querySelector('[data-c9-move-subcategory="down"]'),handle=subcard.querySelector('.c10-subcategory-drag-handle');add(Boolean(up&&down),'Botões ↑/↓ continuam presentes após imagem');add(Boolean(handle)&&handle.draggable,'Handle Arrastar continua ativo após imagem');add([...subcard.querySelectorAll('.rule-image-card img')].every(img=>img.draggable===false),'Miniaturas não roubam o drag nativo');const direction=target.si===0?1:-1;const button=direction>0?down:up;add(Boolean(button)&&!button.disabled,'Botão de movimento aplicável continua habilitado');const originalSub=target.sub;button?.click();await wait(180);const now=target.c.subcategories.indexOf(originalSub);add(now===target.si+direction,'Subcategoria move por ↑/↓ mesmo com imagem',`${target.si} → ${now}`);const movedCard=[...([...d.querySelectorAll('#cats > details.item')][target.ci]?.querySelectorAll(':scope > .sub-list > details.subitem')||[])][now];add(Boolean(movedCard?.querySelector('.c10-subcategory-drag-handle')),'Handle é religado depois do movimento');add((target.rule.images||[])[0]==='./assets/logo-sin-city.webp','Imagem permanece na mesma regra após mover');w.SinCityReorderEngine.moveSubcategoryTo(target.ci,now,target.si,{notify:false,preview:false,render:true});await wait(120);add(target.c.subcategories[target.si]===originalSub,'Ordem original restaurada');}catch(e){add(false,'Runner executado sem exceções',e.message||String(e))}finally{try{if(target&&original){if(original.hadImages)target.rule.images=original.images;else delete target.rule.images;if(original.hadImage)target.rule.image=original.image;else delete target.rule.image;w.SinCityRuleImages?.refreshBindings?.();w.SinCityImageReorderBridge?.refresh?.();}}catch{}}results.innerHTML=checks.map(c=>row(c.ok,c.t,c.x)).join('');const passed=checks.filter(c=>c.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;}frame.addEventListener('load',()=>setTimeout(run,1800));document.getElementById('run').onclick=run;</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C10 • Regressão imagem + regra</title>
+<style>
+body{margin:0;background:#101114;color:#f6f6f7;font-family:system-ui,Segoe UI,Arial,sans-serif}.wrap{max-width:1450px;margin:auto;padding:18px}.grid{display:grid;grid-template-columns:minmax(380px,.9fr) minmax(650px,1.5fr);gap:14px}.card{background:#181a1e;border:1px solid #363a42;border-radius:13px;padding:16px}.status{padding:9px 11px;border:1px solid #3c4149;border-radius:8px;margin:7px 0}.ok{border-color:#2c7659}.bad{border-color:#98414c}.muted{font-size:12px;color:#aeb4bd}iframe{width:100%;height:820px;border:1px solid #343840;border-radius:10px;background:#000}@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>Imagem + reordenação da própria regra</h1><p class="muted">Simula uma imagem em uma regra, reconstrói o Studio e valida se ↑/↓ e Arrastar continuam ligados na própria regra. Não publica.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),summary=document.getElementById('summary'),results=document.getElementById('results');
+const wait=(ms=100)=>new Promise(r=>setTimeout(r,ms));
+const row=(ok,t,d='')=>`<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${t}</strong>${d?`<div class="muted">${d}</div>`:''}</div>`;
+async function ready(w,d){for(let i=0;i<180;i++){if(w.SinCityImageReorderBridge?.rebuildAfterImageChange&&w.SinCityRuleDrag?.refresh&&w.SinCityRuleFallback?.refresh&&w.SinCityReorderEngine?.getData?.()&&d.querySelector('#cats > details.item'))return true;await wait(75)}return false}
+function findTarget(data){
+ for(let ci=0;ci<(data.categories||[]).length;ci++){
+  const category=data.categories[ci];
+  if((category.rules||[]).length>1)return{scope:'direct',ci,si:null,category,list:category.rules,rule:category.rules[0],ri:0};
+  for(let si=0;si<(category.subcategories||[]).length;si++){
+   const sub=category.subcategories[si],list=sub.rules||[];
+   if(list.length>1)return{scope:'nested',ci,si,category,sub,list,rule:list[0],ri:0};
+  }
+ }
+ return null;
+}
+function ruleCard(d,target,index){
+ const category=[...d.querySelectorAll('#cats > details.item')][target.ci];
+ if(target.scope==='direct')return [...(category?.querySelectorAll(':scope > .direct-list > .rule')||[])][index]||null;
+ const sub=[...(category?.querySelectorAll(':scope > .sub-list > details.subitem')||[])][target.si];
+ return [...(sub?.querySelectorAll(':scope > .rule')||[])][index]||null;
+}
+async function run(){
+ const w=frame.contentWindow,d=frame.contentDocument,checks=[];const add=(ok,t,x='')=>checks.push({ok:Boolean(ok),t,x});let original=null,target=null;
+ try{
+  add(await ready(w,d),'Camadas necessárias carregadas');
+  const data=w.SinCityReorderEngine.getData();target=findTarget(data);
+  if(!target){add(false,'Existe bloco com 2+ regras para testar','dados insuficientes');throw new Error('Sem estrutura adequada para o teste');}
+  original={images:Array.isArray(target.rule.images)?target.rule.images.slice():target.rule.images,image:target.rule.image,hadImages:Object.prototype.hasOwnProperty.call(target.rule,'images'),hadImage:Object.prototype.hasOwnProperty.call(target.rule,'image')};
+  target.rule.images=['./assets/logo-sin-city.webp'];target.rule.image='./assets/logo-sin-city.webp';
+  add(w.SinCityImageReorderBridge.rebuildAfterImageChange({preview:false})===true,'Studio reconstruído após imagem');await wait(140);
+  let card=ruleCard(d,target,target.ri);const up=card?.querySelector('[data-c10-rule-move="up"]'),down=card?.querySelector('[data-c10-rule-move="down"]'),handle=card?.querySelector('.c10-rule-drag-handle');
+  add(Boolean(up&&down),'Botões ↑/↓ da regra continuam presentes após imagem');
+  add(Boolean(handle)&&handle.draggable,'Handle Arrastar da regra continua ativo após imagem');
+  add([...card.querySelectorAll('.rule-image-card img')].every(img=>img.draggable===false),'Miniaturas não roubam o drag nativo');
+  const direction=target.ri===0?1:-1,button=direction>0?down:up;
+  add(Boolean(button)&&!button.disabled,'Botão aplicável da regra continua habilitado');
+  const movedRule=target.rule;button?.click();await wait(180);
+  const now=target.list.indexOf(movedRule);add(now===target.ri+direction,'A própria regra move por ↑/↓ depois da imagem',`${target.ri} → ${now}`);
+  card=ruleCard(d,target,now);add(Boolean(card?.querySelector('.c10-rule-drag-handle')),'Arrastar é religado na nova posição');
+  add((movedRule.images||[])[0]==='./assets/logo-sin-city.webp','Imagem permanece na mesma regra após mover');
+  const restoreOptions={notify:false,preview:false,render:true};
+  if(target.scope==='direct')w.SinCityReorderEngine.moveDirectRuleTo(target.ci,now,target.ri,restoreOptions);
+  else w.SinCityReorderEngine.moveNestedRuleTo(target.ci,target.si,now,target.ri,restoreOptions);
+  await wait(120);add(target.list[target.ri]===movedRule,'Ordem original restaurada');
+ }catch(e){add(false,'Runner executado sem exceções',e.message||String(e));}
+ finally{
+  try{if(target&&original){if(original.hadImages)target.rule.images=original.images;else delete target.rule.images;if(original.hadImage)target.rule.image=original.image;else delete target.rule.image;w.SinCityImageReorderBridge?.rebuildAfterImageChange?.({preview:false});}}catch{}
+ }
+ results.innerHTML=checks.map(c=>row(c.ok,c.t,c.x)).join('');const passed=checks.filter(c=>c.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,1800));document.getElementById('run').onclick=run;
+</script></body></html>
