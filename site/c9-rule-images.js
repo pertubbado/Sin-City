@@ -1,4 +1,4 @@
-/* C9.0.13 — upload e galeria de imagens por regra. */
+/* C9.0.13 + C10.0.6 — upload/galeria de imagens por regra e ponte segura de rebind. */
 'use strict';
 
 (() => {
@@ -63,20 +63,16 @@
 
   function ruleByKey(key, root = data) {
     const parts = String(key || '').split(':');
-    if (parts[0] === 'D' && parts.length === 3) {
-      return root?.categories?.[+parts[1]]?.rules?.[+parts[2]] || null;
-    }
-    if (parts[0] === 'S' && parts.length === 4) {
-      return root?.categories?.[+parts[1]]?.subcategories?.[+parts[2]]?.rules?.[+parts[3]] || null;
-    }
+    if (parts[0] === 'D' && parts.length === 3) return root?.categories?.[+parts[1]]?.rules?.[+parts[2]] || null;
+    if (parts[0] === 'S' && parts.length === 4) return root?.categories?.[+parts[1]]?.subcategories?.[+parts[2]]?.rules?.[+parts[3]] || null;
     return null;
   }
 
   function keyFromAttrs(attrs) {
     let match = String(attrs || '').match(/data-sub-rule="([^"]+)"/);
-    if (match) return `S:${match[1].replace(/:/g, ':')}`;
+    if (match) return `S:${match[1]}`;
     match = String(attrs || '').match(/data-rule="([^"]+)"/);
-    if (match) return `D:${match[1].replace(/:/g, ':')}`;
+    if (match) return `D:${match[1]}`;
     return '';
   }
 
@@ -139,13 +135,7 @@
       img.src = dataUrl;
     });
     const objectUrl = URL.createObjectURL(file);
-    return {
-      objectUrl,
-      base64:dataUrl.split(',')[1],
-      extension,
-      name:file.name || `imagem.${extension}`,
-      dimensions
-    };
+    return {objectUrl,base64:dataUrl.split(',')[1],extension,name:file.name || `imagem.${extension}`,dimensions};
   }
 
   async function addRuleImages(key, input) {
@@ -153,10 +143,7 @@
     if (!rule) return;
     const images = normalizeRuleImages(rule);
     const remaining = MAX_RULE_IMAGES - images.length;
-    if (remaining <= 0) {
-      toast('Esta regra já atingiu o limite de 3 imagens.','error');
-      return;
-    }
+    if (remaining <= 0) { toast('Esta regra já atingiu o limite de 3 imagens.','error'); return; }
     const selected = [...(input.files || [])];
     if (!selected.length) return;
     if (selected.length > remaining) toast(`Somente ${remaining} imagem(ns) serão adicionadas para respeitar o limite de 3.`);
@@ -167,9 +154,7 @@
         pendingRuleImageUploads.set(item.objectUrl, item);
         images.push(item.objectUrl);
         added++;
-      } catch (error) {
-        toast(error.message || 'Não foi possível adicionar uma das imagens.','error');
-      }
+      } catch (error) { toast(error.message || 'Não foi possível adicionar uma das imagens.','error'); }
     }
     rule.images = images.slice(0, MAX_RULE_IMAGES);
     rule.image = rule.images[0] || '';
@@ -198,9 +183,7 @@
     document.querySelectorAll('[data-rule-image-add]').forEach(button => {
       button.onclick = () => document.querySelector(`[data-rule-image-file="${CSS.escape(button.dataset.ruleImageAdd)}"]`)?.click();
     });
-    document.querySelectorAll('[data-rule-image-file]').forEach(input => {
-      input.onchange = () => addRuleImages(input.dataset.ruleImageFile, input);
-    });
+    document.querySelectorAll('[data-rule-image-file]').forEach(input => { input.onchange = () => addRuleImages(input.dataset.ruleImageFile, input); });
     document.querySelectorAll('[data-rule-image-remove]').forEach(button => {
       button.onclick = () => {
         const raw = button.dataset.ruleImageRemove || '';
@@ -224,18 +207,22 @@
 
   function countPendingRuleImages() {
     const referenced = new Set();
-    allRules().forEach(({rule}) => normalizeRuleImages(rule).forEach(value => {
-      if (pendingRuleImageUploads.has(value)) referenced.add(value);
-    }));
+    allRules().forEach(({rule}) => normalizeRuleImages(rule).forEach(value => { if (pendingRuleImageUploads.has(value)) referenced.add(value); }));
     return referenced.size;
   }
 
+  function imageBindingSnapshot() {
+    return allRules().map(({rule,key}) => ({key,rule,images:normalizeRuleImages(rule).slice()}));
+  }
+
+  function refreshBindings() {
+    allRules().forEach(({rule}) => normalizeRuleImages(rule));
+    bindRuleImageControls();
+    return imageBindingSnapshot();
+  }
+
   async function publishC9013() {
-    if (!githubToken) {
-      login();
-      toast('Entre com GitHub para publicar.');
-      return;
-    }
+    if (!githubToken) { login(); toast('Entre com GitHub para publicar.'); return; }
     if (!confirm('Publicar as alterações e imagens no GitHub? Isso atualiza o site para todos os visitantes.')) return;
     const btn = $('#publishBtn');
     const old = btn.textContent;
@@ -270,10 +257,7 @@
         const finalImages = [];
         for (const value of rule.images || []) {
           const pending = pendingRuleImageUploads.get(value);
-          if (!pending) {
-            if (isPublishedImage(value)) finalImages.push(value);
-            continue;
-          }
+          if (!pending) { if (isPublishedImage(value)) finalImages.push(value); continue; }
           if (!pending.base64) throw new Error('Uma imagem da regra precisa ser selecionada novamente.');
           const fileName = `rule-${stampId}-${Math.random().toString(36).slice(2,10)}.${pending.extension}`;
           const remotePath = `site/assets/uploads/${fileName}`;
@@ -288,14 +272,10 @@
 
       const siteText = JSON.stringify(publishedSite, null, 2) + '\n';
       const rulesText = JSON.stringify(publishedData, null, 2) + '\n';
-      const totalImages = entries.length;
-      toast(`Preparando conteúdo e ${totalImages} imagem(ns) para publicação...`);
-
+      toast(`Preparando conteúdo e ${entries.length} imagem(ns) para publicação...`);
       const ref = await gh(`/repos/${REPO}/git/ref/heads/${BRANCH}`);
       const parent = await gh(`/repos/${REPO}/git/commits/${ref.object.sha}`);
-      const [siteBlob, rulesBlob, contentRulesBlob] = await Promise.all([
-        createBlob(siteText), createBlob(rulesText), createBlob(rulesText)
-      ]);
+      const [siteBlob, rulesBlob, contentRulesBlob] = await Promise.all([createBlob(siteText), createBlob(rulesText), createBlob(rulesText)]);
       entries.unshift(
         {path:SITE_PATH,mode:'100644',type:'blob',sha:siteBlob.sha},
         {path:RULES_PATH,mode:'100644',type:'blob',sha:rulesBlob.sha},
@@ -340,11 +320,7 @@
         return `<div class="rule"><div class="item-head"><strong>${esc(rule.code||'')} • ${esc(rule.title||'Sem título')}</strong><button class="btn mini danger" ${delAttr}>Excluir</button></div><div class="field-row"><div class="field"><label>Código</label><input ${attrs} data-k="code" value="${esc(rule.code||'')}"></div><div class="field"><label>Tag</label><input ${attrs} data-k="tag" value="${esc(rule.tag||'REGRA')}"></div></div><div class="field"><label>Título</label><input ${attrs} data-k="title" value="${esc(rule.title||'')}"></div><div class="field"><label>Texto da regra (Markdown permitido)</label><textarea ${attrs} data-k="text">${esc(rule.text||'')}</textarea></div>${ruleImagesMarkup(rule,key)}</div>`;
       };
 
-      bindEditor = function() {
-        originalBindEditor();
-        bindRuleImageControls();
-      };
-
+      bindEditor = function() { originalBindEditor(); bindRuleImageControls(); };
       saveDraft = function() {
         const cleanData = cleanRulesForStorage();
         localStorage.setItem('sin-city-editor-draft', JSON.stringify({site:snapshotForStorage(),data:cleanData,savedAt:new Date().toISOString()}));
@@ -352,7 +328,6 @@
         toast(pending ? 'Rascunho salvo. Imagens locais pendentes precisam ser selecionadas/publicadas antes de fechar o editor.' : 'Rascunho salvo somente neste navegador.','ok');
         updateDashboard();
       };
-
       backup = function() {
         const payload = {exportedAt:new Date().toISOString(),site:snapshotForStorage(),data:cleanRulesForStorage()};
         const a = document.createElement('a');
@@ -369,15 +344,17 @@
       $('#backupBtn').onclick = backup;
 
       allRules().forEach(({rule}) => normalizeRuleImages(rule));
-      if ($('#panel-rules')) {
-        renderRules();
-        bindEditor();
-        sendPreview();
-      }
+      window.SinCityRuleImages = {
+        version:'C9.0.13+C10.0.6',
+        refreshBindings,
+        imageBindingSnapshot,
+        pendingCount:countPendingRuleImages,
+        ruleByKey,
+        normalizeRuleImages
+      };
+      if ($('#panel-rules')) { renderRules(); bindEditor(); sendPreview(); }
       console.info('[Sin City Studio] C9.0.13 ativa: galeria de até 3 imagens por regra.');
-    } catch (error) {
-      console.error('[Sin City Studio] C9.0.13 não pôde ser inicializada:', error);
-    }
+    } catch (error) { console.error('[Sin City Studio] C9.0.13 não pôde ser inicializada:', error); }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true});
