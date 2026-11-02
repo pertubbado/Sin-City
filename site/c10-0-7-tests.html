@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin City • C10.0.7 Acessibilidade e fallback</title>
+<style>
+body{margin:0;background:#0f1012;color:#f5f5f6;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}.wrap{max-width:1500px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:minmax(390px,.9fr) minmax(650px,1.5fr);gap:16px;align-items:start}.card{background:#181a1d;border:1px solid #34373d;border-radius:14px;padding:18px}.status{padding:10px 12px;border:1px solid #3b3f46;border-radius:9px;margin:8px 0}.ok{border-color:#2d7a5b}.bad{border-color:#9c414c}.muted{color:#aeb2b9;font-size:13px;line-height:1.45}.group{margin:15px 0 7px;font-size:12px;letter-spacing:.08em;color:#c9cdd3;text-transform:uppercase}iframe{width:100%;height:840px;border:1px solid #34373d;border-radius:12px;background:#000}button{margin-bottom:8px}@media(max-width:1050px){.grid{grid-template-columns:1fr}iframe{height:720px}}
+</style>
+</head>
+<body><div class="wrap"><div class="grid">
+<section class="card"><h1>C10.0.7 — Acessibilidade e fallback</h1><p class="muted">Valida instruções, região aria-live, foco, fallback ↑/↓ das regras e compatibilidade touch/reduced-motion. Não conecta GitHub e restaura a ordem original.</p><button id="run">Executar novamente</button><div id="summary" class="status">Aguardando o Studio…</div><div id="results"></div></section>
+<section class="card"><iframe id="studio" src="./editor.html" title="Studio C10.0.7"></iframe></section>
+</div></div>
+<script>
+'use strict';
+const frame=document.getElementById('studio'),results=document.getElementById('results'),summary=document.getElementById('summary');
+const wait=(ms=110)=>new Promise(r=>setTimeout(r,ms));
+function row(ok,title,detail=''){return `<div class="status ${ok?'ok':'bad'}"><strong>${ok?'✓':'✕'} ${title}</strong>${detail?`<div class="muted">${detail}</div>`:''}</div>`}
+function group(title){return `<div class="group">${title}</div>`}
+async function ready(w){for(let i=0;i<100;i++){if(w.SinCityDragA11y?.version==='C10.0.7'&&w.SinCityRuleFallback?.version==='C10.0.7'&&w.SinCityReorderEngine&&w.document.querySelector('#cats > details.item'))return true;await wait(75)}return false}
+async function run(){
+ const w=frame.contentWindow,checks=[];let section='';const add=(ok,title,detail='')=>checks.push({section,ok:Boolean(ok),title,detail});
+ try{
+  const loaded=await ready(w);section='01 · Carregamento';
+  add(loaded,'Camadas C10.0.7 carregadas');
+  add(w.SinCityDragA11y?.version==='C10.0.7','Camada de acessibilidade disponível');
+  add(w.SinCityRuleFallback?.version==='C10.0.7','Fallback de regras disponível');
+
+  section='02 · Infraestrutura acessível';
+  const d=w.document,help=d.getElementById('c10DragHelp'),live=d.getElementById('c10DragLive');
+  add(!!help&&/Arrastar/.test(help.textContent)&&/Subir/.test(help.textContent),'Instrução visual explica drag e fallback');
+  add(live?.getAttribute('role')==='status'&&live?.getAttribute('aria-live')==='polite','Região aria-live configurada');
+  const handles=[...d.querySelectorAll('.c10-category-drag-handle,.c10-subcategory-drag-handle,.c10-rule-drag-handle')];
+  add(handles.length>0,'Handles de drag encontrados',String(handles.length));
+  add(handles.every(h=>h.getAttribute('aria-describedby')==='c10DragHelp'),'Todos os handles apontam para a instrução');
+  add(handles.every(h=>String(h.getAttribute('aria-label')||'').trim()),'Todos os handles têm nome acessível');
+
+  section='03 · Fallback das regras';
+  const ruleCards=[...d.querySelectorAll('#cats .rule')];
+  const groups=[...d.querySelectorAll('.c10-rule-move-controls')];
+  add(ruleCards.length===groups.length,'Cada regra possui grupo ↑/↓',`${groups.length}/${ruleCards.length}`);
+  add(groups.every(g=>g.getAttribute('role')==='group'&&g.getAttribute('aria-label')),'Grupos de fallback têm semântica acessível');
+  add(groups.every(g=>g.querySelector('[data-c10-rule-move="up"]')&&g.querySelector('[data-c10-rule-move="down"]')),'Todos os grupos possuem Subir e Descer');
+  add([...d.querySelectorAll('[data-c10-rule-move]')].every(b=>b.getAttribute('aria-label')),'Botões de regra têm aria-label');
+
+  section='04 · CSS responsivo';
+  const css=d.getElementById('c10DragA11yStyles')?.textContent||'';
+  add(/pointer:coarse/.test(css),'Fallback touch/coarse presente');
+  add(/prefers-reduced-motion:reduce/.test(css),'Movimento reduzido respeitado');
+  add(/focus-visible/.test(css),'Foco visível explícito configurado');
+  add(/SOLTAR ANTES|data-c10-drop-label/.test(css),'Alvo de drop possui feedback textual além da cor');
+
+  const engine=w.SinCityReorderEngine,data=engine.getData(),original=JSON.stringify(data);
+  section='05 · Movimento por fallback';
+  let tested=false;
+  for(let ci=0;ci<data.categories.length&&!tested;ci++){
+   const rules=data.categories[ci].rules||[];
+   if(rules.length>1){
+    const first=rules[0],code=first.code;
+    const r=engine.moveDirectRuleTo(ci,0,1,{notify:false,preview:false,render:true});await wait(180);
+    add(r.moved&&data.categories[ci].rules[1]===first,'Regra direta move sem drag');
+    add(String(first.code||'')===String(code||''),'Código manual preservado no fallback');
+    engine.moveDirectRuleTo(ci,1,0,{notify:false,preview:false,render:true});await wait(180);tested=true;
+   }
+  }
+  if(!tested)add(true,'Teste direto não aplicável','nenhuma categoria com 2+ regras diretas');
+
+  section='06 · Regressão final';
+  add(JSON.stringify(data)===original,'Estado de dados restaurado exatamente');
+  add(d.querySelectorAll('.c10-rule-move-controls').length===d.querySelectorAll('#cats .rule').length,'Fallback reconstruído após re-render');
+  add(!w.sessionStorage.getItem('sin-city-gh-token'),'Runner não cria sessão GitHub');
+ }catch(error){checks.push({section:section||'Erro',ok:false,title:'Runner executado sem exceções',detail:error?.message||String(error)});}
+ let html='',last='';for(const c of checks){if(c.section!==last){last=c.section;html+=group(last)}html+=row(c.ok,c.title,c.detail)}results.innerHTML=html;
+ const passed=checks.filter(x=>x.ok).length;summary.className='status '+(passed===checks.length?'ok':'bad');summary.textContent=`${passed}/${checks.length} aprovados`;
+}
+frame.addEventListener('load',()=>setTimeout(run,2500));document.getElementById('run').addEventListener('click',run);
+</script></body></html>
