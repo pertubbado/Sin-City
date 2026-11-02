@@ -6,6 +6,16 @@
 window.DXStudiosShell = (function () {
   const VERSION = 'C11.0.1';
 
+  function ensureStylesheet() {
+    if (document.querySelector('link[data-dx-studios-shell]')) return true;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = './c11-dx-shell.css';
+    link.dataset.dxStudiosShell = VERSION;
+    document.head.appendChild(link);
+    return true;
+  }
+
   function setText(selector, text) {
     const el = document.querySelector(selector);
     if (el) el.textContent = text;
@@ -112,6 +122,7 @@ window.DXStudiosShell = (function () {
     const shell = document.querySelector('.shell');
     if (!shell) return false;
 
+    ensureStylesheet();
     document.documentElement.dataset.dxStudios = VERSION;
     document.body.classList.add('dx-studios');
     shell.classList.add('dx-shell');
@@ -123,11 +134,13 @@ window.DXStudiosShell = (function () {
     return true;
   }
 
+  ensureStylesheet();
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', install, {once:true});
   } else {
     install();
   }
 
-  return {version: VERSION, install};
+  return {version: VERSION, install, ensureStylesheet};
 })();
