@@ -1,11 +1,12 @@
-/* Sin City C10 — ponte de compatibilidade entre galeria de imagens e reordenação do Studio. */
+/* Sin City C10 — ponte robusta entre galeria de imagens e reordenação do Studio. */
 'use strict';
 
 window.SinCityImageReorderBridge = (function () {
-  const VERSION = 'C10.0-image-reorder-fix';
+  const VERSION = 'C10.0-image-reorder-fix-2';
   let observer = null;
-  let refreshFrame = 0;
-  let refreshing = false;
+  let observedRoot = null;
+  let rebuildFrame = 0;
+  let rebuilding = false;
 
   function imageMutation(mutation) {
     const target = mutation?.target;
@@ -26,46 +27,81 @@ window.SinCityImageReorderBridge = (function () {
     });
   }
 
-  function refresh() {
-    if (refreshing) return false;
+  function refreshControls() {
     const panel = document.getElementById('panel-rules');
     if (!panel) return false;
-    refreshing = true;
+    disableNativeImageDrag(panel);
+    try { window.SinCityOrdering?.refresh?.({preview:false}); } catch {}
+    try { window.SinCityFlowGuard?.syncRuleCodePolicy?.(); } catch {}
+    try { window.SinCityCategoryDrag?.refresh?.(); } catch {}
+    try { window.SinCitySubcategoryDrag?.refresh?.(); } catch {}
+    try { window.SinCityRuleDrag?.refresh?.(); } catch {}
+    try { window.SinCityRuleFallback?.refresh?.(); } catch {}
+    try { window.SinCityDragA11y?.refresh?.(); } catch {}
+    document.documentElement.dataset.sinCityImageReorderBridge = VERSION;
+    return true;
+  }
+
+  function observe() {
+    observedRoot = document.getElementById('cats') || document.getElementById('panel-rules');
+    if (!observedRoot) return false;
+    if (!observer) {
+      observer = new MutationObserver(mutations => {
+        if (rebuilding) return;
+        if (mutations.some(imageMutation)) scheduleRebuild();
+      });
+    }
+    observer.disconnect();
+    observer.observe(observedRoot, {childList:true, subtree:true});
+    return true;
+  }
+
+  function rebuildAfterImageChange(options={}) {
+    if (rebuilding) return false;
+    const panel = document.getElementById('panel-rules');
+    if (!panel) return false;
+
+    rebuilding = true;
+    const state = (() => {
+      try { return window.SinCityVisualState?.snapshot?.() || null; }
+      catch { return null; }
+    })();
+
+    observer?.disconnect();
     try {
+      if (typeof renderRules === 'function') renderRules();
+      if (typeof bindEditor === 'function') bindEditor();
+      refreshControls();
+      try { window.SinCityRuleImages?.refreshBindings?.(); } catch {}
+      try { window.SinCityVisualState?.restore?.(state); } catch {}
       disableNativeImageDrag(panel);
-      try { window.SinCityOrdering?.refresh?.({preview:false}); } catch {}
-      try { window.SinCityFlowGuard?.syncRuleCodePolicy?.(); } catch {}
-      try { window.SinCityCategoryDrag?.refresh?.(); } catch {}
-      try { window.SinCitySubcategoryDrag?.refresh?.(); } catch {}
-      try { window.SinCityRuleDrag?.refresh?.(); } catch {}
-      try { window.SinCityRuleFallback?.refresh?.(); } catch {}
-      try { window.SinCityDragA11y?.refresh?.(); } catch {}
+      if (options.preview !== false) {
+        try { if (typeof sendPreview === 'function') sendPreview(); } catch {}
+      }
       document.documentElement.dataset.sinCityImageReorderBridge = VERSION;
       return true;
     } finally {
-      refreshing = false;
+      rebuilding = false;
+      observe();
     }
   }
 
-  function scheduleRefresh() {
-    if (refreshFrame) return;
-    refreshFrame = requestAnimationFrame(() => {
-      refreshFrame = 0;
-      refresh();
+  function scheduleRebuild() {
+    if (rebuildFrame || rebuilding) return;
+    rebuildFrame = requestAnimationFrame(() => {
+      rebuildFrame = 0;
+      rebuildAfterImageChange({preview:true});
     });
   }
 
+  function refresh() {
+    return refreshControls();
+  }
+
   function install() {
-    const root = document.getElementById('cats') || document.getElementById('panel-rules');
-    if (!root) return false;
-    refresh();
-    if (!observer) {
-      observer = new MutationObserver(mutations => {
-        if (mutations.some(imageMutation)) scheduleRefresh();
-      });
-      observer.observe(root, {childList:true, subtree:true});
-    }
-    return true;
+    if (!document.getElementById('panel-rules')) return false;
+    refreshControls();
+    return observe();
   }
 
   function boot() {
@@ -81,5 +117,12 @@ window.SinCityImageReorderBridge = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
   else boot();
 
-  return {version:VERSION, refresh, install, disableNativeImageDrag};
+  return {
+    version:VERSION,
+    refresh,
+    install,
+    refreshControls,
+    rebuildAfterImageChange,
+    disableNativeImageDrag
+  };
 })();
