@@ -3,6 +3,7 @@
 
 window.SinCityRuleDrag = (function () {
   const VERSION = 'C10.0.5';
+  const DRAG_IMAGE_STRATEGY = 'handle-only';
   let dragState = null;
   let refreshFrame = 0;
   let observer = null;
@@ -109,6 +110,17 @@ window.SinCityRuleDrag = (function () {
     };
   }
 
+  function applyLightweightDragImage(event, handle) {
+    if (!event?.dataTransfer || !handle) return false;
+    try {
+      const rect = handle.getBoundingClientRect();
+      event.dataTransfer.setDragImage(handle, Math.max(8, Math.min(28, rect.width / 2 || 18)), Math.max(6, Math.min(18, rect.height / 2 || 12)));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   function onDragStart(event, ruleCard, context, fromIndex, handle) {
     if (!engineReady() || fromIndex < 0) {
       event.preventDefault();
@@ -121,15 +133,15 @@ window.SinCityRuleDrag = (function () {
       label: ruleLabel(ruleCard, fromIndex)
     };
 
-    ruleCard.classList.add('c10-rule-dragging');
-    document.documentElement.dataset.c10RuleDragging = 'true';
-    handle.setAttribute('aria-grabbed', 'true');
-
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
       try { event.dataTransfer.setData('text/plain', `${dragState.containerKey}:${dragState.from}`); } catch {}
-      try { event.dataTransfer.setDragImage(ruleCard, 26, 16); } catch {}
+      applyLightweightDragImage(event, handle);
     }
+
+    ruleCard.classList.add('c10-rule-dragging');
+    document.documentElement.dataset.c10RuleDragging = 'true';
+    handle.setAttribute('aria-grabbed', 'true');
   }
 
   function onDragOver(event, ruleCard, targetContext) {
@@ -199,6 +211,7 @@ window.SinCityRuleDrag = (function () {
     else handle.dataset.subcategoryIndex = String(context.subcategoryIndex);
     handle.dataset.ruleIndex = String(index);
     handle.dataset.ruleContainer = context.containerKey;
+    handle.dataset.c10DragImage = DRAG_IMAGE_STRATEGY;
     handle.title = `Arrastar ${label} para outra posição neste bloco`;
     handle.setAttribute('aria-label', `Arrastar ${label} dentro deste mesmo bloco de regras.`);
     handle.setAttribute('aria-grabbed', 'false');
@@ -283,10 +296,12 @@ window.SinCityRuleDrag = (function () {
 
   return {
     version: VERSION,
+    dragImageStrategy: DRAG_IMAGE_STRATEGY,
     refresh,
     install,
     computeDropIndex,
     sameContainer,
+    applyLightweightDragImage,
     clearDragState,
     isDragging: () => Boolean(dragState)
   };
