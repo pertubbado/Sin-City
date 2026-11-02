@@ -28,22 +28,14 @@ window.SinCityVisualState = (function () {
     if (active && active !== document.body && active instanceof HTMLElement) {
       const categoryCard = active.closest('details.item');
       const subcard = active.closest('details.subitem');
-      const ruleCard = active.closest('.rule');
       focus = {
         categoryId: String(categoryCard?.dataset.categoryId || ''),
         subcategoryId: String(subcard?.dataset.subcategoryId || ''),
-        ruleScope: String(ruleCard?.dataset.c10RuleScope || ''),
-        ruleContainer: String(ruleCard?.dataset.c10RuleContainer || ''),
         selector: active.matches('input,textarea,select,button') ? active.tagName.toLowerCase() + (active.getAttribute('data-k') ? `[data-k="${CSS.escape(active.getAttribute('data-k'))}"]` : '') : ''
       };
     }
 
-    return {
-      openCategories,
-      openSubcategories,
-      scrollTop: Number(workspace?.scrollTop || 0),
-      focus
-    };
+    return {openCategories,openSubcategories,scrollTop:Number(workspace?.scrollTop || 0),focus};
   }
 
   function restore(state) {
@@ -56,10 +48,7 @@ window.SinCityVisualState = (function () {
       if (categorySet.has(categoryId)) card.open = true;
       [...card.querySelectorAll(':scope > .sub-list > details.subitem')].forEach(subcard => {
         const subcategoryId = String(subcard.dataset.subcategoryId || '');
-        if (subcategorySet.has(subcategoryId)) {
-          card.open = true;
-          subcard.open = true;
-        }
+        if (subcategorySet.has(subcategoryId)) { card.open = true; subcard.open = true; }
       });
     });
 
@@ -69,11 +58,10 @@ window.SinCityVisualState = (function () {
     const focus = state.focus;
     if (focus?.selector) {
       let root = document;
-      if (focus.categoryId) root = [...categoryCards()].find(card => card.dataset.categoryId === focus.categoryId) || root;
+      if (focus.categoryId) root = categoryCards().find(card => card.dataset.categoryId === focus.categoryId) || root;
       if (focus.subcategoryId) root = [...root.querySelectorAll('details.subitem')].find(card => card.dataset.subcategoryId === focus.subcategoryId) || root;
       try { root.querySelector(focus.selector)?.focus({preventScroll:true}); } catch {}
     }
-
     return true;
   }
 
@@ -81,17 +69,13 @@ window.SinCityVisualState = (function () {
     if (document.getElementById('c10VisualStateStyles')) return;
     const style = document.createElement('style');
     style.id = 'c10VisualStateStyles';
-    style.textContent = `
-      .c10-moved-highlight{animation:c10MovedHighlight 1.45s ease-out}
-      @keyframes c10MovedHighlight{0%{outline:2px solid #d0d6df;outline-offset:4px;box-shadow:0 0 0 5px #ffffff12}100%{outline-color:transparent;box-shadow:none}}
-    `;
+    style.textContent = `.c10-moved-highlight{animation:c10MovedHighlight 1.45s ease-out}@keyframes c10MovedHighlight{0%{outline:2px solid #d0d6df;outline-offset:4px;box-shadow:0 0 0 5px #ffffff12}100%{outline-color:transparent;box-shadow:none}}`;
     document.head.appendChild(style);
   }
 
   function highlightMoved(meta={}) {
     installStyles();
     let target = null;
-
     if (meta.kind === 'category' && meta.id) {
       target = categoryCards().find(card => card.dataset.categoryId === meta.id) || null;
     } else if (meta.kind === 'subcategory' && meta.id) {
@@ -104,62 +88,40 @@ window.SinCityVisualState = (function () {
         categoryCards().forEach((categoryCard, ci) => {
           if (target) return;
           if (meta.kind === 'direct-rule') {
-            const rules = data.categories?.[ci]?.rules || [];
-            const ri = rules.indexOf(meta.ruleRef);
+            const ri = (data.categories?.[ci]?.rules || []).indexOf(meta.ruleRef);
             if (ri >= 0) target = [...categoryCard.querySelectorAll(':scope > .direct-list > .rule')][ri] || null;
           } else {
             [...categoryCard.querySelectorAll(':scope > .sub-list > details.subitem')].forEach((subcard, si) => {
               if (target) return;
-              const rules = data.categories?.[ci]?.subcategories?.[si]?.rules || [];
-              const ri = rules.indexOf(meta.ruleRef);
+              const ri = (data.categories?.[ci]?.subcategories?.[si]?.rules || []).indexOf(meta.ruleRef);
               if (ri >= 0) target = [...subcard.querySelectorAll(':scope > .rule')][ri] || null;
             });
           }
         });
       }
     }
-
     if (!target) return false;
-    target.classList.remove('c10-moved-highlight');
-    void target.offsetWidth;
-    target.classList.add('c10-moved-highlight');
-    clearTimeout(highlightTimer);
-    highlightTimer = setTimeout(() => target?.classList?.remove('c10-moved-highlight'), 1500);
+    target.classList.remove('c10-moved-highlight'); void target.offsetWidth; target.classList.add('c10-moved-highlight');
+    clearTimeout(highlightTimer); highlightTimer=setTimeout(()=>target?.classList?.remove('c10-moved-highlight'),1500);
     return true;
   }
 
   function refreshImageBindings() {
-    try {
-      return window.SinCityRuleImages?.refreshBindings?.() || [];
-    } catch {
-      return [];
-    }
+    try { return window.SinCityRuleImages?.refreshBindings?.() || []; } catch { return []; }
   }
 
   function afterRender(state, meta={}, options={}) {
     try { window.SinCityOrdering?.refresh?.({preview:false}); } catch {}
     try { window.SinCityFlowGuard?.flush?.(); } catch {}
     refreshImageBindings();
-    try { window.SinCityCategoryDrag?.refresh?.(); } catch {}
-    try { window.SinCitySubcategoryDrag?.refresh?.(); } catch {}
-    try { window.SinCityRuleDrag?.refresh?.(); } catch {}
+    try { window.SinCityRuleFallback?.refresh?.(); } catch {}
     restore(state);
     highlightMoved(meta);
-    if (options.preview !== false) {
-      try { if (typeof sendPreview === 'function') sendPreview(); } catch {}
-    }
+    if (options.preview !== false) { try { if (typeof sendPreview === 'function') sendPreview(); } catch {} }
     document.documentElement.dataset.sinCityVisualState = VERSION;
   }
 
   installStyles();
   document.documentElement.dataset.sinCityVisualState = VERSION;
-
-  return {
-    version: VERSION,
-    snapshot,
-    restore,
-    highlightMoved,
-    refreshImageBindings,
-    afterRender
-  };
+  return {version:VERSION,snapshot,restore,highlightMoved,refreshImageBindings,afterRender};
 })();
