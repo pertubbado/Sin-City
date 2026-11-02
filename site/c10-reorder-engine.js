@@ -2,16 +2,15 @@
 'use strict';
 
 window.SinCityReorderEngine = (function () {
-  const VERSION = 'C10.0.6';
+  const VERSION = 'C10.0.2';
+  const INTEGRATION_VERSION = 'C10.0.6';
 
   function getData() {
     try { return typeof data !== 'undefined' && data && Array.isArray(data.categories) ? data : null; }
     catch { return null; }
   }
 
-  function validIndex(index, length) {
-    return Number.isInteger(index) && index >= 0 && index < length;
-  }
+  function validIndex(index, length) { return Number.isInteger(index) && index >= 0 && index < length; }
 
   function reorderArray(array, fromIndex, toIndex) {
     if (!Array.isArray(array)) return {moved:false, reason:'invalid-array'};
@@ -151,6 +150,7 @@ window.SinCityReorderEngine = (function () {
   }
 
   document.documentElement.dataset.sinCityReorderEngine = VERSION;
+  document.documentElement.dataset.sinCityReorderIntegration = INTEGRATION_VERSION;
 
-  return {version:VERSION,getData,reorderArray,moveCategoryTo,moveSubcategoryTo,moveDirectRuleTo,moveNestedRuleTo,moveRuleTo,syncEditor};
+  return {version:VERSION,integrationVersion:INTEGRATION_VERSION,getData,reorderArray,moveCategoryTo,moveSubcategoryTo,moveDirectRuleTo,moveNestedRuleTo,moveRuleTo,syncEditor};
 })();
