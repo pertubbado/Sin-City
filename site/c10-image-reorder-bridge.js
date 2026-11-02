@@ -1,8 +1,8 @@
-/* Sin City C10 — ponte robusta entre galeria de imagens e reordenação do Studio. */
+/* Sin City C10 — integração estável entre galeria de imagens e reordenação por ↑/↓. */
 'use strict';
 
 window.SinCityImageReorderBridge = (function () {
-  const VERSION = 'C10.0-image-reorder-fix-2';
+  const VERSION = 'C10.0-buttons-only';
   let observer = null;
   let observedRoot = null;
   let rebuildFrame = 0;
@@ -33,11 +33,7 @@ window.SinCityImageReorderBridge = (function () {
     disableNativeImageDrag(panel);
     try { window.SinCityOrdering?.refresh?.({preview:false}); } catch {}
     try { window.SinCityFlowGuard?.syncRuleCodePolicy?.(); } catch {}
-    try { window.SinCityCategoryDrag?.refresh?.(); } catch {}
-    try { window.SinCitySubcategoryDrag?.refresh?.(); } catch {}
-    try { window.SinCityRuleDrag?.refresh?.(); } catch {}
     try { window.SinCityRuleFallback?.refresh?.(); } catch {}
-    try { window.SinCityDragA11y?.refresh?.(); } catch {}
     document.documentElement.dataset.sinCityImageReorderBridge = VERSION;
     return true;
   }
@@ -60,13 +56,11 @@ window.SinCityImageReorderBridge = (function () {
     if (rebuilding) return false;
     const panel = document.getElementById('panel-rules');
     if (!panel) return false;
-
     rebuilding = true;
     const state = (() => {
       try { return window.SinCityVisualState?.snapshot?.() || null; }
       catch { return null; }
     })();
-
     observer?.disconnect();
     try {
       if (typeof renderRules === 'function') renderRules();
@@ -94,9 +88,7 @@ window.SinCityImageReorderBridge = (function () {
     });
   }
 
-  function refresh() {
-    return refreshControls();
-  }
+  function refresh() { return refreshControls(); }
 
   function install() {
     if (!document.getElementById('panel-rules')) return false;
@@ -117,12 +109,5 @@ window.SinCityImageReorderBridge = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
   else boot();
 
-  return {
-    version:VERSION,
-    refresh,
-    install,
-    refreshControls,
-    rebuildAfterImageChange,
-    disableNativeImageDrag
-  };
+  return {version:VERSION,refresh,install,refreshControls,rebuildAfterImageChange,disableNativeImageDrag};
 })();
